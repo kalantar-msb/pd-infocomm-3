@@ -1,0 +1,25 @@
+tmp/
+
+/workspace/clusters
+/workspace/**/run_metadata.json
+/workspace/setup_config.json
+workspace/runs/**/manifest.assembly.yaml
+/results/
+/out/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Go build output
+/bin/
+*.test
+
+# Editor and OS noise
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+
