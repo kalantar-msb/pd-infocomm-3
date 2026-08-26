@@ -1,0 +1,179 @@
+scenario:
+- name: pdinfocomm3
+
+  model:
+    name: meta-llama/Llama-3.3-70B-Instruct  # config.md row "Model"
+    shortName: meta-llama-llama-3.3-70b-instruct  # derived from model name
+    path: models/meta-llama/Llama-3.3-70B-Instruct  # derived from model name
+    huggingfaceId: meta-llama/Llama-3.3-70B-Instruct  # config.md row "Model"
+    size: 1Ti  # default estimate
+    maxModelLen: 131072  # config.md row "max_model_len"
+    blockSize: 16  # config.md row "block_size"
+    gpuMemoryUtilization: 0.9  # config.md row "gpu_memory_utilization"
+
+  vllmCommon:
+    flags:
+      enforceEager: false  # config.md row "enforce_eager"
+    # Required for the prefill pool to do anything: the
+    # --kv-transfer-config flag is gated on `enabled`, which
+    # defaults to false, so without this the prefill pod is
+    # never routed to and decode prefills its own requests.
+    kvTransfer:
+      enabled: true  # implied by prefill pod count; P/D requires a KV transfer backend
+      connector: NixlConnector  # framework default, stated explicitly (llm-d-benchmark defaults.yaml:56)
+      role: kv_both  # framework default, stated explicitly; kv_both is deprecated for NixlConnector but per-role values are not expressible (see #845)
+    # Sources the env file the preprocess init container writes. Without
+    # this the init container's work is discarded and NIXL initialises
+    # with no network or GPU-routing configuration -- the crashloop #848
+    # describes. The libcuda prologue must run before the source line.
+    preprocessScript: |
+      export LD_LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | sed ':a; N; $!ba; s/\n/:/g'):${LD_LIBRARY_PATH}
+      export LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | head -1):${LIBRARY_PATH}
+      . /shared-config/llmdbench_env.sh
+    volumes:
+    # Handoff between the preprocess init container (writes) and the
+    # vLLM container's preprocessScript (reads). Plain emptyDir, not
+    # memory-backed -- a few KB of shell exports.
+    - name: shared-config
+      type: emptyDir
+      emptyDir: {}
+    # Multi-GPU collectives use shared memory. The K8s default 64 MB
+    # /dev/shm is a latency-jitter and hang risk for a multi-GPU pod.
+    # medium: Memory is tmpfs, so this charges against the pod's
+    # memory limit -- see #850 before setting one below this size.
+    - name: dshm
+      type: emptyDir
+      emptyDir:
+        medium: Memory
+        sizeLimit: 16Gi
+    volumeMounts:
+    - name: shared-config
+      mountPath: /shared-config
+    - name: dshm
+      mountPath: /dev/shm
+
+  decode:
+    replicas: 2  # config.md row "Number of decode pods"
+    acceleratorType:
+      labelKey: nvidia.com/gpu.product
+      labelValue: NVIDIA-H100-80GB-HBM3  # lookup: HARDWARE_LABELS["H100_SXM_80GB"] via config.md row "decode GPU"
+    parallelism:
+      data: 1  # default (not in config.md)
+      dataLocal: 1  # default (not in config.md)
+      tensor: 4  # config.md row "tensor_parallel_size"
+      workers: 1  # single-node default (LWS pods per replica, not a parallelism degree)
+    vllm:
+      additionalFlags:
+      - "--max-num-seqs=256"  # config.md row "max_num_seqs"
+      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
+      - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"
+    # Computes network and GPU-routing values and writes them to the
+    # shared-config volume for preprocessScript to source. One unit with
+    # those two -- any one missing makes the other two inert (#848).
+    initContainers:
+    - name: preprocess
+      imageKey: benchmark
+      imagePullPolicy: Always
+      command: ["set_llmdbench_environment.py", "-e", "/shared-config/llmdbench_env.sh", "-i"]
+      # Required explicitly: init containers do not inherit
+      # vllmCommon.volumeMounts (_macros.j2:52-54).
+      volumeMounts:
+      - name: shared-config
+        mountPath: /shared-config
+    extraEnvVars:
+    # Diagnostics only -- NIXL init failures are otherwise silent in
+    # the worker log. Safe to drop if log volume becomes a problem.
+    - name: NIXL_LOG_LEVEL
+      value: debug
+    - name: NCCL_DEBUG
+      value: "INFO"
+    # NOT just a log level: set_llmdbench_environment.py:539-541 adds
+    # NVSHMEM_HCA_LIST to the generated env file only when this is not
+    # "none". Dropping it silently removes that entry.
+    - name: NVSHMEM_DEBUG
+      value: "INFO"
+    # Some or all of these are GENEROUS DEFAULTS, NOT measured -- see
+    # the per-value sources. Defaults' limits come from llm-d's
+    # pd-disaggregation guide. Watch for 'Reducing Torch parallelism
+    # from N threads to 1' in the pod log: that is CPU starvation, and
+    # it shows up as ITL noise rather than a failure.
+    #
+    # requests never exceed limits -- Kubernetes rejects such a pod.
+    # Both halves are stated because the framework default sets both,
+    # so emitting only limits would leave requests at the inherited
+    # 40Gi/4.
+    resources:
+      limits:
+        memory: '128Gi'  # sim2real-bootstrap default (UNMEASURED)
+        cpu: '32'  # sim2real-bootstrap default (UNMEASURED)
+      requests:
+        memory: '64Gi'  # sim2real-bootstrap default (UNMEASURED)
+        cpu: '16'  # sim2real-bootstrap default (UNMEASURED)
+
+  prefill:
+    enabled: true  # required: capacity planning defaults prefill to disabled with 0 replicas (pipeline/lib/capacity.py)
+    replicas: 1  # config.md row "Number of prefill pods"
+    acceleratorType:
+      labelKey: nvidia.com/gpu.product
+      labelValue: NVIDIA-H100-80GB-HBM3  # lookup: HARDWARE_LABELS["H100_SXM_80GB"] via config.md row "prefill GPU"
+    parallelism:
+      data: 1  # default (not in config.md)
+      dataLocal: 1  # default (not in config.md)
+      tensor: 4  # config.md row "tensor_parallel_size"
+      workers: 1  # single-node default (LWS pods per replica, not a parallelism degree)
+    vllm:
+      additionalFlags:
+      - "--max-num-seqs=256"  # config.md row "max_num_seqs"
+      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
+      - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"
+    # Computes network and GPU-routing values and writes them to the
+    # shared-config volume for preprocessScript to source. One unit with
+    # those two -- any one missing makes the other two inert (#848).
+    initContainers:
+    - name: preprocess
+      imageKey: benchmark
+      imagePullPolicy: Always
+      command: ["set_llmdbench_environment.py", "-e", "/shared-config/llmdbench_env.sh", "-i"]
+      # Required explicitly: init containers do not inherit
+      # vllmCommon.volumeMounts (_macros.j2:52-54).
+      volumeMounts:
+      - name: shared-config
+        mountPath: /shared-config
+    extraEnvVars:
+    # Diagnostics only -- NIXL init failures are otherwise silent in
+    # the worker log. Safe to drop if log volume becomes a problem.
+    - name: NIXL_LOG_LEVEL
+      value: debug
+    - name: NCCL_DEBUG
+      value: "INFO"
+    # NOT just a log level: set_llmdbench_environment.py:539-541 adds
+    # NVSHMEM_HCA_LIST to the generated env file only when this is not
+    # "none". Dropping it silently removes that entry.
+    - name: NVSHMEM_DEBUG
+      value: "INFO"
+    # Some or all of these are GENEROUS DEFAULTS, NOT measured -- see
+    # the per-value sources. Defaults' limits come from llm-d's
+    # pd-disaggregation guide. Watch for 'Reducing Torch parallelism
+    # from N threads to 1' in the pod log: that is CPU starvation, and
+    # it shows up as ITL noise rather than a failure.
+    #
+    # requests never exceed limits -- Kubernetes rejects such a pod.
+    # Both halves are stated because the framework default sets both,
+    # so emitting only limits would leave requests at the inherited
+    # 40Gi/4.
+    resources:
+      limits:
+        memory: '16Gi'  # sim2real-bootstrap default (UNMEASURED)
+        cpu: '8'  # sim2real-bootstrap default (UNMEASURED)
+      requests:
+        memory: '16Gi'  # sim2real-bootstrap default (UNMEASURED)
+        cpu: '8'  # sim2real-bootstrap default (UNMEASURED)
+
+  # Sidecar half of the connector decision the engine makes in
+  # vllmCommon.kvTransfer.connector. Both spellings come from one value
+  # (pd_plumbing.KV_CONNECTOR_*) so they cannot drift apart (#848).
+  routing:
+    connector: nixlv2  # framework default, stated explicitly
+

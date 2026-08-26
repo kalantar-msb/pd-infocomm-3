@@ -1,0 +1,60 @@
+# DISABLED BY DEFAULT. Bootstrap lists this stem in transfer.yaml's
+# `defaults.disable`; enabling it is deleting that one line.
+#
+# Elevated pod capabilities for NIXL memory registration.
+#
+# WHY OFF BY DEFAULT: this fragment cannot grant the permission it depends on. On
+# OpenShift the pod will not admit until someone runs, out of band,
+#   oc adm policy add-scc-to-user privileged -z <serviceaccount> -n <namespace>
+# so shipping it enabled would produce unschedulable pods on any cluster whose SCC
+# has not been widened. That is a worse failure than not asking for the capability.
+#
+# ONLY `IPC_LOCK` HAS A P/D JUSTIFICATION -- mlock / ibv_reg_mr for NIXL memory
+# registration. The other three are carried because they are what ran, not because
+# they were shown to be needed:
+#   SYS_RAWIO  gated on NCCL_ACS_DISABLE=1, which nothing in the pipeline sets.
+#   NET_ADMIN  applies only on multi-NIC nodes with same-subnet IPs.
+#   NET_RAW    only if the fping smoketest runs.
+# Trimming to IPC_LOCK alone would also shrink the SCC grant this fragment needs,
+# removing a real deployment obstacle. Worth testing; not yet tested.
+#
+# The keys land on the vLLM container (extraContainerConfig), not the pod, and are
+# duplicated across decode and prefill because both are per-role keys with no
+# vllmCommon equivalent. Keep the two copies in sync.
+#
+# `capabilities.add` is a list of SCALARS, so pipeline/lib/values.py `_merge_lists`
+# Tier 1 has any downstream layer REPLACE it wholesale rather than merge into it.
+# The defaults overlay is the first layer in resolve_baseline's chain, so if your
+# baseline or treatment overlay sets the same key it takes the whole list. Set the
+# capabilities HERE or set them entirely in your baseline; never split them.
+# (Allowlisted in tests/test_defaults_templates.py::_ALLOWED_SCALAR_LISTS.)
+#
+# Provenance: llm-d guides/pd-disaggregation/modelserver/gpu/vllm/base/
+# patch-{decode,prefill}.yaml. Upstream's shipped guides carry IPC_LOCK and
+# SYS_RAWIO in 8 of 9 scenarios; NET_ADMIN and NET_RAW in 4 of 9.
+#
+# scenario[0].name is realigned to the experiment baseline at merge time.
+scenario:
+- name: defaults
+  decode:
+    extraContainerConfig:
+      securityContext:
+        capabilities:
+          add:
+            - "IPC_LOCK"
+            - "SYS_RAWIO"
+            - "NET_ADMIN"
+            - "NET_RAW"
+        runAsGroup: 0
+        runAsUser: 0
+  prefill:
+    extraContainerConfig:
+      securityContext:
+        capabilities:
+          add:
+            - "IPC_LOCK"
+            - "SYS_RAWIO"
+            - "NET_ADMIN"
+            - "NET_RAW"
+        runAsGroup: 0
+        runAsUser: 0

@@ -1,0 +1,36 @@
+# DISABLED BY DEFAULT. Bootstrap lists this stem in transfer.yaml's
+# `defaults.disable`; enabling it is deleting that one line.
+#
+# Reserves an RDMA device on every model-server pod.
+#
+# WHY OFF BY DEFAULT: it did not work on the cluster it was written for. RoCE
+# derives its GIDs from the associated netdev's IP address, and the pod's network
+# namespace holds only `eth0` (OVN overlay) and `lo` -- so the `mlx5_*` GID tables
+# read all zeros from inside the pod, and adding `rc` to `ucxTls` fails NIXL
+# backend creation outright:
+#   uct_iface_open(rc_verbs/mlx5_0:1) failed: Address not valid
+# In that state these two keys reserve an allocatable `rdma/roce_gdr` device to
+# advertise a capability the pod cannot use, so the reservation is pure cost: the
+# scheduler is asked for a resource that changes nothing.
+#
+# BEFORE ENABLING, confirm your cluster gives the pod a usable RDMA path. Using
+# RoCE requires either hostNetwork or an RDMA-capable CNI (e.g. macvlan +
+# rdma-cni) that places a VF and its GID in the pod's netns. Without one of those,
+# leave this disabled and expect KV transfer over TCP-on-overlay -- which is
+# functional but materially slower, so measure `vllm:nixl_xfer_time_seconds`
+# rather than assuming a simulated transfer bandwidth.
+#
+# Both keys are required together: llm-d-benchmark adds the reservation to pod
+# specs only when `networkResource` AND `networkNr` are both non-empty
+# (config/templates/values/defaults.yaml:781-784). They default to "" upstream,
+# which is why this fragment is the thing that turns the reservation on at all.
+#
+# Provenance: llm-d's pd-disaggregation guide, which sets both keys; 3 of the 9
+# shipped upstream guide scenarios carry `networkResource`.
+#
+# scenario[0].name is realigned to the experiment baseline at merge time.
+scenario:
+- name: defaults
+  vllmCommon:
+    networkResource: "auto"
+    networkNr: "1"

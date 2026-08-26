@@ -1,0 +1,46 @@
+# DISABLED BY DEFAULT. Bootstrap lists this stem in transfer.yaml's
+# `defaults.disable`; enabling it is deleting that one line.
+#
+# Excludes specific InfiniBand/RoCE HCAs from NCCL, and caps UCX RMA rails.
+#
+# WHY OFF BY DEFAULT: the value is a literal device list for ONE cluster's cards.
+# A shipped default naming another cluster's devices would exclude the wrong ones,
+# which is worse than excluding none -- NCCL would skip working HCAs and fall back
+# to a slower transport, silently. THE LIST BELOW IS AN EXAMPLE, NOT A DEFAULT:
+# replace it with your own `ibv_devinfo` output before enabling.
+#
+# `mlxl5_7` IS CARRIED VERBATIM AND IS ALMOST CERTAINLY A TYPO for mlx5_7, which
+# would mean that device is NOT actually excluded. Kept as-is because it is what
+# ran in the configuration this was lifted from; fix it deliberately, together with
+# replacing the rest of the list, rather than by assuming the correction is safe.
+#
+# Duplicated across decode and prefill because `extraEnvVars` is a per-role key
+# with no vllmCommon equivalent. Keep the two copies in sync.
+#
+# SAFE TO COEXIST with vllm-keepalive.yaml, which also sets `prefill.extraEnvVars`:
+# the list is all-dicts with a common `name` field, so pipeline/lib/values.py
+# `_merge_lists` Tier 2b merges the two lists BY NAME rather than replacing. Both
+# fragments' variables reach the rendered pod. The same is true of the
+# NIXL/NCCL/NVSHMEM variables `sim2real assemble` emits from config.md (issue
+# #848) -- this fragment adds to them rather than displacing them.
+#
+# Provenance: llm-d guides/pd-disaggregation/modelserver/gpu/vllm/base/
+# patch-{decode,prefill}.yaml. NCCL_EXCLUDE_IB_HCA appears in 2 of the 9 shipped
+# upstream guide scenarios and UCX_MAX_RMA_RAILS in 1 -- it is cluster-tuning, not
+# framework boilerplate, which is the other half of why it ships off.
+#
+# scenario[0].name is realigned to the experiment baseline at merge time.
+scenario:
+- name: defaults
+  decode:
+    extraEnvVars:
+      - name: NCCL_EXCLUDE_IB_HCA
+        value: "mlx5_0,mlx5_2,mlx5_4,mlx5_8,mlxl5_7,mlx5_10,mlx5_12,mlx5_14,mlx5_16"
+      - name: UCX_MAX_RMA_RAILS
+        value: "1"
+  prefill:
+    extraEnvVars:
+      - name: NCCL_EXCLUDE_IB_HCA
+        value: "mlx5_0,mlx5_2,mlx5_4,mlx5_8,mlxl5_7,mlx5_10,mlx5_12,mlx5_14,mlx5_16"
+      - name: UCX_MAX_RMA_RAILS
+        value: "1"

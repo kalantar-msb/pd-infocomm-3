@@ -1,0 +1,206 @@
+kind: sim2real-transfer
+version: 3
+
+scenario: pdinfocomm3
+
+component:
+  repo: github.com/llm-d/llm-d-router
+  kind: EndpointPickerConfig
+  # Tag v0.9.0. `v0.9.0^{commit}` resolves to exactly this SHA (the tag is
+  # annotated, object dda86863), so the latest stable release and the pin in
+  # README.md, config.md, and all three arms' PINS headers are the same commit.
+  # Verified present at this ref: the 7-field Metrics struct
+  # (pkg/epp/framework/interface/datalayer/metrics.go), the scheduling picker
+  # plugin tree, and apix/config/v1alpha1/endpointpickerconfig_types.go.
+  ref: 5f4e762f341a5196393ce79f8a57c3e1900c4a6b
+  base_image:
+    hub: ghcr.io/llm-d
+    name: llm-d-router
+  build:
+    commands:
+      - "make build"
+      # The policy lands as a Picker plus a ProfileHandler, so both the
+      # scheduling core (which owns enforceScoreRange and the shared
+      # candidateEndpoints slice) and the scheduling plugin tree are in scope.
+      - "go test ./pkg/epp/scheduling/..."
+      - "go test ./pkg/epp/framework/plugins/scheduling/..."
+
+algorithms:
+  - name: causalsloexternality
+    source: algorithms/causal_slo_externality.go
+    defaults: baseline
+  - name: leastttftjoint
+    source: algorithms/least_ttft_joint.go
+    defaults: baseline
+  # algorithms/kairos_paper.go is deliberately NOT registered, per config.md §9.4,
+  # README.md ("Why Kairos is specified but not registered"), and the file's own
+  # header. It is blocked on a vLLM `num_pending_prefill_tokens` gauge (K1,
+  # config.md §5 signal 29). Reading zero does not add noise, it INVERTS the
+  # comparator: the eligibility gate is a disjunction, so zeroing the second
+  # operand degrades it from "exclude any node with a deflected prefill in flight"
+  # to "exclude only a node being chunk-prefilled this step", and the pool
+  # queue-wait term collapses to zero, making remote prefill look free. Both push
+  # the same way, so a zero-filled run measures a more aggressive relative of
+  # Kairos in the direction that makes it look worse -- a misreport, not a partial
+  # result. Add it with `sim2real translation append` once the gauge exists.
+
+baselines:
+  - name: baseline
+    scenario: baselines/baseline.yaml
+
+workloads:
+  - workloads/deep-research-single-turn.yaml
+  - workloads/interactive-chat-single-turn.yaml
+  - workloads/reasoning-single-turn.yaml
+
+blis_observe:
+  maxConcurrency: 10000  # source: config.md
+  timeout: 1800  # source: config.md
+  warmupRequests: 50  # source: config.md
+  prewarmDuration: "60s"  # source: config.md
+  # EMITTED AS config.md §8 STATES IT -- config.md §8 declares no extra flags.
+  #
+  # OPEN BLOCKER, inherited and unresolved: this is a P/D bundle (prefill 1 /
+  # decode 2, NixlConnector, routing.connector nixlv2) with the same three
+  # workloads as pd-infocomm-2, so the `min_tokens` blocker that bundle hit
+  # applies here unchanged. llm-d-router's nixlv2 connector clamps
+  # max_tokens/max_completion_tokens/max_output_tokens to 1 when building the
+  # prefill request (connector_nixlv2.go:495-499) but never touches min_tokens,
+  # while `blis observe` sets MinTokens = MaxOutputLen per request
+  # (observe_cmd.go:1441-1461). Every disaggregated request therefore reaches
+  # prefill with min_tokens > max_tokens=1 and vLLM rejects it:
+  #   ValueError: min_tokens must be less than or equal to max_tokens=1, got 228
+  #   POST /v1/completions HTTP/1.1" 400 Bad Request
+  #
+  # Three options, recorded at pd-infocomm-2 docs/signal-mapping.md §8.5, none
+  # resolved there:
+  #   (1) Fix llm-d-router -- strip min_tokens from the prefill body and restore
+  #       it for the decode leg, mirroring the connector's existing
+  #       stream/stream_options handling. THE CORRECT FIX. Same omission in
+  #       connector_mooncake.go:94 and connector_shared_storage.go:217.
+  #   (2) extraArgs: "--unconstrained-output" -- unblocks today, but sets
+  #       MinTokens=0 and omits max_tokens, so output runs to EOS bounded only by
+  #       max_model_len minus prompt. It CHANGES THE MEASURED QUANTITY: goodput is
+  #       a hard conjunction over TTFT, mean ITL, and E2E, and E2E scales in output
+  #       length against tau_e2e = 16 s. Common-mode across arms, so ORDERING
+  #       claims may survive; absolute values are NOT comparable to sim_results/.
+  #       pd-infocomm-2's realized record rejects it for measurement runs while its
+  #       own transfer.yaml carries it -- read that as an unblock under protest.
+  #   (3) Small BLIS patch -- MinTokens=0 while keeping MaxOutputLen. Preserves the
+  #       output-length spec. No flag exists today.
+  #
+  # Left empty here so the deviation is a decision on the record rather than an
+  # inherited default. If you take option (2), set it here, not by hand-editing
+  # generated PipelineRuns -- doing that is what previously stranded the setting
+  # outside the source.
+  extraArgs: ""  # source: sim2real-bootstrap default
+
+context:
+  text: |
+    Joint causal-SLO-externality P/D placement. The decision rule is a joint
+    argmin over (decode endpoint d, prefill placement p) of
+
+        J(d, p) = V * ( externality(d, p) - ownGood(d, p) ),   V = 8
+
+    with the capacity term disabled (the `causal_externality_no_capacity_v8`
+    controller, config.md §9.2). Candidates are priced by the smooth SLO value
+    they destroy among their residents, evaluated causally: every completion
+    model is gated on an admission window, so a resident finishing before the
+    arrival is admitted contributes exactly zero. That gating is what makes the
+    term an externality rather than another load proxy, and it is why the effect
+    survives on a fleet whose load signals are already balanced.
+
+    REQUIRED SHAPE -- a joint argmin over the cross product: D local candidates
+    plus D*P disaggregated candidates, scored on one scale in one argmin. This
+    CANNOT be a per-endpoint Scorer at this pin, for two independent reasons: a
+    scorer returns a per-endpoint map, so no pair can be named; and every scorer
+    contribution passes through the profile's score-range enforcement, which
+    clamps to [0,1], while J is signed and unbounded -- clamping collapses every
+    candidate with J <= 0 to one score, destroying the ranking rather than
+    degrading it. The comparator faces the same hazard for a different reason:
+    its objective is a latency in microseconds, non-negative and unbounded above.
+
+    PLACEMENT -- a custom Picker over a role-blind profile, which must also
+    ignore inherited scorer contributions for the same clamping reason.
+
+    THE HAZARD IS SILENT FALLBACK to the target's natural decode-first
+    decomposition: pick a decode endpoint with the stock scorer, then decide
+    placement. That is the simulation's decode-first ablation arm, so its cost is
+    measured rather than estimated -- +0.0485 equal-cell mean goodput in favour of
+    the joint shape, 95% CI [+0.0305, +0.0665], worst cell falling 0.918 -> 0.700
+    at h100_a100_realistic:interactive:medium_0p80. A port that keeps the stock
+    handler and moves J into a binary disaggregate() gate still runs, still
+    reports goodput, and is running a different algorithm. The decomposition
+    switch is kept reachable (config.md §10) because flipping it is the cheapest
+    on-cluster check that the joint shape survived the port.
+
+    Three settings are forced on an internal copy of the decider rather than
+    exposed as flags, so a port must hard-wire them: exact prefill overlap,
+    deployable resident estimates (censored N_out, never true remaining), and
+    collocated-prefill pricing (config.md §9.2).
+
+    THETA IS KEYED BY POD LABEL, NOT BY THE SCENARIO (config.md §5 signal 8, §2).
+    Per-GPU coefficients differ most in the per-iteration intercept -- 25 563.82 us
+    on A100 against 16 613.54 us on H100, a factor of 1.539 present on EVERY
+    iteration regardless of KV state -- so a wrong or defaulted GPU label is wrong
+    on every decision. Reject absent or unknown types; never default. Both
+    coefficient files must be transcribed into every arm's plugin config, keyed by
+    label value, so the A100 decode instance is priced correctly whether or not the
+    generated scenario names it.
+
+    FLEET CAPABILITY GAP, disclosed not silent (config.md §2). The campaign's
+    decode pool is genuinely heterogeneous -- instance_1 on H100, instance_2 on
+    A100 -- and that heterogeneity is the condition the mechanism exploits. The
+    scenario schema expresses one acceleratorType per role and has no construct
+    for per-instance hardware within a role, so the generated baseline names H100
+    for both roles and describes only instance_1. The A100 decode pod must be
+    deployed outside the generated scenario or the scenario hand-edited. This
+    bundle deliberately does not choose among config.md §2's options.
+
+    DECLARED DEGRADATION (D1): every cited margin was produced with the
+    scheduler-rollout TTFT model, whose per-request wait-queue inputs are
+    unobtainable at this pin -- the target exposes WaitingQueueSize, one integer.
+    The port substitutes the closed-form rollforward estimator, which past one
+    batch drain understates admission delay and so biases toward remote prefill.
+    A substitution counter is required, not optional: the fallback is acceptable,
+    the silence is the defect. Net direction across all declared degradations is
+    NOT known and is NOT claimed -- D1 biases remote, D2b and D2c bias local.
+    See README.md, "Pre-registered expectation" and "Open threats to validity".
+  files:
+    - README.md
+    - config.md
+    - inputs/coeffs-llama70b-h100-tp4.json
+    - inputs/coeffs-llama70b-a100real-tp4.json
+    - inputs/hetero-realistic-1p2d.yaml
+
+defaults:
+  # These four ship DISABLED. Each is copied into baselines/defaults/ so there is
+  # something to enable rather than reinvent, but none can be a correct always-on
+  # default. Enabling one is deleting its line.
+  #   nic-exclusion            -- a literal device list for one cluster's cards
+  #   pod-capabilities         -- needs an out-of-band `oc adm policy add-scc-to-user
+  #                               privileged`; enabled-by-default yields unschedulable pods
+  #   preserve-request-id      -- an Istio EnvoyFilter selecting a hardcoded gateway
+  #                               name; under epponly + externallyManaged no Gateway is
+  #                               deployed, so it matches nothing, and it is the only
+  #                               fragment using extraObjects so the only one that can
+  #                               fail at APPLY time rather than being silently inert
+  #   rdma-device-reservation  -- reserves an rdma/roce_gdr the pod netns cannot use
+  disable:
+    - nic-exclusion
+    - pod-capabilities
+    - preserve-request-id
+    - rdma-device-reservation
+  # Available fragments (filename stems in baselines/defaults/):
+  #   - epp-verbosity
+  #   - epponly
+  #   - externally-managed-gateway
+  #   - model-pvc-size
+  #   - nic-exclusion               (ships disabled)
+  #   - pod-capabilities            (ships disabled)
+  #   - preserve-request-id         (ships disabled)
+  #   - rdma-device-reservation     (ships disabled)
+  #   - routing-proxy-resources
+  #   - tokenizer-sidecar
+  #   - vllm-keepalive
+  #   - vllm-logging

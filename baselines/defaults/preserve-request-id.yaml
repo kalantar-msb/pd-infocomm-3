@@ -1,0 +1,44 @@
+# DISABLED BY DEFAULT. Bootstrap lists this stem in transfer.yaml's
+# `defaults.disable`; enabling it is deleting that one line.
+#
+# Workaround: preserve external request-id so requests can be correlated to pods/nodes.
+# See docs/troubleshooting.md "Correlate requests with pods (and hence nodes)".
+#
+# WHY OFF BY DEFAULT (issue #853): the `workloadSelector` below names a Kubernetes
+# Gateway by label. Under this bundle's default topology — `gateway.className:
+# epponly` (epponly.yaml) with `externallyManaged: true`
+# (externally-managed-gateway.yaml) — no Gateway is deployed at all; the EPP's Envoy
+# sidecar is the whole data plane, so the filter matches nothing. It also requires
+# Istio CRDs to be present.
+#
+# It is additionally the ONLY fragment using `extraObjects` (free-form Kubernetes
+# manifests), which makes it the only one that can fail at *apply* time rather than
+# being silently inert. Enable it only under an Istio-managed Gateway whose name
+# matches the selector below.
+#
+# scenario[0].name is realigned to the experiment baseline at merge time.
+scenario:
+- name: defaults
+  extraObjects:
+    - apiVersion: networking.istio.io/v1alpha3
+      kind: EnvoyFilter
+      metadata:
+        name: preserve-external-request-id
+      spec:
+        workloadSelector:
+          labels:
+            gateway.networking.k8s.io/gateway-name: infra-llmdbench-inference-gateway
+        configPatches:
+          - applyTo: NETWORK_FILTER
+            match:
+              context: GATEWAY
+              listener:
+                filterChain:
+                  filter:
+                    name: envoy.filters.network.http_connection_manager
+            patch:
+              operation: MERGE
+              value:
+                typed_config:
+                  "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                  preserve_external_request_id: true

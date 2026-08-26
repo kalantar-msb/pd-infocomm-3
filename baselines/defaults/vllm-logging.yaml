@@ -1,0 +1,51 @@
+# Restore vLLM's own default for the uvicorn access log, which llm-d-benchmark
+# inverts.
+#
+# WHAT THE LOG IS. uvicorn is the ASGI server under vLLM's OpenAI-compatible API
+# server; its access log emits one line per HTTP request:
+#   INFO: 10.x.x.x:54321 - "POST /v1/completions HTTP/1.1" 400 Bad Request
+# Without it the engine log still shows an exception but not which requests were
+# rejected, on which pod, or at what rate.
+#
+# THE TWO DEFAULTS, AND THE INVERSION:
+#   vLLM             `disable_uvicorn_access_log: bool = False` on FrontendArgs
+#                    ("Disable uvicorn access log.")             -> log ON
+#   llm-d-benchmark  `vllmCommon.flags.disableUvicornAccessLog: true`
+#                    (config/templates/values/defaults.yaml:789), gated at
+#                    _macros.j2:100 / :364 and emitting
+#                    --disable-uvicorn-access-log at :154 / :397 for BOTH roles
+#                                                                -> log OFF
+# Line refs are against the pinned llm-d-benchmark (see the `llm-d-benchmark`
+# submodule SHA). This fragment puts vLLM back on its own default.
+#
+# USE THE TYPED KEY, NOT additionalFlags. A previous version of this fragment set
+#     decode: {vllm: {additionalFlags: ["--no-disable-uvicorn-access-log"],
+#                     loggingLevel: INFO}}
+# and both keys were inert:
+#   - `additionalFlags` is a list of scalars, so pipeline/lib/values.py
+#     `_merge_lists` Tier 1 has the overlay REPLACE the base. This fragment is
+#     the FIRST layer in resolve_baseline's chain, and both `baselines/<name>.yaml`
+#     and the translate-generated baseline overlay set that same list downstream
+#     -- so the fragment's entry was discarded before it could reach the command.
+#     No scalar-list key can usefully be set from this layer at all.
+#   - `loggingLevel: INFO` is already the framework default twice over
+#     (defaults.yaml:51 `logging_level: &logging_level INFO`, plus a
+#     `default('INFO')` fallback at _macros.j2:230).
+# It was also decode-only, while the framework's suppression covers both roles --
+# so prefill served its requests with no access log at all. The typed
+# `vllmCommon.flags` key below is read per-role by the macro and fixes both.
+#
+# WHY THIS IS A FRAGMENT AND NOT PART OF baselines/<name>.yaml. It is a
+# framework-default override for diagnosability, not part of the measured
+# mechanism, so nothing in config.md declares it. Keeping it here means
+# `transfer.yaml: defaults.disable` can switch it off -- which matters, because
+# per-request logging is not free at high QPS: this is exactly the kind of
+# diagnostic you want during bring-up and may want off for a measurement run.
+# A key in baselines/<name>.yaml has no such switch.
+#
+# scenario[0].name is realigned to the experiment baseline at merge time.
+scenario:
+- name: defaults
+  vllmCommon:
+    flags:
+      disableUvicornAccessLog: false

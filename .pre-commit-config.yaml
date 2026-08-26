@@ -1,0 +1,48 @@
+# Secret-scan pre-commit hook, scaffolded by /sim2real-bootstrap (issue #822).
+#
+# This is the second layer behind sim2real's collect-time redactor
+# (pipeline/lib/redact.py, issue #819): the redactor knows what the pipeline
+# WRITES; this hook knows what is about to be COMMITTED. Different inputs,
+# different blind spots. Experiment repos track their workspace/ tree, so a
+# credential the redactor misses (a new key name, a hand-copied results tree,
+# a stray .env / kubeconfig) would otherwise land in public git history the
+# moment it is committed.
+#
+# The scan is whole-repo and blocking: detect-secrets fails the commit on any
+# unaudited finding. To activate it in a fresh clone:
+#
+#     pip install pre-commit detect-secrets
+#     pre-commit install
+#
+# Escape hatch for a known-clean commit the scanner false-positives on:
+#     git commit --no-verify
+# (prefer auditing the finding into .secrets.baseline over routine --no-verify)
+#
+# Retrofitting an already-committed repo: rotate/scrub any real secrets FIRST,
+# then regenerate the baseline over the cleaned tree:
+#     detect-secrets scan --baseline .secrets.baseline
+# Do NOT regenerate the baseline over a tree that still contains live tokens —
+# that audits the secret as "known" and permanently whitelists it.
+repos:
+  - repo: https://github.com/ibm/detect-secrets
+    # Pinned to match the shipped .secrets.baseline `version`. `pre-commit
+    # autoupdate` bumps this to the latest tag; regenerate the baseline if
+    # you do. Matches the ref used by llm-d-benchmark for consistency.
+    rev: 0.13.1+ibm.64.dss
+    hooks:
+      - id: detect-secrets # pragma: whitelist secret
+        # --use-all-plugins: run every detector, not just those recorded in
+        # the baseline, so new secret shapes are caught without editing this
+        # file. --baseline: audited known-safe hits live in .secrets.baseline.
+        #
+        # .secrets.baseline also tunes Base64HighEntropyString base64_limit to
+        # 4.25 (down from the 4.5 default). The HF token from issue #819 has
+        # Shannon entropy 4.391 — it slips past the default limit, but its
+        # base64-encoded twin (tokenBase64, 4.546) does not; 4.25 catches both
+        # representations. On the real leaked 933-line plan config, 4.25 added
+        # zero false positives (4.0 flagged file paths / namespaces). The hook
+        # honors this limit even under --use-all-plugins.
+        args: [--baseline, .secrets.baseline, --use-all-plugins]
+        # The baseline file records hashes of audited hits; scanning it would
+        # be circular. Everything else in the repo is in scope.
+        exclude: ^\.secrets\.baseline$
