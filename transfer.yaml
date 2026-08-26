@@ -18,12 +18,31 @@ component:
     name: llm-d-router
   build:
     commands:
-      - "make build"
-      # The policy lands as a Picker plus a ProfileHandler, so both the
-      # scheduling core (which owns enforceScoreRange and the shared
-      # candidateEndpoints slice) and the scheduling plugin tree are in scope.
-      - "go test ./pkg/epp/scheduling/..."
-      - "go test ./pkg/epp/framework/plugins/scheduling/..."
+    # 1. The component's own gates (Makefile:254-257, :266-270). Invoked
+    #    directly rather than via `make lint` / `make test-unit`, which run
+    #    inside the builder container image (image-build-builder) and are not
+    #    available to the translation writer.
+    - "make build"
+    - "go vet ./pkg/epp/framework/plugins/scheduling/profilehandler/... ./cmd/epp/runner/..."
+    - "golangci-lint run --config=./.golangci.yml ./pkg/epp/framework/plugins/scheduling/profilehandler/... ./cmd/epp/runner/..."
+    # `typos` is the second half of the repo's lint gate; omitted because the
+    # binary is not present in this environment. Run it manually before merge.
+
+    # 2. The new plugins' own packages. -count=1 is REQUIRED, not stylistic:
+    #    leastttftjoint/overlay_test.go:139 reads the treatment overlay with
+    #    os.ReadFile from outside the Go module, so it is not hashed into the
+    #    test cache key and a cached PASS can coexist with a known-bad overlay.
+    - "go test -count=1 ./pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/..."
+    - "go test -count=1 ./pkg/epp/framework/plugins/scheduling/profilehandler/leastttftjoint/..."
+    #    -race separately: the plugin keeps a shadow table written from a
+    #    response-body goroutine and read from the scheduling path.
+    - "go test -count=1 -race ./pkg/epp/framework/plugins/scheduling/profilehandler/..."
+
+    # 3. Blast radius: the trees the plugin depends on or could break, plus the
+    #    file it modifies for registration.
+    - "go test ./pkg/epp/scheduling/..."
+    - "go test ./pkg/epp/framework/..."
+    - "go build ./cmd/epp/..."
 
 algorithms:
   - name: causalsloexternality
@@ -120,8 +139,22 @@ context:
     degrading it. The comparator faces the same hazard for a different reason:
     its objective is a latency in microseconds, non-negative and unbounded above.
 
-    PLACEMENT -- a custom Picker over a role-blind profile, which must also
-    ignore inherited scorer contributions for the same clamping reason.
+    PLACEMENT -- TWO plugin registrations sharing state, not one plugin with two
+    interfaces. ProfileHandler.Pick and Picker.Pick share a method name with
+    different signatures (pkg/epp/framework/interface/scheduling/plugins.go:47,
+    :77), so no single Go type can satisfy both:
+
+      Handler: ProfileHandler (Pick, ProcessResults) + PreRequest +
+              ResponseBodyProcessor
+      Picker:  Filter + Picker
+
+    Filter is required, not incidental: Picker.Pick receives only
+    []*ScoredEndpoint and no request, so the arriving request's token count
+    reaches the argmin no other way. All profiles receive the same
+    candidateEndpoints slice (pkg/epp/scheduling/scheduler.go:78), so an
+    unfiltered profile sees both pools; ProfileRunResult.TargetEndpoints is a
+    slice (pkg/epp/framework/interface/scheduling/types.go:165-167), so one
+    picker run carries both picks.
 
     THE HAZARD IS SILENT FALLBACK to the target's natural decode-first
     decomposition: pick a decode endpoint with the stock scorer, then decide
