@@ -1,36 +1,63 @@
-# DISABLED BY DEFAULT. Bootstrap lists this stem in transfer.yaml's
-# `defaults.disable`; enabling it is deleting that one line.
+# Puts the model-server pods on the cluster's RDMA fabric, so KV-cache transfer
+# between prefill and decode moves over RoCE instead of the pod network.
 #
-# Reserves an RDMA device on every model-server pod.
+# Four settings, and they only do their job together:
 #
-# WHY OFF BY DEFAULT: it did not work on the cluster it was written for. RoCE
-# derives its GIDs from the associated netdev's IP address, and the pod's network
-# namespace holds only `eth0` (OVN overlay) and `lo` -- so the `mlx5_*` GID tables
-# read all zeros from inside the pod, and adding `rc` to `ucxTls` fails NIXL
-# backend creation outright:
-#   uct_iface_open(rc_verbs/mlx5_0:1) failed: Address not valid
-# In that state these two keys reserve an allocatable `rdma/roce_gdr` device to
-# advertise a capability the pod cannot use, so the reservation is pure cost: the
-# scheduler is asked for a resource that changes nothing.
+#   annotations      Attaches each pod to the SR-IOV network. This is what gives
+#                    the pod a real RDMA device -- a VF and its GID -- inside its
+#                    own network namespace.
+#   networkResource  Reserves one of those devices through the scheduler, so a pod
+#                    only lands on a node that still has one free.
+#   ucxTls           Allows UCX to use RDMA (`rc`) and takes `tcp` off the list, so
+#                    KV payload cannot quietly fall back to the pod network.
+#   UCX_LOG_LEVEL    Make UCX report which transport it actually chose, so "RDMA is
+#   UCX_PROTO_INFO   working" is something you can read rather than assume.
 #
-# BEFORE ENABLING, confirm your cluster gives the pod a usable RDMA path. Using
-# RoCE requires either hostNetwork or an RDMA-capable CNI (e.g. macvlan +
-# rdma-cni) that places a VF and its GID in the pod's netns. Without one of those,
-# leave this disabled and expect KV transfer over TCP-on-overlay -- which is
-# functional but materially slower, so measure `vllm:nixl_xfer_time_seconds`
-# rather than assuming a simulated transfer bandwidth.
+# Why all four: with no annotation the pod has no RDMA device, so the reservation
+# buys nothing and `rc` makes NIXL fail to start. With no ucxTls the device is
+# present but unused and transfers run over TCP. Take the whole fragment or none
+# of it.
 #
-# Both keys are required together: llm-d-benchmark adds the reservation to pod
-# specs only when `networkResource` AND `networkNr` are both non-empty
-# (config/templates/values/defaults.yaml:781-784). They default to "" upstream,
-# which is why this fragment is the thing that turns the reservation on at all.
+# The network name and the resource name below describe one specific cluster.
+# Both have to change for another one.
 #
-# Provenance: llm-d's pd-disaggregation guide, which sets both keys; 3 of the 9
-# shipped upstream guide scenarios carry `networkResource`.
+# To turn this off, add `rdma-device-reservation` to transfer.yaml's
+# `defaults.disable`. Expect KV transfer over TCP when it is off.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
+
 scenario:
 - name: defaults
   vllmCommon:
-    networkResource: "auto"
+    ucxTls: rc,sm,cuda_ipc,cuda_copy
+    networkResource: "rdma/roce_gdr"
+    # networkResource: "auto"
     networkNr: "1"
+
+  decode:
+    extraEnvVars:
+      - name: UCX_LOG_LEVEL
+        value: info
+      - name: UCX_PROTO_INFO
+        value: "y"
+      # this is default value
+      # - name: UCX_MAX_RMA_RAILS
+      #   value: "1"
+
+  prefill:
+    extraEnvVars:
+      - name: UCX_LOG_LEVEL
+        value: info
+      - name: UCX_PROTO_INFO
+        value: "y"
+      # this is default value
+      # - name: UCX_MAX_RMA_RAILS
+      #   value: "1"
+
+  annotations:
+    decode:
+      pod:
+        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute
+    prefill:
+      pod:
+        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute

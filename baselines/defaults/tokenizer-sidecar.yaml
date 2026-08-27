@@ -1,67 +1,28 @@
-# Enable the chart's vLLM render sidecar in the EPP pod, so a token-producer
-# plugin's `http://localhost:8000` actually resolves.
+# Runs a CPU-only vLLM "render" container in the EPP pod, so a token-producer
+# plugin's http://localhost:8000 has something answering it. That is what turns a
+# prompt into the token count the EPP needs to make a P/D decision.
 #
-# ONLY NEEDED IF YOUR ARMS USE A token-producer PLUGIN. If no generated
-# `<algo>_config.yaml` declares one, add `tokenizer-sidecar` to
-# `transfer.yaml: defaults.disable` -- this fragment then only costs you a CPU
-# container in the EPP pod. Making the emission conditional on the plugin list is
-# tracked as inference-sim/sim2real#840.
+# Only needed if your arms declare a token-producer plugin. If none do, add
+# `tokenizer-sidecar` to transfer.yaml's `defaults.disable`; leaving it on costs
+# an idle container in the EPP pod and nothing else.
 #
-# WHY IT IS REQUIRED WHEN IT IS REQUIRED, and why the failure is silent. A plugin
-# config that declares
-#   - type: token-producer
-#     parameters: {modelName: ..., vllm: {url: "http://localhost:8000"}}
-# has nothing serving port 8000 inside the EPP pod, because
-# `router.tokenizer.enabled` defaults to false (routerlib values.yaml:78-79,
-# v0.9.0). The consequence is silent rather than loud: with no TokenizedPrompt,
-# `getUserInputLenInTokens` returns 0 WITH NO ERROR, so a P/D decider comparing it
-# against a non-cached-token threshold answers "no disaggregated PD" for EVERY
-# request -- logged only at DEBUG(4), i.e. invisible at the verbosity
-# epp-verbosity.yaml sets. The observable signature is a run with thousands of
-# requests and zero prefill selections.
+# When it is needed and missing, the failure is silent rather than loud. With
+# nothing on port 8000 the token count comes back as 0 with no error, so a decider
+# comparing it against a threshold answers "no disaggregation" for every request.
+# The signature is a run with thousands of requests and zero prefill selections.
 #
-# WHAT THIS ADDS: a `vllm-render` container in the EPP pod running
-# `vllm launch render <modelName> --port=8000` from docker.io/vllm/vllm-openai-cpu
-# -- CPU-only, so it consumes no GPU. `modelName` is deliberately left unset;
-# render_plans `_normalize_router_block` fills it from `model.name`.
+# Two settings below you may need to change:
 #
-# HF_TOKEN OVERRIDE. The chart points this sidecar at secret `llm-d-hf-token`
-# (routerlib values.yaml:89-94). Change the secret name below to whatever your
-# namespace actually has, and note that a gated model repo makes the override
-# mandatory rather than cosmetic -- without a usable token the render container
-# cannot pull the tokenizer.
+#   HF_TOKEN  reads a secret named `hf-secret`. Point it at whatever your namespace
+#             actually has. A gated model repo makes this mandatory -- without a
+#             usable token the container cannot pull the tokenizer.
+#   HF_HOME   is /tmp/hf because the cache has to be writable by whatever UID the
+#             cluster assigns the container. If it is not writable the container
+#             crash-loops, which holds the EPP below ready and fails the whole run
+#             on a sidecar the model servers never needed.
 #
-# HF_HOME. Set explicitly to a world-writable path, and NOT to the chart's own
-# cache mount. The chart mounts an emptyDir named model-cache at
-# /root/.cache/huggingface (routerlib templates/_deployment.yaml) and never sets
-# HF_HOME, so that path is the HF cache ONLY IF HOME=/root -- i.e. only when the
-# container runs as root. Under an OpenShift SCC that forces a high random
-# runAsUser with runAsNonRoot, that UID has no /etc/passwd entry, HOME resolves to
-# `/`, HuggingFace resolves its cache to /.cache, and the download dies with
-#   OSError: PermissionError at /.cache when downloading <model>.
-# Pointing HF_HOME at the chart's mount does not help either: /root is mode 0700
-# owned by root, so a non-root UID cannot traverse into it, and the error just
-# moves to "PermissionError at /root/.cache". The emptyDir itself is writable (the
-# pod fsGroup applies to it) but the path leading to it is not, so no value of
-# HF_HOME makes that mount usable. The volume is therefore left unused and the
-# cache lands in the container's writable layer -- a few MB of config.json +
-# tokenizer.json, re-fetched on restart. /tmp is mode 1777 and the container sets
-# no readOnlyRootFilesystem, so it is writable by any UID.
-#
-# WHY THIS MATTERS FOR STANDUP, not just for the plugin: with the cache
-# unwritable, vllm-render CrashLoopBackOffs, which holds the EPP below ready and
-# makes standup fail fast with "Inference pool not ready: Pod(s) in terminal
-# failure state" -- so the whole run fails on a sidecar the model servers do not
-# need.
-#
-# PREFLIGHT after deploy:
-#   - `curl -s localhost:8000/v1/models` from inside the EPP pod succeeds
-#   - the EPP log does NOT contain "auto-created default producer" naming
-#     token-producer (which would mean the estimate backend is in the path)
-#
-# KNOWN VERSION SKEW: the sidecar image tag defaults to a vllm-openai-cpu build
-# that may lag the vllm-openai tag the model servers run. Token counts normally
-# agree; pin the sidecar tag to match if that assumption matters for your arms.
+# After deploy, `curl -s localhost:8000/v1/models` from inside the EPP pod should
+# succeed.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:

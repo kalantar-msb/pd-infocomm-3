@@ -1,19 +1,14 @@
-# DISABLED BY DEFAULT. Bootstrap lists this stem in transfer.yaml's
-# `defaults.disable`; enabling it is deleting that one line.
+# Installs an Istio EnvoyFilter that makes the Gateway keep the caller's
+# request id instead of replacing it, so a request can be traced to the pod and
+# node that served it.
 #
-# Workaround: preserve external request-id so requests can be correlated to pods/nodes.
-# See docs/troubleshooting.md "Correlate requests with pods (and hence nodes)".
+# Ships disabled. It selects a Kubernetes Gateway by label, and this bundle's
+# topology -- epponly with an externally-managed Gateway -- deploys no Gateway at
+# all, so the filter matches nothing. It also needs Istio CRDs present.
 #
-# WHY OFF BY DEFAULT (issue #853): the `workloadSelector` below names a Kubernetes
-# Gateway by label. Under this bundle's default topology — `gateway.className:
-# epponly` (epponly.yaml) with `externallyManaged: true`
-# (externally-managed-gateway.yaml) — no Gateway is deployed at all; the EPP's Envoy
-# sidecar is the whole data plane, so the filter matches nothing. It also requires
-# Istio CRDs to be present.
-#
-# It is additionally the ONLY fragment using `extraObjects` (free-form Kubernetes
-# manifests), which makes it the only one that can fail at *apply* time rather than
-# being silently inert. Enable it only under an Istio-managed Gateway whose name
+# It is the only fragment that ships free-form Kubernetes manifests
+# (`extraObjects`), which makes it the only one that can fail when applied rather
+# than just sit inert. Enable it only under an Istio-managed Gateway whose name
 # matches the selector below.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.

@@ -1,26 +1,16 @@
-# Size the model PVC for a large model.
+# Sizes the shared model PVC large enough for a 70B-class model.
 #
-# The framework defaults `storage.modelPvc.size` to 300Gi
-# (llm-d-benchmark config/templates/values/defaults.yaml:307 at the pinned SHA),
-# which cannot hold a 70B-class model as the download job fetches it: `hf download`
-# takes the WHOLE repo, so e.g. Llama-3.3-70B-Instruct lands as ~132 GiB of
-# safetensors plus ~131 GiB of original/*.pth that vLLM never reads. All nine
-# shipped llm-d-benchmark guide scenarios override this same default to 1Ti.
+# The framework default of 300Gi is smaller than what the download job actually
+# writes: it fetches the whole model repo, so a 70B model arrives as its
+# safetensors plus the original .pth files vLLM never reads.
 #
-# 1Ti IS NOT UNIVERSALLY CORRECT -- it is sized for a 70B-class model and is
-# wasteful for a small one. If your model is small, either lower this value or add
-# `model-pvc-size` to `transfer.yaml: defaults.disable` to fall back to the
-# framework's 300Gi. Deriving the size from the model rather than emitting a
-# constant is tracked as inference-sim/sim2real#840.
+# 1Ti is not universally right -- it is generous for a small model. Lower it, or
+# add `model-pvc-size` to transfer.yaml's `defaults.disable` to fall back to the
+# framework default.
 #
-# THIS ONLY SIZES A PVC THAT DOES NOT YET EXIST. An existing model-pvc is never
-# resized: `_check_existing_pvc` (llmdbenchmark/executor/step.py:331) fails standup
-# with "existing PVC is too small" rather than expanding it. Already-provisioned
-# namespaces need `kubectl patch pvc model-pvc` first.
-#
-# Keys must sit under scenario[0]: llm-d-benchmark's render_plans.py merges
-# "defaults -> shared -> stack", so only `scenario:` and `shared:` are read from a
-# scenario file's top level and any other top-level key is silently ignored.
+# This only sizes a PVC that does not exist yet. An existing model-pvc is never
+# resized; standup fails with "existing PVC is too small" instead. In a namespace
+# that already has one, patch the PVC by hand first.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:

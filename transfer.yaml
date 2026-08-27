@@ -255,9 +255,9 @@ defaults:
   #   rdma-device-reservation  -- reserves an rdma/roce_gdr the pod netns cannot use
   disable:
     - nic-exclusion
-    - pod-capabilities
+    # - pod-capabilities
     - preserve-request-id
-    - rdma-device-reservation
+    # - rdma-device-reservation
   # Available fragments (filename stems in baselines/defaults/):
   #   - epp-verbosity
   #   - epponly

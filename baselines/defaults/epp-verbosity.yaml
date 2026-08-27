@@ -1,34 +1,19 @@
-# Raise EPP log verbosity above the framework default for diagnosability.
-# See docs/troubleshooting.md "Increasing logging verbosity / EPP".
+# Raises the EPP's log verbosity so its routing decisions are visible.
 #
-# THE SCALE. llm-d-router's EPP logs through named constants, not raw numbers
-# (pkg/common/observability/logging/const.go:20-23, v0.9.0):
-#   DEFAULT = 2    VERBOSE = 3    DEBUG = 4    TRACE = 5
-# llm-d-benchmark defaults `router.epp.verbosity` to "1"
-# (config/templates/values/defaults.yaml:649 at the pinned SHA), i.e. below even
-# DEFAULT, so the EPP is near-silent out of the box.
+# The framework leaves the EPP near-silent. The scale is DEFAULT 2, VERBOSE 3,
+# DEBUG 4, TRACE 5; this sets 3.
 #
-# WHY "3" AND NOT "5". DEBUG(4) is by far the largest bucket of call sites in the
-# EPP, and the EPP sits in the request path -- so the logging costs CPU on every
-# request as well as disk. "5" turns on every DEBUG and TRACE site at once, which
-# in practice is more log volume than a run can carry.
+# 3 is a floor, not a taste. /sim2real-check reads `objectiveKey` and `priority`
+# off the EPP's "Request handled" lines, and those only appear at 3. Below that the
+# check has nothing to read and reports INAPPLICABLE.
 #
-# "3" IS THE FLOOR, NOT A PREFERENCE. /sim2real-check S5c.6 (InferenceObjective
-# resolution at runtime) reads `objectiveKey` and `priority` off `Request handled`
-# lines, which are attached under V(logging.VERBOSE) -- i.e. exactly 3. At "3"
-# that check runs; below "3" it reports INAPPLICABLE and the run loses its
-# objective-resolution evidence. Do not lower this without accepting that.
+# Chasing a prefill-selection problem, go to 4 -- that is where the P/D decider
+# explains itself. 5 turns on every TRACE site at once, usually more log volume
+# than a run can carry, so use it only for a call site you have already found.
 #
-# ESCALATING. "3" stops BELOW the level where the P/D decider explains itself
-# (prefix_based_pd_decider.go uses V(logging.DEBUG)), so the escalation for
-# prefill-selection problems is "4" -- which keeps the decider diagnostics and
-# still drops every TRACE site. Reach for "5" only for a specific TRACE-level
-# call site you have already identified.
-#
-# WHY THIS IS A FRAGMENT AND NOT PART OF baselines/<name>.yaml. Verbosity is a
-# diagnostic, not part of the measured mechanism, so nothing in config.md declares
-# it. Keeping it here means `transfer.yaml: defaults.disable` can switch it off
-# for a measurement run; a key in baselines/<name>.yaml has no such switch.
+# The EPP sits in the request path, so this costs CPU per request as well as disk.
+# It is a fragment rather than baseline content so a measurement run can switch it
+# off with transfer.yaml's `defaults.disable`.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:

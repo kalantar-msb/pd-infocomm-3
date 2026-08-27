@@ -1,48 +1,18 @@
-# Workaround: raise vLLM's HTTP keep-alive above the routing sidecar's idle
-# connection timeout, on the prefill leg.
+# Raises vLLM's HTTP keep-alive timeout on the prefill leg, so the routing sidecar
+# stops reusing connections vLLM has already closed.
 #
-# THE MISMATCH, both sides verified in source:
-#   - the routing sidecar holds idle connections for 90s:
-#     `t.IdleConnTimeout = 90 * time.Second` on a cloned http.DefaultTransport with
-#     unlimited idle conns (llm-d-router v0.9.0, pkg/sidecar/proxy/proxy.go:415)
-#   - vLLM closes them after 5s: `VLLM_HTTP_TIMEOUT_KEEP_ALIVE: int = 5` in
-#     vllm/envs.py ("Timeout in seconds for keeping HTTP connections alive in API
-#     server")
-# A Go transport pooling sockets for 90s against a server that drops them at 5s
-# reuses connections the server has already closed, and the reuse fails with a
-# TCP RST.
+# The sidecar holds idle connections for 90s and vLLM drops them after 5s. When the
+# sidecar reuses one in that window the request dies on a TCP reset. 120 gives the
+# server the longer timeout of the two.
 #
-# PROVENANCE OF 120. It is llm-d-benchmark's own default, not a number picked here:
-# config/templates/jinja/_macros.j2 emits
-#     - name: VLLM_HTTP_TIMEOUT_KEEP_ALIVE
-#       value: "{{ config.vllm.httpTimeoutKeepAlive | default(120) }}"
-# unconditionally into every model-server container, for both roles. Added in
-# llm-d-benchmark 28cfc06 (#1675).
+# Prefill only: the decode connection sees traffic on nearly every request and
+# rarely idles that long, while the prefill connection idles whenever nothing
+# disaggregates. Extending it to decode would be reasonable.
 #
-# WHY THIS FRAGMENT STILL EXISTS GIVEN THAT MACRO: sim2real's llm-d-benchmark pin
-# predates it. `git grep -i http_timeout_keep_alive` over the pinned tree returns
-# nothing, so on the version that actually renders these pods nothing sets the
-# variable and vLLM's 5s default applies. This fragment is load-bearing today.
-#
-# WHEN TO DELETE IT: once the llm-d-benchmark pin advances past 28cfc06. Tracked
-# with the exact removal conditions as inference-sim/sim2real#838. At that point
-# the macro supplies 120 on both roles and this fragment becomes redundant, and the
-# first-class way to express a NON-default value becomes the per-role key
-# `prefill.vllm.httpTimeoutKeepAlive` rather than an extraEnvVars entry. Setting it
-# via extraEnvVars once the macro exists appends a second env entry for the same
-# name in the rendered container (last one wins) -- harmless but a smell. Do NOT
-# switch to the first-class key before the pin moves: at the pinned version nothing
-# reads it, so the change would silently drop prefill back to 5s.
-#
-# PREFILL ONLY, and why: the decode leg is localhost inside the sidecar's own pod
-# and sees traffic on nearly every request, so its connections rarely idle past 5s,
-# while the prefill connection idles whenever no request disaggregates. Widening
-# this to decode would be defensible and closer to what the macro does.
-#
-# Inert until KV transfer is enabled in baselines/<name>.yaml, and live the moment
-# it is. `extraEnvVars` is a list of dicts carrying `name`, so pipeline/lib/values.py
-# `_merge_lists` merges it by that key (Tier 2b) rather than replacing it -- unlike
-# a scalar list, this key CAN be set from the defaults layer.
+# Inert until KV transfer is enabled in baselines/<name>.yaml, and live as soon as
+# it is. Delete this fragment once the llm-d-benchmark pin sets the variable
+# itself; from then on the per-role `prefill.vllm.httpTimeoutKeepAlive` key is the
+# way to express a non-default value.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:

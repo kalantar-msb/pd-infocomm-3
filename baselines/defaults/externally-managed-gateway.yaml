@@ -1,4 +1,8 @@
-# Assume that gateway (istio, agentgateway, etc)
+# Declares that the Gateway is provisioned outside this deployment (Istio,
+# agentgateway, or the epponly Envoy sidecar), so nothing here tries to create or
+# own one.
+#
+# scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:
 - name: defaults
   gateway:

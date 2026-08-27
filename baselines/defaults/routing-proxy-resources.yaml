@@ -1,18 +1,12 @@
-# Workaround: declare explicit resource requests for the routing proxy sidecar.
-# The chart leaves routing.proxy.resources unset; without requests the proxy
-# can be scheduled with no real CPU/memory budget. See docs/troubleshooting.md
-# "Framework defaults overlay".
+# Gives the nixl routing-proxy sidecar an explicit CPU and memory request.
 #
-# THIS SIZES A DIFFERENT SIDECAR THAN epponly.yaml. The two look like duplicates
-# and are not:
-#   routing.proxy  (here)  -> llm-d-benchmark's nixl routing sidecar BESIDE EACH
-#                             MODEL SERVER, the peer of vllmCommon.kvTransfer
-#                             (defaults.yaml:691 `routing:` at the pinned SHA).
-#   router.proxy   (there) -> the Envoy sidecar INSIDE THE EPP POD, which under
-#                             the epponly topology is the whole data plane
-#                             (defaults.yaml:627 `router:`).
-# Distinct containers, distinct pods, distinct jobs. Both fragments are intended
-# to coexist; do not "deduplicate" them.
+# The chart leaves its resources unset, so without this the proxy can be scheduled
+# with no real budget and gets squeezed on a busy node. It sits on the KV-transfer
+# path beside every model server, so that shows up as transfer latency.
+#
+# Not the same sidecar as epponly.yaml. That one sizes the Envoy container inside
+# the EPP pod; this one sizes the routing proxy beside each model server.
+# Different containers, different pods, both wanted.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:

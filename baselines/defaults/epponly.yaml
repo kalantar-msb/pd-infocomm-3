@@ -1,61 +1,18 @@
-# Standalone router topology: no Kubernetes Gateway is deployed; the EPP runs with
-# an Envoy sidecar that serves HTTP directly. Sizes and configures that sidecar,
-# because under this topology it becomes the WHOLE data plane.
+# Runs the router with no Kubernetes Gateway: the EPP's own Envoy sidecar serves
+# HTTP directly and is the entire data plane. Sizes and configures that sidecar,
+# since under this topology every request goes through it.
 #
-# THIS FRAGMENT SIZES A DIFFERENT SIDECAR THAN routing-proxy-resources.yaml.
-# The two look like duplicates and are not:
-#   router.proxy   (here)  -> the Envoy sidecar INSIDE THE EPP POD. Maps onto the
-#                             routerlib chart's top-level `proxy:`
-#                             (config/charts/routerlib/values.yaml:76, v0.9.0).
-#   routing.proxy  (there) -> llm-d-benchmark's nixl routing sidecar BESIDE EACH
-#                             MODEL SERVER, the peer of vllmCommon.kvTransfer.
-# They are distinct containers in distinct pods with distinct jobs. Both fragments
-# are intended to coexist; do not "deduplicate" them.
+# Not the same sidecar as routing-proxy-resources.yaml. That one sizes the nixl
+# routing proxy beside each model server; this one sizes the Envoy container inside
+# the EPP pod. Different containers, different pods, both wanted.
 #
-# THE TWO KEYS BELOW ARE COUPLED, which is why they live in one file:
-# `--concurrency 8` is chosen to match the `limits.cpu: "8"` set immediately below.
-# Change one without the other and you either starve Envoy's workers or
-# oversubscribe them.
+# `--concurrency 8` below is chosen to match `limits.cpu: "8"`. Change one and you
+# have to change the other, or Envoy's worker pool and its CPU budget disagree.
 #
-# WARNING -- THE COUPLING CAN BREAK SILENTLY. `args` is a list of SCALARS, so
-# pipeline/lib/values.py `_merge_lists` Tier 1 has any downstream layer REPLACE it
-# wholesale rather than merge into it. The defaults overlay is the first layer in
-# resolve_baseline's chain, so if your `baselines/<name>.yaml` or the registered
-# treatment overlay sets `router.proxy.args` at all, it takes the whole list -- and
-# `--concurrency 8` goes with it -- while `limits.cpu: "8"` below still applies.
-# That is the failure this file was written to prevent, reappearing one layer up.
-# Set the args HERE, or set BOTH keys in your baseline; never split them.
-# (`.claude/skills/sim2real-bootstrap/tests/test_defaults_templates.py` allowlists
-# this one key so a new fragment cannot add another scalar list unnoticed.)
-#
-# THE ARGS BLOCK IS UPSTREAM BOILERPLATE, not a local invention. It appears
-# byte-for-byte -- comment included -- in 8 of the 9 shipped llm-d-benchmark guide
-# scenarios at the pinned SHA (config/scenarios/guides/: optimized-baseline,
-# flow-control, agentic-serving, predicted-latency-routing, tiered-prefix-cache,
-# precise-prefix-cache-routing, pd-disaggregation, wide-ep-lws; only
-# workload-autoscaling omits it). That every shipped scenario overrides the same
-# chart defaults identically is an argument for them being framework defaults
-# instead. Not yet filed upstream against llm-d/llm-d-benchmark -- if you file it,
-# reference it here.
-#
-# WHAT THIS BLOCK ADDS OVER UPSTREAM: `limits.cpu: "8"`. Upstream sets
-# `--concurrency 8` while leaving CPU unlimited, so the 8 there is arbitrary. The
-# limit below is what makes it mean something.
-#
-# CAVEAT ON THE UPSTREAM COMMENT'S CLAIMS. Those guide scenarios justify the block
-# as overriding chart defaults of `--log-level trace` and no `--concurrency`. That
-# is stale as of routerlib v0.9.0, whose envoy preset already passes
-# `--log-level warn` AND `--cpuset-threads`
-# (config/charts/llm-d-router-standalone/values.yaml:253-265). `--cpuset-threads`
-# makes Envoy size its worker pool from the cgroup's CPU allotment, which is
-# strictly more adaptive than a hardcoded `--concurrency 8` -- and copying the
-# upstream block DROPS it. The args are kept as-is here for byte-parity with
-# upstream rather than because that tradeoff was decided; revisit if the sidecar
-# shows CPU trouble.
-#
-# Keys must sit under scenario[0]: llm-d-benchmark's render_plans.py merges
-# "defaults -> shared -> stack", so only `scenario:` and `shared:` are read from a
-# scenario file's top level and any other top-level key is silently ignored.
+# Careful: `args` is a scalar list, so any later layer that sets
+# `router.proxy.args` replaces the whole list -- taking `--concurrency 8` with it
+# while the CPU limit stays behind. Set the args here, or set both keys in your
+# baseline. Never split them across layers.
 #
 # scenario[0].name is realigned to the experiment baseline at merge time.
 scenario:
