@@ -3,7 +3,7 @@ tmp/
 /workspace/clusters
 /workspace/**/run_metadata.json
 /workspace/setup_config.json
-workspace/runs/**/manifest.assembly.yaml
+/workspace/runs/**/manifest.assembly.yaml
 /results/
 /out/
 
