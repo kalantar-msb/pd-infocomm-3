@@ -1,0 +1,3 @@
+[submodule "llm-d-router"]
+	path = llm-d-router
+	url = https://github.com/llm-d/llm-d-router
