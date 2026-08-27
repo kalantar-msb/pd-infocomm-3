@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "translation_hash": "ef2cd961b0783f23abab60d579d3c467cfa122ae1540efaf2705aa391f886799",
+  "experiment_root": "/Users/kalantar/projects/go.workspace/src/github.com/kalantar-msb/pd-infocomm-3",
+  "translations_dir": "/Users/kalantar/projects/go.workspace/src/github.com/kalantar-msb/pd-infocomm-3/workspace/translations/ef2cd961b0783f23abab60d579d3c467cfa122ae1540efaf2705aa391f886799",
+  "scenario": "pdinfocomm3",
+  "baselines": [
+    {
+      "name": "baseline",
+      "generated_overlay_path": "generated/baselines/baseline/baseline_config.yaml"
+    }
+  ],
+  "algorithms": [
+    {
+      "name": "causalsloexternality",
+      "source_path": "algorithms/causal_slo_externality.go",
+      "source_sha256": "6ff305167cace438b8f0a26adbe66fdf6c2559ca9b83900cdf1e03bb1415b682",
+      "output_dir": "generated/causalsloexternality",
+      "config_output_path": "generated/causalsloexternality/causalsloexternality_config.yaml",
+      "baseline_overlay_path": "generated/baselines/baseline/baseline_config.yaml",
+      "notes": ""
+    },
+    {
+      "name": "leastttftjoint",
+      "source_path": "algorithms/least_ttft_joint.go",
+      "source_sha256": "5c49c65c203fca2db90d87664f8169d73380253b4349e07747ec793507b1b7b5",
+      "output_dir": "generated/leastttftjoint",
+      "config_output_path": "generated/leastttftjoint/leastttftjoint_config.yaml",
+      "baseline_overlay_path": "generated/baselines/baseline/baseline_config.yaml",
+      "notes": ""
+    }
+  ],
+  "context": {
+    "text": "Joint causal-SLO-externality P/D placement. The decision rule is a joint\nargmin over (decode endpoint d, prefill placement p) of\n\n    J(d, p) = V * ( externality(d, p) - ownGood(d, p) ),   V = 8\n\nwith the capacity term disabled (the `causal_externality_no_capacity_v8`\ncontroller, config.md \u00a79.2). Candidates are priced by the smooth SLO value\nthey destroy among their residents, evaluated causally: every completion\nmodel is gated on an admission window, so a resident finishing before the\narrival is admitted contributes exactly zero. That gating is what makes the\nterm an externality rather than another load proxy, and it is why the effect\nsurvives on a fleet whose load signals are already balanced.\n\nREQUIRED SHAPE -- a joint argmin over the cross product: D local candidates\nplus D*P disaggregated candidates, scored on one scale in one argmin. This\nCANNOT be a per-endpoint Scorer at this pin, for two independent reasons: a\nscorer returns a per-endpoint map, so no pair can be named; and every scorer\ncontribution passes through the profile's score-range enforcement, which\nclamps to [0,1], while J is signed and unbounded -- clamping collapses every\ncandidate with J <= 0 to one score, destroying the ranking rather than\ndegrading it. The comparator faces the same hazard for a different reason:\nits objective is a latency in microseconds, non-negative and unbounded above.\n\nPLACEMENT -- TWO plugin registrations sharing state, not one plugin with two\ninterfaces. ProfileHandler.Pick and Picker.Pick share a method name with\ndifferent signatures (pkg/epp/framework/interface/scheduling/plugins.go:47,\n:77), so no single Go type can satisfy both:\n\n  Handler: ProfileHandler (Pick, ProcessResults) + PreRequest +\n          ResponseBodyProcessor\n  Picker:  Filter + Picker\n\nFilter is required, not incidental: Picker.Pick receives only\n[]*ScoredEndpoint and no request, so the arriving request's token count\nreaches the argmin no other way. All profiles receive the same\ncandidateEndpoints slice (pkg/epp/scheduling/scheduler.go:78), so an\nunfiltered profile sees both pools; ProfileRunResult.TargetEndpoints is a\nslice (pkg/epp/framework/interface/scheduling/types.go:165-167), so one\npicker run carries both picks.\n\nTHE HAZARD IS SILENT FALLBACK to the target's natural decode-first\ndecomposition: pick a decode endpoint with the stock scorer, then decide\nplacement. That is the simulation's decode-first ablation arm, so its cost is\nmeasured rather than estimated -- +0.0485 equal-cell mean goodput in favour of\nthe joint shape, 95% CI [+0.0305, +0.0665], worst cell falling 0.918 -> 0.700\nat h100_a100_realistic:interactive:medium_0p80. A port that keeps the stock\nhandler and moves J into a binary disaggregate() gate still runs, still\nreports goodput, and is running a different algorithm. The decomposition\nswitch is kept reachable (config.md \u00a710) because flipping it is the cheapest\non-cluster check that the joint shape survived the port.\n\nThree settings are forced on an internal copy of the decider rather than\nexposed as flags, so a port must hard-wire them: exact prefill overlap,\ndeployable resident estimates (censored N_out, never true remaining), and\ncollocated-prefill pricing (config.md \u00a79.2).\n\nTHETA IS KEYED BY POD LABEL, NOT BY THE SCENARIO (config.md \u00a75 signal 8, \u00a72).\nPer-GPU coefficients differ most in the per-iteration intercept -- 25 563.82 us\non A100 against 16 613.54 us on H100, a factor of 1.539 present on EVERY\niteration regardless of KV state -- so a wrong or defaulted GPU label is wrong\non every decision. Reject absent or unknown types; never default. Both\ncoefficient files must be transcribed into every arm's plugin config, keyed by\nlabel value, so the A100 decode instance is priced correctly whether or not the\ngenerated scenario names it.\n\nFLEET CAPABILITY GAP, disclosed not silent (config.md \u00a72). The campaign's\ndecode pool is genuinely heterogeneous -- instance_1 on H100, instance_2 on\nA100 -- and that heterogeneity is the condition the mechanism exploits. The\nscenario schema expresses one acceleratorType per role and has no construct\nfor per-instance hardware within a role, so the generated baseline names H100\nfor both roles and describes only instance_1. The A100 decode pod must be\ndeployed outside the generated scenario or the scenario hand-edited. This\nbundle deliberately does not choose among config.md \u00a72's options.\n\nDECLARED DEGRADATION (D1): every cited margin was produced with the\nscheduler-rollout TTFT model, whose per-request wait-queue inputs are\nunobtainable at this pin -- the target exposes WaitingQueueSize, one integer.\nThe port substitutes the closed-form rollforward estimator, which past one\nbatch drain understates admission delay and so biases toward remote prefill.\nA substitution counter is required, not optional: the fallback is acceptable,\nthe silence is the defect. Net direction across all declared degradations is\nNOT known and is NOT claimed -- D1 biases remote, D2b and D2c bias local.\nSee README.md, \"Pre-registered expectation\" and \"Open threats to validity\".\n",
+    "file_paths": [
+      "README.md",
+      "config.md",
+      "inputs/coeffs-llama70b-h100-tp4.json",
+      "inputs/coeffs-llama70b-a100real-tp4.json",
+      "inputs/hetero-realistic-1p2d.yaml"
+    ]
+  }
+}

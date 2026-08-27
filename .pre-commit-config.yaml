@@ -42,7 +42,35 @@ repos:
         # representations. On the real leaked 933-line plan config, 4.25 added
         # zero false positives (4.0 flagged file paths / namespaces). The hook
         # honors this limit even under --use-all-plugins.
-        args: [--baseline, .secrets.baseline, --use-all-plugins]
+        #
+        # --exclude-lines: skip lines whose KEY NAME marks the value as a
+        # content-addressed identifier, not a credential. This bundle is built
+        # out of hashes -- `sim2real translate` stamps translation_hash and
+        # source_sha256 into skill_input.json / translation_output.json, the
+        # review rounds record package_manifest_sha256 / runner_go_sha256 /
+        # package_manifest_short, sim_results/ manifests carry a per-sample
+        # `hash`, and transfer.yaml pins the component by git `ref`. Every one
+        # is a SHA over public content, and every one trips
+        # HexHighEntropyString (SHA-256 hex entropy ~3.9 > the 3.0 hex_limit).
+        #
+        # Auditing them into .secrets.baseline does NOT work here: the baseline
+        # keys on (file, line, hash), and these values change on every
+        # translation, so each run would strand the old entries and fail again.
+        # Excluding the files wholesale would also stop scanning the paths,
+        # env, and config they contain. Keying on the field name keeps the file
+        # in scope and drops only the hash line.
+        #
+        # The regex matches a key ENDING in sha1/sha256/sha512/hash/digest/
+        # checksum/fingerprint/manifest_short (so `hashicorp_vault_token:` and
+        # `refresh_token:` are still scanned), plus ref/commit/revision ONLY
+        # when the value is a bare 7-64 char git sha (so `ref: refs/heads/main`
+        # and any opaque token are still scanned).
+        args:
+          - --baseline
+          - .secrets.baseline
+          - --use-all-plugins
+          - --exclude-lines
+          - '(?i)(?:^[\s"-]*[a-z0-9_.]*(?:sha1|sha256|sha512|hash|digest|checksum|fingerprint|manifest_short)"?\s*[:=])|(?:^\s*-?\s*"?(?:ref|commit|revision)"?\s*[:=]\s*"?[0-9a-f]{7,64}"?\s*,?\s*(?:#.*)?$)'
         # The baseline file records hashes of audited hits; scanning it would
         # be circular. Everything else in the repo is in scope.
         exclude: ^\.secrets\.baseline$

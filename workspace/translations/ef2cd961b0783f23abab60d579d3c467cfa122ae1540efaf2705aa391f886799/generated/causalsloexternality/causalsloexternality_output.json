@@ -1,0 +1,49 @@
+{
+  "plugin_type": "causal-slo-externality-handler",
+  "files_created": [
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/README.md",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/admission.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/admission_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/capacity.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/coeffs.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/coeffs_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/config.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/config_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/handler.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/kernels.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/kernels_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/metrics.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/metrics_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/overlay_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/picker.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/plugin_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/policy.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/policy_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/retiming.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/retiming_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/rollout.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/rollout_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/shadow.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/shadow_test.go",
+    "pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/types.go"
+  ],
+  "files_modified": [
+    "cmd/epp/runner/runner.go"
+  ],
+  "package": "causalsloexternality",
+  "register_file": "cmd/epp/runner/runner.go",
+  "test_commands": [
+    "make build",
+    "go vet ./pkg/epp/framework/plugins/scheduling/profilehandler/... ./cmd/epp/runner/...",
+    "golangci-lint run --config=./.golangci.yml ./pkg/epp/framework/plugins/scheduling/profilehandler/... ./cmd/epp/runner/...",
+    "go test -count=1 ./pkg/epp/framework/plugins/scheduling/profilehandler/causalsloexternality/...",
+    "go test -count=1 ./pkg/epp/framework/plugins/scheduling/profilehandler/leastttftjoint/...",
+    "go test -count=1 -race ./pkg/epp/framework/plugins/scheduling/profilehandler/...",
+    "go test ./pkg/epp/scheduling/...",
+    "go test ./pkg/epp/framework/...",
+    "go build ./cmd/epp/..."
+  ],
+  "config_kind": "EndpointPickerConfig",
+  "treatment_config_generated": true,
+  "description": "Joint causal-SLO-externality P/D placement as two co-operating plugin registrations: causal-slo-externality-handler (ProfileHandler + PreRequest + ResponseBodyProcessor) owns the Policy and the resident shadow table, and causal-slo-externality-picker (Filter + Picker) runs the argmin over D local plus D*P disaggregated candidates on one signed unbounded scale."
+}

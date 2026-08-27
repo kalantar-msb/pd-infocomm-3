@@ -1,0 +1,582 @@
+# Treatment overlay for the COMPARATOR ARM: least_ttft_joint (config.md §9.3).
+#
+#   treatment_resolved = deep_merge(baseline_resolved, treatment_diffs, THIS FILE)
+#
+# There is no `treatment.yaml` in this experiment repo (transfer.yaml declares
+# none), so `treatment_diffs` is EMPTY and this file carries the entire delta from
+# baseline_resolved. Everything already in the baseline overlay -- the objective, the
+# GPU-type pod label, `epp.replicas: 1`, both roles' engine flags including
+# `--enable-force-include-usage` -- propagates automatically and is deliberately NOT
+# repeated here.
+#
+# The one key that changes is `router.epp.pluginsCustomConfig.custom-plugins.yaml`.
+# It is a STRING, so deep_merge replaces it wholesale rather than merging into it:
+# the arm's plugin config is stated in full below and the baseline's threshold P/D
+# config does not survive into the treatment ConfigMap.
+#
+# EVERY PARAMETER NAME BELOW IS LOAD-BEARING. Plugin `parameters:` blocks are
+# decoded with `plugin.StrictDecoder`, which sets DisallowUnknownFields
+# (pkg/epp/framework/interface/plugin/registry.go:35-42), so a misspelled key is a
+# STARTUP ERROR rather than a silently ignored one. That is the desired behaviour
+# here and the reason nothing in this file relies on a default.
+#
+# ============================================================================
+# WHY THIS ARM EXISTS, AND WHAT THAT DEMANDS OF THIS FILE
+# ============================================================================
+# It shares the candidate set, the estimators, the physics, and the prefix reads
+# with the focal arm and differs IN THE OBJECTIVE ONLY. That is what attributes the
+# measured effect to the MECHANISM rather than to the MACHINERY: a weaker baseline
+# would leave open that the focal arm won because it computes better physics, not
+# because it prices SLO externality.
+#
+# SO EVERY SHARED VALUE BELOW MUST EQUAL THE FOCAL ARM'S OVERLAY, KEY FOR KEY.
+# That is not a tidiness request. The two arms run in SEPARATE EPP PROCESSES
+# (§"one ProfileHandler per EPP" below), so nothing at runtime can detect a
+# divergence -- these two YAML files are the only place the equality lives.
+# `contract_test.go` in the plugin package asserts it in Go
+# (TestTheTwoArmsSharedConfigValuesAgree) against the same values, so a drift here
+# shows up as a unit-test failure rather than as a quietly invalid comparison.
+#
+# Diff this file's parameter values against
+# `generated/causalsloexternality/causalsloexternality_config.yaml` before any run.
+# Expect exactly these differences and no others:
+#   - the two plugin `type:` strings and the picker's `handlerPluginName`
+#   - the profile's `pluginRef`
+#   - the ABSENCE of `v`, `ablation`, `activeWorkload`, `workloadTargets`, and
+#     `capacity` -- see "What is absent" below
+#
+# ============================================================================
+# WHAT IS ABSENT, AND WHY EACH ABSENCE IS A DECISION
+# ============================================================================
+# This arm's plugin Config is a STRICT SUBSET of the focal arm's. It drops fields
+# rather than carrying unread ones, because a populated-but-never-read field is a
+# reader trap: it implies a consumer exists somewhere.
+#
+#   NO `v`               The objective is a latency in microseconds, not a weighted
+#                        sum. There is no penalty/stability multiplier to carry.
+#
+#   NO `activeWorkload`, NO `workloadTargets`
+#                        NO tau REACHES THIS ARM ANYWHERE. Consequence worth
+#                        stating because it is asymmetric: the tau selector of
+#                        config.md §6 is IRRELEVANT to this arm, and -- unlike the
+#                        focal arm -- this arm CANNOT be flattened by a
+#                        misconfigured zero triple. Running the three workloads
+#                        therefore needs ONE assemble for this arm, not three;
+#                        only the focal arm's overlay changes per workload.
+#
+#   NO `ablation`         Its externality/own-good switches name terms this arm does
+#                        not have. Its `decomposed` switch is structurally
+#                        unreachable here, not merely unused: restricting the decode
+#                        enumeration presupposes the scorer-first ordering that this
+#                        arm deliberately does not apply (upstream's least-ttft
+#                        branch iterates decodeSnaps directly, sim/edpp.go:1456,
+#                        while scorerFirstSnapshots is applied only in the
+#                        SLO-externality and causal-VaR branches, :2176-2178).
+#                        THE §10 DECOMPOSITION ABLATION IS RUN ON THE FOCAL ARM,
+#                        which is where it belongs: it prices the joint SHAPE, and
+#                        both arms share the shape.
+#
+#   NO `capacity`         This arm has no capacity term. `nomPrefillTokens` was
+#                        considered and is genuinely unreachable: muDNom and muPNom
+#                        take their arguments BY PARAMETER, so the verbatim-copied
+#                        Coeffs methods compile without any Config field, and this
+#                        arm calls neither -- its admission contexts use muDecode
+#                        and muPrefill, which read only batch state.
+#
+# Because the decoder is strict, PASTING THE FOCAL ARM'S PARAMETERS BLOCK HERE IS A
+# STARTUP FAILURE rather than a silent partial apply. That is deliberate: an
+# operator must not be able to set a tau triple on this arm and believe it took
+# effect.
+
+scenario:
+- name: pdinfocomm3
+
+  router:
+    epp:
+      pluginsCustomConfig:
+        custom-plugins.yaml: |
+          apiVersion: llm-d.ai/v1alpha1
+          kind: EndpointPickerConfig
+          plugins:
+          # ===================================================================
+          # Inherited producers -- IDENTICAL to the baseline's and to the focal
+          # arm's, restated because this string replaces the baseline's wholesale.
+          # ===================================================================
+          # THE PRODUCER NAMES ARE THE CROSS-ARM BINDING AND MUST MATCH THE FOCAL
+          # ARM'S EXACTLY. A data key's identity is "<DataType>/<ProducerName>"
+          # (plugin/datakey.go:46-48). If the two arms bound different producer
+          # instances they would price DIFFERENT PROMPTS, and the measured
+          # difference would no longer attribute to the objective. Each arm
+          # resolves its own binding, in its own process, so nothing can detect the
+          # divergence at runtime.
+          #
+          # a_r, config.md §5 signal 10. BUILT: tokenizer sidecar + this plugin.
+          # Read as `request.Body.TokenizedPrompt.TokenCount()`; the field is a
+          # NULLABLE pointer and absence is a real runtime state (degradation D8).
+          - type: token-producer
+            parameters:
+              modelName: ${model.name}
+              vllm:
+                url: "http://localhost:8000"
+          # a_p, config.md §5 signal 11. Publishes PrefixCacheMatchInfo as a
+          # per-endpoint attribute; the arm binds it BY PRODUCER NAME below.
+          - type: approx-prefix-cache-producer
+
+          # ===================================================================
+          # THE ARM -- TWO REGISTRATIONS SHARING ONE STATE OBJECT
+          # ===================================================================
+          # NOT one plugin with two interfaces. `ProfileHandler.Pick` and
+          # `Picker.Pick` share a method name with different signatures
+          # (pkg/epp/framework/interface/scheduling/plugins.go:47, :77), so no single
+          # Go type can satisfy both. The split is forced by the target's interface
+          # set, not chosen:
+          #
+          #   least-ttft-joint-handler  ProfileHandler + PreRequest +
+          #                             ResponseBodyProcessor
+          #   least-ttft-joint-picker   Filter + Picker
+          #
+          # THE HANDLER IS DECLARED FIRST AND OWNS THE STATE -- the Policy and the
+          # shadow table. The picker looks it up by name. This order is REQUIRED,
+          # not stylistic: `instantiatePlugins` builds plugins in CONFIG ORDER and
+          # calls `handle.AddPlugin(name, plugin)` after each
+          # (pkg/epp/config/loader/configloader.go:215-239), so `handle.Plugin(name)`
+          # resolves only BACKWARD. A forward reference returns nil, and the picker's
+          # factory errors on nil rather than constructing a second, divergent copy
+          # of the shadow table.
+          #
+          # ONE ProfileHandler PER EPP, WHICH IS WHY THE TWO ARMS ARE TWO SCENARIOS.
+          # Exactly one ProfileHandler is permitted across all instantiated plugins
+          # (configloader.go:275-284 errors with "multiple profile handlers found").
+          # `causal-slo-externality-handler` is also a ProfileHandler, so naming both
+          # arms in one plugin config is a STARTUP ERROR, not a silent A/B. Both
+          # registrations exist in the binary (cmd/epp/runner/runner.go) and the
+          # overlay decides which one is instantiated. The two arms therefore never
+          # share a process, a shadow table, a Policy, or a decision.
+          #
+          # `disagg-profile-handler` MUST NOT APPEAR IN THIS CONFIG either, for the
+          # same reason. This arm's handler does the whole job itself, including
+          # setting the prefill routing header.
+          #
+          # WHY THE ARGMIN IS A PICKER AND NOT A SCORER, verified at the pin:
+          #   - a scorer returns a per-endpoint map and has NO WAY TO NAME A PAIR,
+          #     while the objective is over (decode endpoint, prefill placement);
+          #   - every scorer contribution passes through the profile's score-range
+          #     enforcement, which CLAMPS to [0,1], while this objective is a
+          #     LATENCY IN MICROSECONDS -- non-negative but unbounded above and
+          #     routinely in the tens of thousands. Clamping does not degrade the
+          #     ranking, it DESTROYS it: essentially every candidate saturates at 1
+          #     and the argmin degenerates to enumeration order. (The focal arm is
+          #     barred from the scorer pin for the mirror-image reason: its J is
+          #     signed, so clamping collapses the J <= 0 half.)
+          #
+          # A Filter is required, not incidental: `Picker.Pick(ctx, []*ScoredEndpoint)`
+          # receives NO REQUEST, so the arriving request's token count reaches the
+          # argmin no other way. There is no CycleState at this pin -- the type does
+          # not exist -- so the Filter hands the request-derived operands to the
+          # Picker by `Endpoint.Put` on the per-request endpoint clones the director
+          # builds fresh for every cycle (director.go:479-486), which the Picker
+          # reads back with `Get`. Those clones are private to one request, which is
+          # what makes the handoff race-free.
+          - type: least-ttft-joint-handler
+            parameters:
+
+              # -------------------------------------------------------------
+              # Engine agreement -- config.md §5 signals 22-24, §9.1
+              # -------------------------------------------------------------
+              # SHARED WITH THE FOCAL ARM -- identical values required.
+              engine:
+                # = max_num_batched_tokens. Signal 22.
+                chunkTokens: 2048
+                # = block_size. Signal 23. VALIDATED AGAINST THE SCRAPED
+                # `Metrics.CacheBlockSize` WITH A LOUD FAILURE ON DISAGREEMENT:
+                # upstream has ONE block size, and a port carrying two that silently
+                # convert leaves a latent unit bug in the admission test, which
+                # compares blocks accumulated in one unit against a need expressed in
+                # another.
+                blockSize: 16
+                # = max_num_seqs. Signal 24. No metric exposes it -- and
+                # `Metrics.KvCacheMaxTokenCapacity` is NOT a substitute: it is
+                # assigned nowhere outside tests at this pin, so it always reads 0 and
+                # any branch guarded on it being positive is dead code. KV capacity is
+                # derived from CacheNumBlocks * CacheBlockSize instead.
+                maxBatchSize: 256
+
+              # -------------------------------------------------------------
+              # Signal plumbing -- config.md §5 signals 8, 10, 11
+              # -------------------------------------------------------------
+              # SHARED WITH THE FOCAL ARM -- identical values required. The two
+              # producer names below are the load-bearing pair; see the note above
+              # the producers.
+              signals:
+                # Signal 8. theta is keyed by THIS POD LABEL, read from
+                # `Endpoint.GetMetadata().Labels` (a map[string]string,
+                # datalayer/endpoint_metadata.go:33), NOT from the node's
+                # nvidia.com/gpu.product -- plugins see endpoints, not nodes.
+                #
+                # An endpoint whose label is ABSENT, or whose value is not a key of
+                # `coeffsByGpuType` below, is REJECTED from the candidate set and the
+                # rejection COUNTED -- never defaulted. Heterogeneity rides the
+                # per-iteration intercept alpha, present on every iteration
+                # regardless of KV state, so a defaulted label is wrong on EVERY
+                # decision rather than only under load; without the counter the
+                # removal would look like a routing PREFERENCE.
+                #
+                # THIS ARM IS HARDWARE-AWARE BY CONSTRUCTION AND THAT IS DELIBERATE.
+                # Each side of every candidate prices with its own candidate's theta.
+                # A hardware-BLIND least-TTFT baseline would lose to the focal arm
+                # partly because it cannot see the fleet, which would confound the
+                # mechanism with hardware awareness.
+                gpuTypeLabelKey: pd-infocomm.io/gpu-type
+
+                # Signal 11. BOUND BY PRODUCER NAME so both arms read the SAME prefix
+                # signal. The plugin also declares this key through `Consumes()`,
+                # which makes the producer DAG order it before the arm and turns a
+                # missing producer into a startup error rather than a per-request
+                # miss.
+                #
+                # AN EMPTY VALUE IS WORSE THAN A WRONG ONE and is rejected at startup:
+                # `DataKey.WithNonEmptyProducerName("")` returns the key UNCHANGED
+                # (datakey.go:36-43), leaving producerName at the plugin TYPE string.
+                # A WRONG explicit name errors at startup (data_graph.go:96-98); an
+                # EMPTY one silently resolves to the type string, and if the operator
+                # declared their producer under any other instance name the required
+                # key looks unproduced -- so CreateMissingDataProducers
+                # auto-instantiates a SECOND, nil-parameter producer
+                # (data_graph.go:72-118) which this arm then reads. Two indexers, two
+                # block sizes, the operator's tuning bypassed, and the two arms
+                # potentially bound to different prefix signals.
+                prefixMatchInfoProducerName: approx-prefix-cache-producer
+
+                # Signal 10. Bound BY PRODUCER NAME for the same reason. NOTE WHAT
+                # THIS CANNOT DO: the token-producer's `estimate` backend is the
+                # ZERO-CONFIG DEFAULT and TokenizedPrompt carries no provenance
+                # marker, so an unreachable tokenizer does NOT surface as an absent
+                # prompt -- it surfaces as a plausible ESTIMATED a_r that mis-prices
+                # every candidate. There is no runtime discriminator. Binding the
+                # name makes the DAG fail at init if no such producer exists; the
+                # operator preflight in config.md §11 (curl the render sidecar) is the
+                # only check that it is the real tokenizer, and the plugin's D8
+                # counter covers the genuinely-absent case only.
+                #
+                # DEGRADATION D8 IS SHARPER FOR THE COMPARISON THAN FOR EITHER ARM
+                # ALONE. On a nil prompt this arm returns no ranking, so the decision
+                # falls to a THIRD policy -- neither arm. The two arms are separate
+                # plugin instances with separate bindings, so if the DECLINE RATE
+                # differs between them it confounds the very comparison the arms exist
+                # to make. It is likeliest on long prompts, exactly where
+                # local-versus-remote is most contested. Compare
+                # `least_ttft_joint_tokenization_unavailable_total` against
+                # `causal_slo_externality_tokenization_unavailable_total` before
+                # reading any result.
+                tokenizedPromptProducerName: token-producer
+
+                # THERE IS DELIBERATELY NO prefixBlockSizeTokens KNOB.
+                #
+                # The two-block-size problem is real -- the engine reports 16 while
+                # `approx-prefix-cache-producer` clamps its own block size up to a
+                # 64-token floor (approximateprefix/plugin.go:42-50,
+                # minBlockSizeTokens = 64), so multiplying the producer's block COUNT
+                # by the ENGINE's block SIZE understates the cached span by 4x,
+                # inflating a_p and OVER-pricing prefill work, which biases toward
+                # remote prefill.
+                #
+                # But it needs no config: `PrefixCacheMatchInfo` publishes
+                # `BlockSizeTokens()` alongside `CachedBlockCount()`, so the plugin
+                # reads BOTH off the same attribute, per endpoint, per request. That
+                # is strictly better than a knob -- a producer reconfiguration cannot
+                # silently rescale a_p, because there is no second value to drift
+                # from. engine.blockSize above stays the ENGINE's 16, which is what
+                # reqKVNeed and the rollout need.
+
+              # -------------------------------------------------------------
+              # Admission-delay estimator -- DEGRADATION D1
+              # -------------------------------------------------------------
+              # config.md §9.1 declares `rollforward`, and `rollforward` is the ONLY
+              # accepted value at this pin. Any other value FAILS AT STARTUP rather
+              # than silently degrading:
+              #   `waiting` reads QWork -- no per-endpoint work account exists;
+              #   `little`  reads AdmissionRate -- no route;
+              #   the published `scheduler-rollout` needs the engine's ordered wait
+              #   queue, its current grants, and its step start instant. The target
+              #   exposes `Metrics.WaitingQueueSize` -- ONE INTEGER
+              #   (pkg/epp/framework/interface/datalayer/metrics.go:33).
+              #
+              # THE ROLLOUT WAS THE LIVE PATH UPSTREAM FOR THIS ARM, NOT A FALLBACK.
+              # Selecting the least-ttft rule makes the simulation record resident and
+              # scheduler detail, which sets SchedulerStateObserved true and activates
+              # the rollout; the closed-form projection is reached only when that guard
+              # fails. On the target the guard is permanently false, so BOTH arms run
+              # an estimator that produced NONE of the numbers in sim_results/. That
+              # is the whole of D1 and it is the single most important thing to
+              # instrument on this arm.
+              #
+              # ITS DIRECTION IS NOT A SINGLE SIGN FOR THIS OBJECTIVE, and the focal
+              # arm's one-line summary MUST NOT be copied over. The two placements
+              # join their clocks differently -- local ADDS tAdmD with slope 1
+              # (sim/edpp.go:1246) while disagg takes max(remoteLead, tAdmD)
+              # (sim/edpp.go:1928):
+              #
+              #   when tAdmD dominates the max, understating it is charged identically
+              #   to both placements and CANCELS;
+              #   when remoteLead dominates, disagg is insensitive to tAdmD
+              #   altogether, so understating it lowers ONLY the local candidate --
+              #   biasing toward LOCAL, the OPPOSITE of the focal arm's direction.
+              #
+              # The toward-remote direction survives only through the tAdmP channel,
+              # and only while remoteLead dominates. The net is load- and
+              # pool-dependent.
+              #
+              # THIS BEARS ON THE ATTRIBUTION ARGUMENT, not just on this arm's
+              # accuracy. It would be convenient to say both arms inherit D1
+              # identically so the comparison stays fair, but a load-dependent
+              # direction cannot support that claim: under decode-side congestion --
+              # the regime the high-load and burst cohorts target -- D1 shifts the two
+              # arms' local/remote splits by different amounts. TREAT THE COMPARISON
+              # AS FAIR ONLY WHERE THE SUBSTITUTION COUNTERS SHOW THE SAME ESTIMATOR
+              # REGIME ON BOTH ARMS.
+              admissionEstimator: rollforward
+
+              # -------------------------------------------------------------
+              # Transfer model -- DEGRADATION D5, config.md §7. UNMEASURED.
+              # -------------------------------------------------------------
+              # SHARED WITH THE FOCAL ARM -- identical values required.
+              #
+              # IT MATTERS MORE HERE THAN IN THE FOCAL ARM: there is no externality
+              # term to partially offset a mis-priced transfer, so an unmeasured
+              # c_xfer moves this arm's decisions systematically. It enters the
+              # objective at exactly ONE place (remoteLeadUs). MEASURE xferBaseUs and
+              # xferBandwidthGbps ON THE TARGET before trusting any magnitude, and
+              # record the deviation as a stated degradation.
+              #
+              # IT IS NOT THE ONLY SIZE-DEPENDENT PRICE OF GOING REMOTE. The
+              # disaggregated projection also adds tIterFirstDecode, the B+1 re-timed
+              # first decode iteration, which the LOCAL projection does not -- local
+              # samples its first token when prefill completes, so no decode iteration
+              # precedes it (sim/edpp.go:1252 against :1245). That term's KV component
+              # scales with the request's own input length, so prompt size prices the
+              # remote path through TWO channels, not one.
+              transfer:
+                sizeAware: true            # config.md §9.1
+                xferBaseUs: 50.0           # simulator value -- UNMEASURED on target
+                xferBandwidthGbps: 25.0    # simulator value -- UNMEASURED on target
+                # 2 (K,V) x 80 layers x 8 KV heads x 128 head_dim x 2 B / TP 4.
+                # DERIVED ARITHMETIC, not measured. Leaving it 0 is severe with
+                # sizeAware: transferBytes becomes 0 so every request is charged a
+                # flat xferBaseUs -- a 4k-token prompt should be charged ~13 500 us,
+                # roughly 270x under-priced, with the error growing linearly toward
+                # the deep-research workload's ~45k-token prompts. Validation rejects
+                # 0 for this reason.
+                kvBytesPerTokenPerGpu: 81920
+                # The FLAT KV-transfer cost, used only when sizeAware is false. A
+                # DISTINCT field from xferBaseUs, which is only the additive base of
+                # the size-aware form (upstream sim/edpp.go:77, default 5 ms at
+                # cmd/root.go:1505). Conflating the two makes the flat path
+                # unrepresentable and silently reprices every disaggregated candidate
+                # if sizeAware is ever turned off.
+                flatCXferUs: 5000
+
+              # -------------------------------------------------------------
+              # theta -- config.md §4, keyed by the signal-8 POD LABEL value
+              # -------------------------------------------------------------
+              # SHARED WITH THE FOCAL ARM -- IDENTICAL VALUES REQUIRED, and this is
+              # the entry where a divergence would be most destructive: the two arms
+              # would then differ in the objective AND in the physics, and no
+              # measurement could separate the mechanism from the machinery.
+              #
+              # BOTH FILES ARE TRANSCRIBED, keyed by label value, so the A100 decode
+              # instance is priced correctly WHETHER OR NOT the generated scenario
+              # names it (config.md §2, §4). The generated scenario names H100 for
+              # both roles; the hand-added A100 decode pod is priced the moment it
+              # carries `pd-infocomm.io/gpu-type: A100_SXM_80GB`, with no
+              # plugin-config change.
+              #
+              # THERE IS NO FALLBACK ENTRY, ON PURPOSE. An unmapped label must have
+              # already caused the endpoint to be REJECTED; a silent default here
+              # would price the endpoint under the wrong physics on every decision.
+              # The intercepts differ by a factor of 1.539 (25 563.82 us A100 against
+              # 16 613.54 us H100) on EVERY iteration regardless of KV state.
+              #
+              # WHERE THIS ARM DIVERGES FROM UPSTREAM'S REDUCED RULE, worth planning
+              # around because it is the cheapest single-endpoint check available for
+              # validating this port. Upstream asserts that restricting the joint
+              # argmin to ONE decode endpoint reproduces the reduced least-ttft
+              # decision (sim/edpp.go:1889). That holds under HOMOGENEOUS theta only.
+              # With coeffsByGpuType loaded the reduced path prices remote prefill
+              # with the GLOBAL coefficients (sim/edpp.go:906, and again in its
+              # prefill admission context at :882), while this objective uses the
+              # prefill endpoint's own thetaP (sim/edpp.go:1915). alphaP is 16 617.85
+              # us on H100 against 25 568.35 us on A100 -- the two disagree by roughly
+              # 8 950 us per prefill iteration, LARGER THAN THE ENTIRE TRANSFER TERM.
+              # So RUN THAT EQUIVALENCE CHECK ON A HOMOGENEOUS FLEET: it WILL diverge
+              # on the h100_a100_realistic cohorts, and a divergence there leaves no
+              # way to tell whether the port or the equivalence claim is at fault.
+              #
+              # Values copied verbatim from inputs/coeffs-llama70b-h100-tp4.json and
+              # inputs/coeffs-llama70b-a100real-tp4.json. Units: alphaD/alphaP us,
+              # c0 us/req, c1 and cPf us/token, cAttn us/token^2. The plugin runs
+              # upstream's validate() on each entry (sim/edpp_coeffs.go:127-146),
+              # whose alpha ~= alpha_p bound rejects a pair diverging by more than
+              # 10% -- a divergence that large means the JSON was fit on mismatched
+              # hardware or regimes. Both pairs below are within 0.03%.
+              coeffsByGpuType:
+                H100_SXM_80GB:
+                  alphaD: 16613.537554540144
+                  alphaP: 16617.85321583337
+                  c0: 5.347316038602452
+                  c1: 0.04761401141756073
+                  cPf: 6.144687138665833
+                  cAttn: 0.00010075247918809842
+                A100_SXM_80GB:
+                  alphaD: 25563.819286862163
+                  alphaP: 25568.34953836831
+                  c0: 5.945331876073271
+                  c1: 0.07822809856114352
+                  cPf: 9.794219053944662
+                  cAttn: 0.00015977670754642687
+
+              # -------------------------------------------------------------
+              # The shadow table -- signals 12-18, DEGRADATIONS D2, D4, D6
+              # -------------------------------------------------------------
+              # SHARED WITH THE FOCAL ARM -- identical values required.
+              #
+              # STILL REQUIRED IN THIS ARM, WHICH IS NOT OBVIOUS: it reads no resident
+              # VALUE, but it reads the resident POPULATIONS in three places.
+              #   D4  ResidentPrefillTokens enters tIterDecode and tIterPrefill as
+              #       S_pf, on EVERY candidate.
+              #   D2  RunningDecode feeds decodeRemStepsEst and the rollforward KV
+              #       walk (sim/edpp.go:1610-1611), so StepsDone and KVBlocks are read.
+              #   D6  RunningPrefill feeds prefillRemStepsEst.
+              #
+              # WHAT IT DOES NOT INHERIT IS D2c, the late-first-token bias: no kernel
+              # here reads ArrivalUs, FirstTokenUs, or TTFTSet. Those fields are still
+              # carried by the verbatim-copied shadow machinery and read by nothing in
+              # this arm.
+              #
+              # It is a mutex-guarded LONG-LIVED index, not framework per-request
+              # state, and the target's own dispatch forces that: non-final response
+              # chunks are drained on a SEPARATE GOROUTINE from an async queue
+              # (director.go:541-552, :668+) while the final chunk runs on the request
+              # goroutine (:539), so writes genuinely arrive concurrently with
+              # scheduling-path reads.
+              shadowTable:
+                # THE TTL SWEEP IS REQUIRED, NOT HYGIENE. Requests terminate without
+                # a final chunk (client disconnect, upstream error) and the
+                # ResponseBodyProcessor signature carries NO error or termination
+                # state (requestcontrol/plugins.go:53-65), so a disconnect is
+                # indistinguishable from a completion. Without the sweep those entries
+                # are charged as residents FOREVER and permanently inflate S_pf and
+                # both remaining-steps estimates on that endpoint.
+                #
+                # 900 s is chosen against the workload, not inherited: the longest
+                # deadline in play is deep_research's tau_e2e = 40 s (config.md §6)
+                # and reasoning's output distribution reaches 32 000 tokens, so a
+                # legitimately live request is far inside this bound while a stranded
+                # entry is reaped within one sweep interval. UNMEASURED against real
+                # client behaviour -- widen it if the reaped-entries counter fires on
+                # requests that were still healthy.
+                #
+                # (tau_e2e is quoted here only to size a timeout against the workload.
+                # No tau reaches this arm's objective -- see "What is absent" above.)
+                entryTtlSeconds: 900
+                sweepIntervalSeconds: 30
+                # Signal 14 / D4: S_pf is what is being prefilled THIS STEP, not the
+                # outstanding backlog, and the EPP cannot know what the engine
+                # scheduled. The shadow sum is capped per occupant and capped in total
+                # at engine.chunkTokens; validation requires the two to be equal,
+                # because they are one fact expressed twice. Still an over-estimate
+                # => over-states local prefill inflation => biased toward REMOTE.
+                residentPrefillTokensCap: 2048
+
+              # -------------------------------------------------------------
+              # OUTSIDE THE CALIBRATED THETA -- config.md §5 signal 25
+              # -------------------------------------------------------------
+              # SHARED WITH THE FOCAL ARM -- identical values required.
+              #
+              # The client-visible per-token post-processing latency (streaming
+              # detokenization), added explicitly to EVERY TTFT projection
+              # (sim/edpp.go:1235-1242) because it sits outside theta.
+              #
+              # NOT STATED IN config.md, WHICH GIVES NO VALUE, and 0 is the neutral
+              # choice rather than a measured one.
+              #
+              # IT IS DECISION-NEUTRAL FOR THIS ARM, unlike for the focal arm, and the
+              # contrast is instructive: there it enters ownGood through a SIGMOID, so
+              # a common additive constant still moves two candidates' values by
+              # different amounts. Here the objective IS the latency, so adding the
+              # same constant to every candidate cannot change the argmin. It is
+              # carried anyway because the projected TTFT is logged and compared
+              # against the focal arm's, and a term present in one arm's projection
+              # and absent from the other's would make those two numbers
+              # incomparable. Measure it on the target before trusting any magnitude.
+              outputTokenProcessingUs: 0.0
+
+          # -------------------------------------------------------------------
+          # The picker registration -- Filter + Picker, reads the handler's state.
+          # -------------------------------------------------------------------
+          # Filter  splits the two pools by role label, REJECTS endpoints whose
+          #         GPU-type label is absent or unmapped (counting each rejection by
+          #         reason), and -- because `Picker.Pick` receives no request -- is the
+          #         only place the arriving request's operands (a_r, SLO class, the
+          #         per-endpoint a_p, the request ID) can be attached to the
+          #         per-request endpoint clones for the Picker to read back.
+          #
+          #         ON A NIL TOKENIZED PROMPT (degradation D8) it narrows to
+          #         DECODE-ELIGIBLE endpoints and declines to rank. The narrowing is
+          #         not optional: nothing downstream of the picker enforces role --
+          #         the director reads Address/Port off whatever the primary profile
+          #         returns and dispatches (director.go:461-472) -- so returning the
+          #         unfiltered candidate set would let a decode request be sent to the
+          #         PREFILL pod. The arm declines to RANK; it does not decline to
+          #         enforce which pods may serve a decode request.
+          #
+          # Picker  runs the joint argmin over D local plus D*P disaggregated
+          #         candidates and returns BOTH picks in one ProfileRunResult --
+          #         legitimate because `ProfileRunResult.TargetEndpoints` is a slice
+          #         (scheduling/types.go:164-167).
+          #
+          #         It IGNORES ScoredEndpoint.Score entirely and computes no scorer
+          #         preference at all. The focal arm reads that field as a tie-break
+          #         order; this arm enumerates in PLAIN ASCENDING ID order because
+          #         upstream's least-ttft branch does (sim/edpp.go:1456), and applying
+          #         the focal arm's reorder here would change which candidate wins an
+          #         exact tie, silently and only sometimes.
+          #
+          # The handler's ProcessResults then SPLITS those two picks into two entries
+          # of SchedulingResult.ProfileResults -- primary carrying the decode pick
+          # ALONE. That split is mandatory, not cosmetic: the director turns EVERY
+          # endpoint in the primary profile's TargetEndpoints into a routing
+          # destination and comma-joins them (director.go:461-472), so leaving both in
+          # the primary profile would dispatch the request to both pods. The joint
+          # argmin is untouched; only the reporting shape splits.
+          - type: least-ttft-joint-picker
+            parameters:
+              handlerPluginName: least-ttft-joint-handler
+
+          schedulingProfiles:
+          # ONE ROLE-BLIND PROFILE, and this is the required shape rather than a
+          # simplification. All profiles receive the same candidateEndpoints slice
+          # (pkg/epp/scheduling/scheduler.go:78), so an unfiltered profile sees BOTH
+          # pools -- which is exactly what the joint argmin needs: D local candidates
+          # plus D*P disaggregated candidates, scored on one scale in one argmin.
+          #
+          # NO SCORERS ARE ATTACHED, and that is deliberate. The arm must IGNORE
+          # inherited scorer contributions for the same clamping reason that forces it
+          # to be a picker: a contribution passing through the profile's [0,1]
+          # score-range enforcement cannot be combined with a latency in microseconds
+          # on one scale. Every ScoredEndpoint therefore reaches the picker with
+          # Score 0, and the picker ignores Score entirely and computes J itself.
+          #
+          # The endpoints reach the picker in MAP ORDER -- runPickerPlugin builds its
+          # slice by ranging a map (scheduler_profile.go:199-205), itself seeded by
+          # ranging the Filter's output -- so the argmin imposes its own ascending-ID
+          # order. Without that, two byte-identical requests could route differently.
+          #
+          # The handler is NOT referenced here and does not need to be: every
+          # instantiated plugin is offered to the requestcontrol config
+          # (cmd/epp/runner/runner.go:663) and sorted into hook lists by interface
+          # assertion (requestcontrol/request_control_config.go:88-109), so its
+          # ProfileHandler, PreRequest and ResponseBody hooks are wired by its mere
+          # presence in `plugins:`.
+          - name: default
+            plugins:
+            - pluginRef: least-ttft-joint-picker

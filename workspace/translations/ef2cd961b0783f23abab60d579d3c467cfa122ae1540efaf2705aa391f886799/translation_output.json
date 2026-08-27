@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "translation_hash": "ef2cd961b0783f23abab60d579d3c467cfa122ae1540efaf2705aa391f886799",
+  "source": "skill",
+  "alias": "pdinfocomm3",
+  "algorithms": [
+    {
+      "name": "causalsloexternality",
+      "source_path": "algorithms/causal_slo_externality.go",
+      "source_sha256": "6ff305167cace438b8f0a26adbe66fdf6c2559ca9b83900cdf1e03bb1415b682",
+      "config_path": null,
+      "image_ref": null,
+      "image_digest": null
+    },
+    {
+      "name": "leastttftjoint",
+      "source_path": "algorithms/least_ttft_joint.go",
+      "source_sha256": "5c49c65c203fca2db90d87664f8169d73380253b4349e07747ec793507b1b7b5",
+      "config_path": null,
+      "image_ref": null,
+      "image_digest": null
+    }
+  ],
+  "created_at": "2026-08-26T18:00:13Z"
+}

@@ -1,0 +1,25 @@
+{
+  "round": 1,
+  "consensus": false,
+  "approve_count": 0,
+  "total_successful": 1,
+  "reviews": [
+    {
+      "model": "agent-reviewer",
+      "verdict": "NEEDS_CHANGES",
+      "issues": [
+        "1 [fidelity, BLOCKING] preferredByScore read a map-ordered slice (scheduler_profile.go:199-205), so the tie-break was nondeterministic and Ablation.Decomposed placed decode uniformly at random per request rather than reproducing a decomposition.",
+        "2 [fidelity, BLOCKING] The D8 tokenization-decline path returned the UNFILTERED candidate set and Pick returned scoredEndpoints[0] (map-random), so a decode request could be dispatched to the prefill pod; nothing downstream enforces role.",
+        "3 [treatment-config] Signals.PrefixMatchInfoProducerName / TokenizedPromptProducerName were not required non-empty; an empty value resolves to the type-string default and can cause a second, nil-parameter producer to be auto-created and read. overlay_test.go's `n != \"\" &&` guard made the guarding test vacuous.",
+        "4 [fidelity] Resident kvBlocks was never advanced after placement, under-stating KV reclaimed by departures, over-stating tAdm, and under-pricing the local candidate. Avoidable rather than a declared degradation.",
+        "5 [code-quality] residentsFor / prefillOccupantsFor returned populations in map-iteration order, voiding the estimator's stable-sort determinism contract, worst on the prefill slice where TrueRemaining genuinely differs.",
+        "6 [code-quality] shadow.go cited a counter (shadowTableStepsAlwaysZero) that does not exist, asserting a silent failure was observable when it is not.",
+        "7 [code-quality] sloClassOf's comment promised per-class tau resolution that Policy.sloFor cannot do (it discards its argument).",
+        "8 [code-quality] A disaggregated win whose prefill endpoint was missing from the scored set ran locally while the placement counter recorded disaggregated.",
+        "9a [code-quality] validate() did not cross-check ShadowTable.ResidentPrefillTokensCap against Engine.ChunkTokens (config.md signal 14).",
+        "9b [code-quality] snapshotFor took the table lock three times, so a chunk arriving between calls could leave S_pf inconsistent with the resident populations in the same snapshot."
+      ],
+      "summary": "The ported algebra is the strongest part of this submission and I found no divergence in it: coeffs.go, retiming.go, kernels.go, admission.go, rollout.go and capacity.go match the specification layer essentially line-for-line, including every detail most likely to be silently 'improved' away. Registration is correct. The writer's three highlighted areas (joint shape, decode pick on a local win, two block sizes) all check out. The blocking problems are all in the seam between the argmin and the target's plumbing, and both of the top two are cases where the arm runs, reports goodput, and is doing something other than the published policy. Reviewer independently re-ran the build gates and accepted the writer's addendum on the absent leastttftjoint package as the comparator's scope."
+    }
+  ]
+}
