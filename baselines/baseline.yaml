@@ -26,9 +26,35 @@ scenario:
     # this the init container's work is discarded and NIXL initialises
     # with no network or GPU-routing configuration -- the crashloop #848
     # describes. The libcuda prologue must run before the source line.
-    preprocessScript: |
-      export LD_LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | sed ':a; N; $!ba; s/\n/:/g'):${LD_LIBRARY_PATH}
-      export LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | head -1):${LIBRARY_PATH}
+    #
+    # BOTH THE FOLDED SCALAR AND THE TRAILING SEMICOLONS ARE LOAD-BEARING.
+    # llm-d-benchmark interpolates this UNTRIMMED into a single command line
+    # (config/templates/jinja/_macros.j2:140, and :115/:366/:380 -- all four
+    # sites lack `| trim`, at 1b18402 and on main alike; the same line at :115
+    # trims customCommand, so the omission is specific to this variable):
+    #     {{ preprocess_script }} {{ preprocess_sep }} vllm serve ...
+    # with preprocess_sep = ';' for any scenario without contextLengthRanges.
+    #
+    #   `>-` (folded, chomped) is required because a literal `|` block keeps its
+    #   trailing newline, which puts the separator alone on the next line:
+    #       . /shared-config/llmdbench_env.sh
+    #        ; vllm serve ...
+    #   and bash rejects a command starting with `;`. Observed twice on cluster:
+    #   "syntax error near unexpected token `;'".
+    #
+    #   The trailing `;` on each line is required because folding joins lines
+    #   with SPACES. Without them the three statements collapse into one
+    #   `export` command that swallows `.` and the env path as variable names --
+    #   "export: `.': not a valid identifier" -- so the env file is NEVER
+    #   sourced and NIXL comes up unconfigured. That variant PASSES `bash -n`,
+    #   which makes it worse than the crash: silent, not loud.
+    #
+    # Neither half is sufficient alone. Do not reformat this for readability.
+    # Revert to a plain `|` block only once `| trim` lands upstream at all four
+    # sites. pd-infocomm-2 baselines/baseline.yaml:135 carries the same form.
+    preprocessScript: >-
+      export LD_LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | sed ':a; N; $!ba; s/\n/:/g'):${LD_LIBRARY_PATH};
+      export LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | head -1):${LIBRARY_PATH};
       . /shared-config/llmdbench_env.sh
     volumes:
     # Handoff between the preprocess init container (writes) and the
@@ -165,10 +191,10 @@ scenario:
     # 40Gi/4.
     resources:
       limits:
-        memory: '16Gi'  # sim2real-bootstrap default (UNMEASURED)
-        cpu: '8'  # sim2real-bootstrap default (UNMEASURED)
+        memory: '64Gi'  # sim2real-bootstrap default (UNMEASURED)
+        cpu: '16'  # sim2real-bootstrap default (UNMEASURED)
       requests:
-        memory: '16Gi'  # sim2real-bootstrap default (UNMEASURED)
+        memory: '32Gi'  # sim2real-bootstrap default (UNMEASURED)
         cpu: '8'  # sim2real-bootstrap default (UNMEASURED)
 
   # Sidecar half of the connector decision the engine makes in

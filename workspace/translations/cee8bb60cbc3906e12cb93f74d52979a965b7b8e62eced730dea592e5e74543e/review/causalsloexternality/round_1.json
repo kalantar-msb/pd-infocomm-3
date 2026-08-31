@@ -1,0 +1,21 @@
+{
+  "round": 1,
+  "consensus": false,
+  "approve_count": 0,
+  "total_successful": 1,
+  "reviews": [
+    {
+      "model": "agent-reviewer",
+      "verdict": "NEEDS_CHANGES",
+      "issues": [
+        "[assembly] BLOCKER: the per-algorithm generated source tree was missing. generated/causalsloexternality/ held only the config and output JSON, no copies of the 27 files_created or the 1 files_modified path. sim2real build runs restore_baseline (deletes files_created, git checkout -- files_modified) then restore_treatment, which copies from generated_dir/<algo>/<rel_path>; with no copies the build would delete the plugin from the submodule and then fail with FileNotFoundError -> return 2.",
+        "[fidelity] The declared size of the core modification was wrong in output.json (+24 lines) and in the review request (+30). git diff --numstat reports 34 insertions, 0 deletions.",
+        "[code-quality] The review request's gate claims were stale: metrics.go gained an 11th collector while metrics_test.go still asserted 10, so the package test was failing when the reviewer started. Six source files plus output.json changed after the request was sent.",
+        "[fidelity] The counter enumeration in output.json's description still listed the pre-D9 set of nine and omitted causal_slo_externality_output_length_folded_total, contradicting the D9 paragraph below it.",
+        "[code-quality] overlay_test.go decoded Scenario[0].Name, APIVersion and Kind but asserted none of them, leaving Criterion 5 Step A's scenario-name match unguarded.",
+        "[open item] Unverified whether the in-tree token-producer populates request.Body.TokenizedPrompt (which promptTokens reads) rather than publishing only to the declared data key. If the latter, promptTokens would return (0,false) on every request and the arm would never compute J while the EPP looked healthy."
+      ],
+      "summary": "The Go port itself is the strongest I have reviewed in this pipeline -- the objective, the causal gating, the forced settings, the estimator substitution, the two-registration split, and the v0.10.0 re-derivation all check out, and I verified the gates independently. The blocker is not in the plugin: the translation directory does not carry the artifact the build step reads, so this port cannot reach a cluster. Agreed with both judgement calls (StabilityBeta, PreRequest erroring) and with both test-design questions (the overlay_test multi-candidate refactor loses no coverage; configload_test.go's boundary is in the right place, made safe by the post-tolerance handle assertions rather than by the string match)."
+    }
+  ]
+}

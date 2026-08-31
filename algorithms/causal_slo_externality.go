@@ -12,7 +12,7 @@
 // # PINS
 //
 //	simulation  vishakha-ramani/inference-sim  871b169bb13934ca8dd1e002638e1f6bf490b3b5  (infocom-implementation)
-//	target      llm-d/llm-d-router             5f4e762f341a5196393ce79f8a57c3e1900c4a6b  (v0.9.0)
+//	target      llm-d/llm-d-router             71f4f0999f95b96c49a9d0c4afbd18dfdb943c26  (v0.10.0)
 //	engine      vllm-project/vllm              v0.26.0
 //
 // Simulator citations are relative to the simulation pin; target citations to the
@@ -125,8 +125,8 @@
 //     a_r is BUILT on the target (config.md §5 signal 10) via a tokenizer sidecar
 //     plus a token-producer plugin, and its carrier is a NULLABLE pointer --
 //     TokenizedPrompt is documented as "parser-derived tokenization results when
-//     available" (pkg/epp/framework/interface/requesthandling/types.go:98-100), with
-//     TokenCount() at :126. Absence is a real runtime state. Upstream has no
+//     available" (pkg/epp/framework/interface/requesthandling/types.go:115-117), with
+//     TokenCount() at :191. Absence is a real runtime state. Upstream has no
 //     counterpart guard, because the simulation's input length is exact DES state and
 //     cannot fail.
 //     WHY THE DIRECTION IS NOT A ROUTING BIAS: on failure this arm returns no

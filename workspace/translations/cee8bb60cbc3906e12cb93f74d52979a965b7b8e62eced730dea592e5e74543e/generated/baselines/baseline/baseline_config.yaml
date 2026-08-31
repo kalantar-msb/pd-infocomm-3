@@ -1,0 +1,229 @@
+# Baseline scenario overlay for pd-infocomm-3 -- the `llm-d threshold` reference arm.
+#
+# Deep-merged onto baselines/baseline.yaml by `sim2real assemble`:
+#   baseline_resolved = deep_merge(framework_defaults, baselines/baseline.yaml, THIS FILE)
+# and it is also the base of every treatment:
+#   treatment_resolved = deep_merge(baseline_resolved, treatment.yaml, <algo>_config.yaml)
+#
+# So everything here that must be COMMON-MODE across arms is deliberately placed
+# here rather than in an arm overlay: the engine flags, the pod GPU-type label, the
+# tokenizer binding, the prefix producer, and epp.replicas. An arm that differed on
+# any of those would confound the comparison the arms exist to make.
+#
+# `name` MUST equal the scenario name in baselines/baseline.yaml exactly
+# (`pdinfocomm3`), or llmdbenchmark deploys two scenarios instead of merging one.
+
+scenario:
+- name: pdinfocomm3
+
+  router:
+    # ---------------------------------------------------------------------
+    # InferenceObjectives -- config.md §5 signal 19 (SLO class via request header)
+    # ---------------------------------------------------------------------
+    # ONE objective, not three. Every cohort in all three workloads declares
+    # `slo_class: standard` (workloads/interactive-chat-single-turn.yaml:21 and the
+    # other two), so `blis observe` sends `x-gateway-inference-objective: standard`
+    # on every request and there is exactly one objective name to resolve.
+    #
+    # This is the same fact that makes the tau triple UNSELECTABLE per request
+    # (config.md §6): the class is one constant string across the whole grid, so the
+    # tau triple is carried in plugin config and one assemble is run per workload.
+    # The objective exists for priority/queue-ordering and for /sim2real-check
+    # S5c.6's objective-resolution evidence, NOT to select tau.
+    #
+    # priority: 3 is `standard` in BLIS's own GIE priority map
+    # (inference-sim/sim/slo_priority.go:22-28: critical 4, standard 3, batch -1,
+    # sheddable -2, background -3), so the deployed CR agrees with what the load
+    # generator assumes. Non-negative, so nothing is shed.
+    #
+    # Chart-native shape (`router.inferenceObjectives`, a list of {name, priority});
+    # the routerlib chart renders each into an `InferenceObjective` CR at deploy time
+    # and hardcodes poolRef from Release.Name (sim2real pipeline/README.md, "Typical
+    # overlay content"). The legacy `extraObjects` shape is NOT used: config.md
+    # declares no InferenceObjective manifest to copy verbatim, and the chart-native
+    # list is what the deployment path consumes.
+    inferenceObjectives:
+    - name: standard
+      priority: 3
+
+    epp:
+      # PINNED IN THE BASELINE, so both arms match -- config.md §11, degradation D2.
+      # The treatment arms maintain an EPP-side shadow table of the requests they
+      # placed (signals 12-18); two replicas PARTITION that table, so each replica
+      # sees a fraction of the residents and every externality is under-counted.
+      # It is pinned here rather than in an arm overlay so the baseline and both
+      # treatments run identical EPP topology.
+      replicas: 1
+
+      pluginsConfigFile: custom-plugins.yaml
+      pluginsCustomConfig:
+        # The stock llm-d threshold P/D policy: pick decode with load-shaped
+        # scorers, then disaggregate iff the uncached suffix clears a token
+        # threshold. This is the `llmd_prefix_threshold_workload_tuned` arm of
+        # sim_results/ (README minimax ranking, rank 4; worst regret 0.3517).
+        #
+        # It is DECODE-FIRST by construction, which is the decomposition the focal
+        # arm's required shape exists to avoid (config.md §10 prices the decode-first
+        # decomposition at +0.0485 equal-cell mean goodput against the joint shape).
+        # That is the point: the baseline is the target's natural decomposition, and
+        # the treatments replace it wholesale.
+        custom-plugins.yaml: |
+          apiVersion: llm-d.ai/v1alpha1
+          kind: EndpointPickerConfig
+          plugins:
+          # --- Producers: the signals both the baseline and both arms read -------
+          #
+          # DECLARED IN THE BASELINE ON PURPOSE. Both treatment arms read a_r
+          # (config.md §5 signal 10) and a_p (signal 11), and signal 11's note is
+          # explicit that the prefix signal must be bound BY PRODUCER NAME so both
+          # arms read ONE signal -- a data key's identity includes its producer
+          # name, so an unbound read can silently become a second,
+          # differently-configured signal. Declaring the producers once here and
+          # inheriting them is what makes that binding shared rather than
+          # per-arm.
+          - type: token-producer
+            parameters:
+              # ${model.name} is expanded by llm-d-benchmark at render time; passed
+              # through verbatim rather than substituted here.
+              modelName: ${model.name}
+              vllm:
+                # The loopback render sidecar in the EPP pod, enabled by the
+                # `tokenizer-sidecar` defaults fragment (NOT in
+                # transfer.yaml:defaults.disable). config.md §11: with nothing
+                # serving :8000 the failure is SILENT -- getUserInputLenInTokens
+                # returns 0 with no error, every prompt reads as shorter than any
+                # threshold, and no disaggregation is ever chosen. The observable
+                # signature is thousands of requests and zero prefill selections.
+                url: "http://localhost:8000"
+          - type: approx-prefix-cache-producer
+
+          # --- The threshold decider --------------------------------------------
+          - type: prefix-based-pd-decider
+            parameters:
+              # UNDERIVABLE FROM THIS BUNDLE, and stated as a decision rather than
+              # left to a default. The simulation arm is named
+              # `llmd_prefix_threshold_workload_tuned` -- the threshold was tuned
+              # PER WORKLOAD -- and no file in sim_results/, config.md, or README.md
+              # records the tuned values. 512 is llm-d's own guide value
+              # (llm-d-benchmark config/scenarios/guides/pd-disaggregation.yaml and
+              # the disagg profile-handler README example).
+              #
+              # WHY IT IS NOT 0: `nonCachedTokens: 0` DISABLES the decider entirely
+              # (the disagg README is explicit -- it always returns false), which
+              # would silently turn the P/D baseline into a decode-only baseline
+              # while still deploying a prefill pod. That is a different arm.
+              #
+              # If the tuned per-workload values are recovered upstream, set them
+              # here and re-assemble; the baseline number in sim_results/ is not
+              # reproducible at an arbitrary threshold, so treat baseline-vs-sim
+              # comparisons as unanchored until then. Arm-vs-arm comparisons are
+              # unaffected: both treatments replace this decider outright.
+              nonCachedTokens: 512
+
+          - type: disagg-profile-handler
+            parameters:
+              deciders:
+                prefill: prefix-based-pd-decider
+
+          # --- Role filters and load-shaped scorers ------------------------------
+          - type: prefill-filter
+          - type: decode-filter
+          - type: prefix-cache-scorer
+            parameters:
+              # BOUND BY PRODUCER NAME -- config.md §5 signal 11. Explicit even
+              # though it matches the producer declared above, so a second
+              # producer cannot silently capture this read.
+              prefixMatchInfoProducerName: approx-prefix-cache-producer
+          - type: queue-scorer
+          - type: kv-cache-utilization-scorer
+          - type: active-request-scorer
+
+          schedulingProfiles:
+          # Profile names match disagg-profile-handler's defaults (`decode`,
+          # `prefill`), so no `profiles:` block is needed.
+          - name: decode
+            plugins:
+            - pluginRef: decode-filter
+            - pluginRef: active-request-scorer
+              weight: 2
+            - pluginRef: prefix-cache-scorer
+              weight: 3
+          - name: prefill
+            plugins:
+            - pluginRef: prefill-filter
+            - pluginRef: prefix-cache-scorer
+              weight: 3
+            - pluginRef: queue-scorer
+              weight: 2
+            - pluginRef: kv-cache-utilization-scorer
+              weight: 2
+
+  # -----------------------------------------------------------------------
+  # Pod GPU-type label -- config.md §5 signal 8, §2, §11
+  # -----------------------------------------------------------------------
+  # theta is keyed by a POD LABEL, not by the scenario's acceleratorType, because
+  # the scenario schema expresses ONE acceleratorType per role and the campaign's
+  # decode pool holds two GPU types (config.md §2: instance_1 H100, instance_2
+  # A100). Per-GPU coefficients differ most in the per-iteration intercept --
+  # 25 563.82 us on A100 against 16 613.54 us on H100, a factor of 1.539 present on
+  # EVERY iteration regardless of KV state -- so a wrong or defaulted label is wrong
+  # on every decision. The arms REJECT an endpoint with an absent or unknown value
+  # and never default.
+  #
+  # DISCLOSED CAPABILITY GAP, not a silent homogenization. `modelArtifacts.extraLabels`
+  # is ONE map stamped on BOTH roles' pods (llm-d-benchmark
+  # config/templates/jinja/13_ms-values.yaml.j2:65-69), so it cannot express
+  # per-role hardware, let alone per-instance hardware within the decode role. The
+  # value below therefore describes instance_0 (prefill, H100) and instance_1
+  # (decode, H100) and NOT instance_2 (decode, A100).
+  #
+  # WHAT THE OPERATOR MUST DO: config.md §2 lists the options and this bundle
+  # deliberately does not choose among them. The A100 decode pod must be deployed
+  # outside the generated scenario, or the scenario hand-edited after render, and it
+  # must carry `pd-infocomm.io/gpu-type: A100_SXM_80GB` with its nodeSelector pinned
+  # to the matching hardware -- config.md §11: pinning makes a mismatch fail at
+  # SCHEDULING time instead of serving traffic under the wrong physics. Both
+  # coefficient sets are transcribed into every arm's plugin config keyed by these
+  # label values, so a hand-added A100 pod is priced correctly the moment it carries
+  # the label, with no plugin-config change.
+  #
+  # Running without the A100 pod is a valid but DIFFERENT experiment
+  # (`h100_homogeneous`), and it is where the mechanism has least room -- the
+  # heterogeneity is the condition it exploits.
+  modelArtifacts:
+    extraLabels:
+      pd-infocomm.io/gpu-type: H100_SXM_80GB
+
+  # -----------------------------------------------------------------------
+  # Engine flags -- config.md §11
+  # -----------------------------------------------------------------------
+  # THE WHOLE LIST IS REPEATED, both here and under prefill, and that is required
+  # rather than redundant: `additionalFlags` is a list of SCALARS, and
+  # pipeline/lib/values.py `_merge_lists` REPLACES a scalar list wholesale instead
+  # of merging into it. Emitting only the new flag would drop the four flags
+  # baselines/baseline.yaml sets.
+  #
+  # --enable-force-include-usage is COMMON-MODE and belongs in the baseline: it
+  # changes ENGINE behaviour (per-chunk `usage` rather than final-chunk only), so
+  # setting it on one arm and not the other would be a confound. It is what makes
+  # signals 15 and 16 exist at all -- without it `Usage.CompletionTokens` arrives
+  # only in the FINAL chunk, so every resident's StepsDone stays 0 for its whole
+  # lifetime and every remaining-steps estimate is wrong while the shadow table
+  # looks present and correct.
+  decode:
+    vllm:
+      additionalFlags:
+      - "--max-num-seqs=256"  # config.md row "max_num_seqs"
+      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
+      - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"; signal 11 needs it
+      - "--enable-force-include-usage"  # config.md §11, signals 15 + 16
+
+  prefill:
+    vllm:
+      additionalFlags:
+      - "--max-num-seqs=256"  # config.md row "max_num_seqs"
+      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
+      - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"; signal 11 needs it
+      - "--enable-force-include-usage"  # config.md §11, signals 15 + 16

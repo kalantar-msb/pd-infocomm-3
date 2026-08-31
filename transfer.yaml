@@ -6,13 +6,44 @@ scenario: pdinfocomm3
 component:
   repo: github.com/llm-d/llm-d-router
   kind: EndpointPickerConfig
-  # Tag v0.9.0. `v0.9.0^{commit}` resolves to exactly this SHA (the tag is
-  # annotated, object dda86863), so the latest stable release and the pin in
-  # README.md, config.md, and all three arms' PINS headers are the same commit.
-  # Verified present at this ref: the 7-field Metrics struct
-  # (pkg/epp/framework/interface/datalayer/metrics.go), the scheduling picker
-  # plugin tree, and apix/config/v1alpha1/endpointpickerconfig_types.go.
-  ref: 5f4e762f341a5196393ce79f8a57c3e1900c4a6b
+  # Tag v0.10.0. `v0.10.0^{commit}` resolves to exactly this SHA (the tag is
+  # annotated, object 0b43c187). Bumped 2026-08-28 from v0.9.0
+  # (5f4e762f341a5196393ce79f8a57c3e1900c4a6b).
+  #
+  # NOT YET PROPAGATED, and one of these is load-bearing: README.md:20,
+  # config.md:10, and all three arms' PINS headers
+  # (algorithms/causal_slo_externality.go:15, algorithms/least_ttft_joint.go:11,
+  # algorithms/kairos_paper.go:14) still cite the v0.9.0 SHA. The three
+  # algorithms/*.go files are folded into the translation hash by
+  # slicer.translation_hash_with_sources, so their headers must be corrected
+  # BEFORE `sim2real translate` runs -- otherwise the hash keys a translation
+  # whose own specification layer contradicts this pin.
+  #
+  # Verified present at this ref: the Metrics struct
+  # (pkg/epp/framework/interface/datalayer/metrics.go, byte-identical to
+  # v0.9.0), the scheduling picker plugin tree, and
+  # apix/config/v1alpha1/endpointpickerconfig_types.go.
+  #
+  # Verified STABLE across the bump, both load-bearing for this bundle:
+  #   - interface/scheduling/plugins.go:47 (ProfileHandler.Pick) and :77
+  #     (Picker.Pick) are unchanged, so the two-registration handler/picker
+  #     split both arms require still holds.
+  #   - interface/datalayer/metrics.go is unchanged, so the observability
+  #     ceiling behind declared degradation D1 is unchanged: still one
+  #     WaitingQueueSize integer, no per-request wait-queue inputs.
+  # CHANGED, reviewed as compatible:
+  #   - interface/scheduling/types.go gained ProfileRunResult.ScoredCandidates,
+  #     an additive field; TargetEndpoints is still a slice at :166.
+  #   - pkg/epp/scheduling/ changed substantially (scheduler.go, and +161 lines
+  #     in scheduler_profile.go, which owns the score-range clamp that forces
+  #     the picker shape described under `context`). Re-read before trusting the
+  #     port; the clamp argument was verified at v0.9.0.
+  # CHANGED, blocking a plain rebuild:
+  #   - cmd/epp/runner/runner.go was rewritten (558 lines). The generated
+  #     registration overlay is a WHOLE-FILE copy, not a patch, so it MUST be
+  #     re-derived against this ref. A v0.9.0 runner.go laid onto this tree does
+  #     not build -- this is what the aborted 2026-08-28 --force-rebuild hit.
+  ref: 71f4f0999f95b96c49a9d0c4afbd18dfdb943c26
   base_image:
     hub: ghcr.io/llm-d
     name: llm-d-router
@@ -77,76 +108,51 @@ blis_observe:
   timeout: 1800  # source: config.md
   warmupRequests: 50  # source: config.md
   prewarmDuration: "60s"  # source: config.md
-  # DEVIATES FROM config.md §8, DELIBERATELY. §8 declares no extra flags; this
-  # carries one. Operator decision of 2026-08-27, taken with the measurement cost
-  # below understood and accepted. Recorded here rather than hand-edited into
-  # generated PipelineRuns, which is what previously stranded the setting outside
-  # the source.
+  # config.md §8 declares no extra flags, and as of the v0.10.0 bump this block
+  # carries none. The history is kept because run try1 was measured UNDER the
+  # workaround below, so its numbers and any taken after this edit are not the
+  # same quantity.
   #
-  # OPEN BLOCKER this works around, inherited from pd-infocomm-2 and still live at
-  # the pinned target: this is a P/D bundle (prefill 1 / decode 2, NixlConnector,
-  # routing.connector nixlv2) with the same three workloads, so the `min_tokens`
-  # conflict that bundle hit applies here.
-  #
-  # THE MECHANISM IS NARROWER THAN pd-infocomm-2 RECORDED, and the difference
-  # matters for option (1). That bundle stated the connector "never touches
-  # min_tokens". At v0.9.0 it does -- but only on the /generate path. The clamp is
-  # driven by a per-API field list (proxy.go:129-131):
-  #     chatCompletionTokenLimitFields = {max_tokens, max_completion_tokens}
-  #     generateStyleTokenLimitFields  = {max_tokens, min_tokens}
-  # applied at connector_nixlv2.go:174-176 (`tokenMap[field] = 1`), with the API
-  # type fixed by the route: POST /v1/completions -> APITypeChatCompletions
-  # (proxy.go:487), i.e. the list WITHOUT min_tokens. The test asserting
-  # min_tokens == 1 on the prefill leg (connector_nixlv2_test.go:755) is explicitly
-  # a *generate* API test. `blis observe` posts /v1/completions and sets
-  # MinTokens = MaxOutputLen per request (observe_cmd.go:1441-1461), so every
-  # disaggregated request reaches prefill with min_tokens > max_tokens=1 and vLLM
-  # rejects it:
+  # THE BLOCKER, inherited from pd-infocomm-2 and live at the former v0.9.0 pin.
+  # `blis observe` posts /v1/completions and sets MinTokens = MaxOutputLen per
+  # request (observe_cmd.go:1441-1461). The routing sidecar clamps token-limit
+  # fields to 1 on the prefill leg, driven by a per-API field list; at v0.9.0 the
+  # chat-completions list omitted min_tokens while the generate list carried it,
+  # and POST /v1/completions maps to APITypeChatCompletions -- the list WITHOUT
+  # min_tokens. So every disaggregated request reached prefill with
+  # min_tokens > max_tokens=1 and vLLM rejected it:
   #   ValueError: min_tokens must be less than or equal to max_tokens=1, got 228
   #   POST /v1/completions HTTP/1.1" 400 Bad Request
   #
-  # Three options, recorded at pd-infocomm-2 docs/signal-mapping.md §8.5, none
-  # resolved there:
-  #   (1) Fix llm-d-router -- THE CORRECT FIX, and now known to be a ONE-LINE
-  #       change with a shape upstream already endorses: add requestFieldMinTokens
-  #       to chatCompletionTokenLimitFields (proxy.go:129), exactly as
-  #       generateStyleTokenLimitFields (:131) already does. The save/restore
-  #       machinery at connector_nixlv2.go:119 and :324 then restores the client's
-  #       min_tokens for the decode leg with no further work, so the output-length
-  #       spec is preserved and this flag becomes unnecessary. Check
-  #       connector_mooncake.go and connector_shared_storage.go for the same gap.
-  #       PREFER THIS as soon as a submodule patch is acceptable; it is the only
-  #       option that keeps absolute values comparable to sim_results/.
-  #   (2) *** TAKEN 2026-08-27 *** extraArgs: "--unconstrained-output" -- sets
-  #       MinTokens=0 and omits max_tokens, so output runs to EOS bounded only by
-  #       max_model_len minus prompt. It CHANGES THE MEASURED QUANTITY: goodput is
-  #       a hard conjunction over TTFT, mean ITL, and E2E, and E2E scales in output
-  #       length against tau_e2e = 16 s. Common-mode across arms, so ORDERING
-  #       claims may survive; absolute values are NOT comparable to sim_results/.
-  #       pd-infocomm-2's realized record rejects it for measurement runs while its
-  #       own transfer.yaml carries it -- read that as an unblock under protest.
-  #   (3) Small BLIS patch -- MinTokens=0 while keeping MaxOutputLen. Preserves the
-  #       output-length spec. No flag exists today.
+  # WHAT WAS DONE, 2026-08-27: option (2), extraArgs: "--unconstrained-output"
+  # -- MinTokens=0 and max_tokens omitted, so output ran to EOS bounded only by
+  # max_model_len minus prompt. It CHANGED THE MEASURED QUANTITY: goodput is a
+  # hard conjunction over TTFT, mean ITL and E2E, and E2E scales in output
+  # length, so try1's ABSOLUTE VALUES ARE NOT COMPARABLE to sim_results/. The
+  # flag was common-mode across both arms, so try1's ORDERING claims may survive
+  # -- which is what the bundle's pre-registered expectation rests on (README,
+  # "Pre-registered expectation" item 1). It applied to all three workloads
+  # unavoidably: interactive-chat was worst affected (declares gaussian(mean
+  # 300, cap 1000) against tau_e2e = 16 s), reasoning least (tau_e2e = 802 s,
+  # output already capped at 32000).
   #
-  # WHAT THIS COSTS THE RESULTS, so no reader has to reconstruct it:
-  #   - Output length is no longer drawn from each workload's declared
-  #     distribution. interactive-chat declares gaussian(mean 300, cap 1000)
-  #     against tau_e2e = 16 s; unconstrained, the ceiling is max_model_len
-  #     (131072) minus prompt. reasoning is least affected (tau_e2e = 802 s,
-  #     output already capped at 32000).
-  #   - Goodput is a hard conjunction over TTFT, mean ITL and E2E, and E2E scales
-  #     in output length, so E2E in particular measures something other than what
-  #     the campaign measured. ABSOLUTE VALUES ARE NOT COMPARABLE TO sim_results/.
-  #   - The flag is common-mode across both arms, so ORDERING claims may survive.
-  #     The bundle's pre-registered expectation is an ordering claim with no
-  #     pre-registered margin (README, "Pre-registered expectation" item 1), which
-  #     is what this deviation leaves intact.
-  #   - It applies to ALL THREE workloads unavoidably: blis_observe is a single
-  #     global block with no per-workload seam, and the trigger is
-  #     workload-independent.
-  # Revisit as soon as option (1) is available; it is one line upstream and it
-  # restores comparability.
-  extraArgs: "--unconstrained-output"  # operator decision 2026-08-27 (option 2); DEVIATES from config.md §8
+  # WHAT RESOLVED IT: option (1), recorded here as the correct fix, landed
+  # upstream and is present at the v0.10.0 pin. pkg/sidecar/proxy/proxy.go:143
+  # now reads
+  #   chatCompletionTokenLimitFields =
+  #       {max_tokens, max_completion_tokens, min_tokens}
+  # matching generateStyleTokenLimitFields (:145). The clamp at
+  # connector_nixlv2.go:179 therefore covers min_tokens on the prefill leg, and
+  # the save/restore machinery returns the client's min_tokens when the decode
+  # body is built (connector_nixlv2.go:480), so the output-length spec survives.
+  # Flag removed 2026-08-28: output lengths are again drawn from each workload's
+  # declared distribution and absolute values are comparable to sim_results/.
+  #
+  # NOT YET CONFIRMED ON CLUSTER -- the fix is read from source at the pin, not
+  # observed. The first v0.10.0 run must be checked for the 400 above on the
+  # prefill leg. If it recurs, reinstate `extraArgs: "--unconstrained-output"`
+  # here and reopen this note; do NOT hand-edit generated PipelineRuns, which is
+  # what previously stranded the setting outside the source.
 
 context:
   text: |
@@ -185,9 +191,9 @@ context:
     Filter is required, not incidental: Picker.Pick receives only
     []*ScoredEndpoint and no request, so the arriving request's token count
     reaches the argmin no other way. All profiles receive the same
-    candidateEndpoints slice (pkg/epp/scheduling/scheduler.go:78), so an
+    candidateEndpoints slice (pkg/epp/scheduling/scheduler.go:81), so an
     unfiltered profile sees both pools; ProfileRunResult.TargetEndpoints is a
-    slice (pkg/epp/framework/interface/scheduling/types.go:165-167), so one
+    slice (pkg/epp/framework/interface/scheduling/types.go:166), so one
     picker run carries both picks.
 
     THE HAZARD IS SILENT FALLBACK to the target's natural decode-first
@@ -269,5 +275,5 @@ defaults:
   #   - rdma-device-reservation     (ships disabled)
   #   - routing-proxy-resources
   #   - tokenizer-sidecar
-  #   - vllm-keepalive
   #   - vllm-logging
+

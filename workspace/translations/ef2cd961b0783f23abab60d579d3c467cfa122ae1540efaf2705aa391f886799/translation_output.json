@@ -2,7 +2,7 @@
   "version": 1,
   "translation_hash": "ef2cd961b0783f23abab60d579d3c467cfa122ae1540efaf2705aa391f886799",
   "source": "skill",
-  "alias": "pdinfocomm3",
+  "alias": null,
   "algorithms": [
     {
       "name": "causalsloexternality",

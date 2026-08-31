@@ -7,7 +7,7 @@ Three pins; every citation in this file and in `algorithms/` resolves against th
 | tree | repository | pin |
 |---|---|---|
 | simulation | `vishakha-ramani/inference-sim` | `871b169bb13934ca8dd1e002638e1f6bf490b3b5` (`infocom-implementation`) |
-| target | `llm-d/llm-d-router` | `5f4e762f341a5196393ce79f8a57c3e1900c4a6b` (v0.9.0) |
+| target | `llm-d/llm-d-router` | `71f4f0999f95b96c49a9d0c4afbd18dfdb943c26` (v0.10.0) |
 | engine | `vllm-project/vllm` | v0.26.0 |
 
 Simulator paths are relative to the simulation pin, target paths to the target pin.

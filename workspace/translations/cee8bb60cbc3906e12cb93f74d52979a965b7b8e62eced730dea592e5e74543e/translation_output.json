@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "translation_hash": "cee8bb60cbc3906e12cb93f74d52979a965b7b8e62eced730dea592e5e74543e",
+  "source": "skill",
+  "alias": "pdinfocomm3",
+  "algorithms": [
+    {
+      "name": "causalsloexternality",
+      "source_path": "algorithms/causal_slo_externality.go",
+      "source_sha256": "61392bc27f19b8b027dbab3c1e7141db64dee92a7e021ccee1aa1199d01ba155",
+      "config_path": null,
+      "image_ref": "ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-causalsloexternality",
+      "image_digest": "sha256:6c7300c491cf40e9e9a71284a10a753370a167db9b60eced96a1ed3ba7e9d0d7"
+    },
+    {
+      "name": "leastttftjoint",
+      "source_path": "algorithms/least_ttft_joint.go",
+      "source_sha256": "f6edeb171b7466fa45f9517c09fc1c5f52bdf5d1bf8c8b5326f1a4bb62df6669",
+      "config_path": null,
+      "image_ref": "ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-leastttftjoint",
+      "image_digest": "sha256:e44579b1854eac5a940e5223a94d8928beb390fbbfdce7051292bd810862214c"
+    }
+  ],
+  "created_at": "2026-08-28T14:02:03Z"
+}

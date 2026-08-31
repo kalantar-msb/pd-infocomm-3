@@ -11,7 +11,7 @@
 // # PINS
 //
 //	simulation  vishakha-ramani/inference-sim  871b169bb13934ca8dd1e002638e1f6bf490b3b5  (infocom-implementation)
-//	target      llm-d/llm-d-router             5f4e762f341a5196393ce79f8a57c3e1900c4a6b  (v0.9.0)
+//	target      llm-d/llm-d-router             71f4f0999f95b96c49a9d0c4afbd18dfdb943c26  (v0.10.0)
 //	engine      vllm-project/vllm              v0.26.0
 //
 // Upstream: "Towards Load-Aware Prefill Deflection for Disaggregated LLM Serving",
@@ -107,9 +107,13 @@
 // seven fields at pkg/epp/framework/interface/datalayer/metrics.go:26-42. It would be
 // too strong to say the field cannot be populated at all -- the target already
 // maintains a per-endpoint in-flight prompt-token counter of nearly this shape,
-// incremented by each request's input token count at dispatch on BOTH the prefill and
-// the decode pod
-// (pkg/epp/framework/plugins/requestcontrol/dataproducer/predictedlatency/requestcontrol_hooks.go:100-106).
+// carrying each request's input tokens and snapshotted at dispatch on BOTH the prefill
+// and the decode pod
+// (pkg/epp/framework/plugins/requestcontrol/dataproducer/predictedlatency/requestcontrol_hooks.go:108-115,
+// reading the datalayer-backed load via readInFlightLoad at plugin.go:222). At the
+// former v0.9.0 pin this was an inline endpointCounter().Add(inputTokenCount) at
+// requestcontrol_hooks.go:100-106; v0.10.0 moved it behind the in-flight load without
+// changing what is observable.
 //
 // THE ARM STILL MUST NOT BE REGISTERED, for reasons that survive that counter:
 //   - it counts tokens DISPATCHED, not tokens REMAINING. Without per-request prefill

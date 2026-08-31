@@ -1,0 +1,20 @@
+{
+  "round": 2,
+  "consensus": false,
+  "approve_count": 0,
+  "total_successful": 1,
+  "reviews": [
+    {
+      "model": "agent-reviewer",
+      "verdict": "NEEDS_CHANGES",
+      "issues": [
+        "[assembly] BLOCKER restated from round 1: the per-algorithm generated source tree missing. NOTE: the reviewer was reading snapshot v2; the tree was materialized in the round-2 submission that crossed with this verdict. Verified fixed: 28/28 declared paths byte-identical to the checkout, no undeclared strays.",
+        "[fidelity] Declared size still '+24 lines'. NOTE: also already corrected in the crossed round-2 submission to '34 insertions and 0 deletions per git diff --numstat'.",
+        "[code-quality] sloClassOf hand-rolled the objective-header alias list instead of using the canonical table in pkg/epp/metadata. Risk: a third alias added upstream lands in the table and not in the loop, silently resolving every request to the fallback class and merging all classes into one nHatOut bucket. FIXED via metadata.HeaderNames.",
+        "[code-quality] The producer-rename comment in config.go framed the consequence in prefix-producer terms only. For the TOKEN producer a nil-parameter auto-instantiation falls through to estimateBackend, which packs raw bytes at 4 bytes/token, so a_r becomes a byte-count heuristic while TokenizedPrompt is non-nil and the D8 counter stays zero. FIXED: comment now states the per-producer consequences separately.",
+        "[code-quality] Gate claims were stale a second time: the package did not compile at 10:52 (configload_test.go: undefined: bytes) and the import was added at 10:58 during the review."
+      ],
+      "summary": "Accepted all of snapshot v2. The round-1 blocker appeared untouched because the verdict crossed with the round-2 submission that fixed it. Judged D9's handling, bias direction and net-direction claim all correct, and supplied a stronger form of the keep-the-fold argument (nHat stuck at 1 collapses the decode externality to ~0, the same degeneration as the tau_e2e=0 trap). Confirmed the Consumes/body split, the two unguarded director panic paths are satisfied by the port's invariants, the bylabel value sets and allowsNoLabel asymmetry, apiVersion, ScoredCandidates, CachedBlockCount x BlockSizeTokens, nil Metrics handling, and pick-once. Restated that configload_test.go's tolerance is made safe by the construction-and-binding assertions after it rather than by the string match."
+    }
+  ]
+}

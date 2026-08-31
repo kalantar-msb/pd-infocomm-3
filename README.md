@@ -17,7 +17,7 @@ so a wrong guess fails loudly rather than mis-scoring silently.
 | tree | repository | pin |
 |---|---|---|
 | simulation | `vishakha-ramani/inference-sim` | `871b169bb13934ca8dd1e002638e1f6bf490b3b5` (`infocom-implementation`) |
-| target | `llm-d/llm-d-router` | `5f4e762f341a5196393ce79f8a57c3e1900c4a6b` (v0.9.0) |
+| target | `llm-d/llm-d-router` | `71f4f0999f95b96c49a9d0c4afbd18dfdb943c26` (v0.10.0) |
 | engine | `vllm-project/vllm` | v0.26.0 |
 
 The simulation worktree was clean at that commit. All 16 files in `sim_results/`
@@ -65,7 +65,7 @@ not a routing term, and the composite kernel never reads τ_itl.
 A **joint argmin over the cross product**: D local candidates plus D×P
 disaggregated candidates, scored on one scale and compared in one argmin.
 
-This cannot be expressed as a per-endpoint scorer on llm-d-router v0.9.0, for two
+This cannot be expressed as a per-endpoint scorer on llm-d-router v0.10.0, for two
 independent reasons that must be confirmed against the pinned checkout:
 
 1. a scorer returns a per-endpoint map and has **no way to name a pair**;
@@ -170,6 +170,7 @@ before trusting any magnitude, not an argument that the errors cancel.
 | **D6** | Pre-first-token occupants incomplete | under-counts ⇒ toward **local** |
 | **D7** | `FreeKVBlocks` is a floor | over-states admission delay |
 | **D8** | Tokenization can be unavailable at runtime; on failure an arm makes no decision at all | not a routing bias — a silent fallback to the stock scorer, i.e. a **third policy**. Confounds the comparison if the rate differs between arms |
+| **D9** | The per-class `N_out` running mean folds in requests that never completed. `pkg/epp/handlers/server.go:372-379` forces a terminal `HandleResponseBody(..., true)` for any request that picked a pod but aborted (error, client disconnect, panic), and the response hook carries no termination state, so a truncated `CompletionTokens` is indistinguishable from a realized one. Gating the fold is worse: nothing can be confirmed complete, so the mean would sit at its seed of 1 forever and every remaining-steps estimate would collapse. The fold is kept and counted by `causal_slo_externality_output_length_folded_total` | under-states `N_out`, so residents look closer to finishing and less value is at risk ⇒ under-counts externality ⇒ toward **local** |
 | **Fleet** | The decode pool is genuinely heterogeneous and the scenario schema cannot represent that | **unresolved — see `config.md §2`** |
 | **Own-good** | Carried despite a CI crossing zero | unknown; it is a term with no measured benefit |
 
