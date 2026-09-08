@@ -721,11 +721,42 @@ func (p *Policy) decide(ec *evalCtx, decodeSnaps, prefillSnaps []Snapshot, score
 		orderedD = orderedD[:1]
 	}
 
-	var best *candidate
+	var best, second *candidate
 	consider := func(c candidate) {
+		// CONSUME the objective's stashed breakdown. Clearing lastValid is what stops
+		// a candidate whose arm populates no breakdown from inheriting the previous
+		// candidate's -- silently mislabelling one candidate's terms as another's is
+		// exactly the failure a decomposition log exists to rule out.
+		score, scoreOK := candidateScore{}, false
+		if t := ec.trace; t != nil {
+			score, scoreOK = t.lastScore, t.lastValid
+			t.lastValid = false
+			t.nCandidates++
+			if t.full {
+				t.all = append(t.all, tracedCandidate{c: c, score: score, scoreOK: scoreOK})
+			}
+		}
+		// THE COMPARATOR BELOW IS UNCHANGED, AND THAT IS THE POINT. The strict
+		// improvement threshold and its 1e-12 epsilon are the determinism contract
+		// (ties resolve to the first-enumerated candidate, see the enumeration-order
+		// comment above). The runner-up branch is an `else if` on the demotion path,
+		// so it cannot reorder, admit, or exclude any candidate: the winner of a
+		// traced decision is bit-identical to the winner of an untraced one.
 		if best == nil || c.J < best.J-1e-12 {
+			if best != nil {
+				demoted := *best
+				second = &demoted
+			}
 			cc := c
 			best = &cc
+			if t := ec.trace; t != nil {
+				t.winner, t.winnerOK = score, scoreOK
+			}
+			return
+		}
+		if second == nil || c.J < second.J-1e-12 {
+			cc := c
+			second = &cc
 		}
 	}
 
@@ -744,6 +775,13 @@ func (p *Policy) decide(ec *evalCtx, decodeSnaps, prefillSnaps []Snapshot, score
 	}
 	if best == nil {
 		return candidate{}, false
+	}
+
+	// The margin against the runner-up is the whole reason it is tracked: a winner
+	// reported alone cannot distinguish an objective that decided decisively from one
+	// whose candidates were separated by less than the tie threshold.
+	if t := ec.trace; t != nil && second != nil {
+		t.runnerUp, t.runnerUpOK = *second, true
 	}
 
 	// The COMMIT half of the capacity account, at the winning endpoints, fed by the

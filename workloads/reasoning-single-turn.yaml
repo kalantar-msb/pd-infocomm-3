@@ -9,8 +9,11 @@
 version: "2"
 seed: 42
 category: language
-aggregate_rate: 1.0
-num_requests: 160
+# original 1.0, 800
+# for max_num_batched_tokens = 2048 try 0.27, 150
+# for max_num_batched_tokens = 32768, don't expect change
+aggregate_rate: 0.27
+num_requests: 150
 
 cohorts:
   - id: reasoning

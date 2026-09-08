@@ -23,6 +23,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/go-logr/logr"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	logutil "github.com/llm-d/llm-d-router/pkg/common/observability/logging"
@@ -496,6 +497,21 @@ func (p *Picker) Pick(ctx context.Context, scoredEndpoints []*fwksched.ScoredEnd
 	}
 	ec.reqKVNeed = p.handler.policy.reqKVNeed(in.inputLen)
 
+	// ARM THE TRACE ONLY IF SOMETHING IS LISTENING, gated on the framework's own
+	// Enabled() rather than on config. Below VERBOSE this is one comparison and no
+	// allocation, and decide's recording branches are all `if t := ec.trace; t != nil`
+	// -- so an unobserved decision pays nothing and, more importantly, follows the
+	// identical code path it followed before this logging existed.
+	//
+	// `full` (the per-candidate table) is armed at DEBUG. It is O(D + D*P) rows
+	// per request on an EPP that sits in the request path, so it is the one
+	// volume knob here -- moved down from TRACE to make the per-candidate J
+	// values readable at the verbosity the experiment already runs at (v=4),
+	// rather than requiring v=5, which arms every other TRACE site as well.
+	if logger.V(logutil.VERBOSE).Enabled() {
+		ec.trace = &decisionTrace{full: logger.V(logutil.DEBUG).Enabled()}
+	}
+
 	// The inherited scorer's preference is used ONLY as a tie-break order, and it is
 	// what makes restricting the enumeration reproduce the decomposed rule exactly.
 	// ScoredEndpoint.Score is otherwise ignored: it carries clamped contributions that
@@ -537,10 +553,9 @@ func (p *Picker) Pick(ctx context.Context, scoredEndpoints []*fwksched.ScoredEnd
 	}
 	p.metrics.recordPlacement(placedLocal)
 
-	logger.V(logutil.DEBUG).Info("joint argmin chose placement",
-		"plugin", p.typedName.String(), "requestID", in.requestID,
-		"decode", best.dID, "prefill", best.pID, "local", best.local, "placedLocal", placedLocal,
-		"J", best.J, "candidates", len(decodeSnaps)+len(decodeSnaps)*len(prefillSnaps))
+	if ec.trace != nil {
+		p.logDecision(logger, in, ec, best, placedLocal, len(decodeSnaps), len(prefillSnaps))
+	}
 
 	return &fwksched.ProfileRunResult{TargetEndpoints: targets}
 }
@@ -783,4 +798,134 @@ func requestID(request *fwksched.InferenceRequest) string {
 		return ""
 	}
 	return request.RequestID
+}
+
+// logDecision emits the decision record: what the argmin chose, what it chose
+// against, and the operands it chose on.
+//
+// TWO LEVELS, BY VOLUME AND BY QUESTION:
+//
+//   - VERBOSE (3) -- one line per request. The winner, the runner-up and the
+//     margin between them, plus every per-decision and per-endpoint operand that
+//     fed the winning candidate. This is the line that answers "why did this
+//     request land here", and it is the level the experiment already runs at.
+//   - DEBUG (4) -- one line per request. The objective's decomposition for the
+//     winner: J = V*(externality - ownGood) + capacity, with externality split
+//     into the three resident populations it charges. This answers "which TERM
+//     drove it", which the scalar J cannot.
+//   - DEBUG (4) -- also one line per CANDIDATE, so O(D + D*P) lines per request.
+//     The full table, for when the winner is not the suspicious part: it carries
+//     each rejected candidate's own J, which is the only way to see BY HOW MUCH
+//     a placement lost. Measured at +2.2% EPP log volume on the try5 shape
+//     (1 prefill + 2 decode, 4 rows/request); it grows as D + D*P, so re-measure
+//     before enabling it on a larger pool.
+//
+// The margin is the load-bearing field. decide resolves ties with a 1e-12 strict
+// improvement threshold, so a margin at that scale means the objective expressed
+// no preference and the outcome was decided by enumeration order -- indistinguishable
+// from a decisive win if only the winner is logged.
+func (p *Picker) logDecision(logger logr.Logger, in *decisionInput, ec *evalCtx,
+	best candidate, placedLocal bool, nDecode, nPrefill int) {
+	t := ec.trace
+
+	kvs := []any{
+		"plugin", p.typedName.String(), "requestID", in.requestID,
+		// --- the decision
+		"decode", best.dID, "prefill", best.pID, "local", best.local,
+		"placedLocal", placedLocal, "J", best.J,
+		// --- what it was chosen against
+		"candidates", nDecode + nDecode*nPrefill, "evaluated", t.nCandidates,
+		// --- per-decision operands, candidate-invariant (evalCtx)
+		"sloClass", ec.class, "inputLen", ec.inputLen,
+		"nHatOut", ec.nHatOut, "reqKVNeed", ec.reqKVNeed,
+		"apDecode", ec.apByEndpoint[best.dID],
+	}
+	if t.runnerUpOK {
+		// The margin is reported as well as both J values, because the interesting
+		// case is a margin small enough that the two J values print identically.
+		kvs = append(kvs,
+			"runnerUpDecode", t.runnerUp.dID, "runnerUpPrefill", t.runnerUp.pID,
+			"runnerUpLocal", t.runnerUp.local, "runnerUpJ", t.runnerUp.J,
+			"margin", t.runnerUp.J-best.J)
+	} else {
+		// Exactly one candidate was evaluated -- a 1D fleet, or Ablation.Decomposed
+		// with a single prefill endpoint. Stated rather than omitted, so a missing
+		// margin is never read as a zero one.
+		kvs = append(kvs, "runnerUp", "none")
+	}
+	if ds, ok := in.snapshots[best.dID]; ok {
+		kvs = append(kvs, snapshotKVs("d", ds)...)
+	}
+	if !best.local {
+		if ps, ok := in.snapshots[best.pID]; ok {
+			kvs = append(kvs, snapshotKVs("p", ps)...)
+		}
+		kvs = append(kvs, "apPrefill", ec.apByEndpoint[best.pID])
+	}
+	logger.V(logutil.VERBOSE).Info("joint argmin chose placement", kvs...)
+
+	if t.winnerOK {
+		logger.V(logutil.DEBUG).Info("joint argmin objective decomposition",
+			append([]any{
+				"plugin", p.typedName.String(), "requestID", in.requestID,
+				"decode", best.dID, "prefill", best.pID, "local", best.local,
+			}, scoreKVs(p.handler.cfg.V, t.winner)...)...)
+	}
+
+	for i := range t.all {
+		row := &t.all[i]
+		kvs := []any{
+			"plugin", p.typedName.String(), "requestID", in.requestID,
+			"rank", i, "decode", row.c.dID, "prefill", row.c.pID,
+			"local", row.c.local, "J", row.c.J,
+			"chosen", row.c.dID == best.dID && row.c.pID == best.pID && row.c.local == best.local,
+		}
+		if row.scoreOK {
+			kvs = append(kvs, scoreKVs(p.handler.cfg.V, row.score)...)
+		}
+		logger.V(logutil.DEBUG).Info("joint argmin candidate", kvs...)
+	}
+}
+
+// scoreKVs flattens one candidate's objective decomposition.
+//
+// The terms are emitted in the order they compose, so the arithmetic is checkable
+// on the line itself: extDecode + extCollocPrefill + extPrefillPool = externality,
+// externality - ownGood = netGoodCost, and V*netGoodCost + capacityTotal = J. A
+// term that is structurally absent prints 0 -- extPrefillPool on a local candidate,
+// and the capacity terms whenever ablation.noCapacity is set, which is this arm's
+// configured setting.
+func scoreKVs(v float64, s candidateScore) []any {
+	return []any{
+		"V", v,
+		"extDecode", s.externalityBreakdown.decode,
+		"extCollocPrefill", s.externalityBreakdown.collocPrefill,
+		"extPrefillPool", s.externalityBreakdown.prefillPool,
+		"externality", s.externality,
+		"ownGood", s.ownGood,
+		"netGoodCost", s.netGoodCost,
+		"capacityDecode", s.capacityDecode,
+		"capacityPrefill", s.capacityPrefill,
+		"capacityTotal", s.capacityTotal,
+		"Jrecomputed", s.total,
+	}
+}
+
+// snapshotKVs flattens the scraped routing view of one endpoint.
+//
+// The prefix ("d" for the decode pick, "p" for the prefill pick) keeps the two
+// sides of a disaggregated placement distinguishable on a single line. Resident
+// populations are logged as COUNTS: the populations themselves are the shadow
+// table's per-request rows, which is a log volume no request path can carry.
+func snapshotKVs(prefix string, s Snapshot) []any {
+	return []any{
+		prefix + "GpuType", s.GPUType,
+		prefix + "BatchSize", s.BatchSize,
+		prefix + "QueueDepth", s.QueueDepth,
+		prefix + "KvTokensInUse", s.KvTokensInUse,
+		prefix + "FreeKvBlocks", s.FreeKVBlocks,
+		prefix + "ResidentPrefillTokens", s.ResidentPrefillTokens,
+		prefix + "RunningDecode", len(s.RunningDecode),
+		prefix + "RunningPrefill", len(s.RunningPrefill),
+	}
 }

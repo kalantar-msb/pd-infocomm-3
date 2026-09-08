@@ -165,8 +165,8 @@ scenario:
               # them is wrong about the engine it is scheduling onto.
               engine:
                 # = max_num_batched_tokens. Sets the prefill chunk budget, so
-                # nChunks = ceil(a_p / min(a_p, 2048)) on every candidate.
-                chunkTokens: 2048
+                # nChunks = ceil(a_p / min(a_p, 32768)) on every candidate.
+                chunkTokens: 32768
                 # = block_size. VALIDATED against the scraped Metrics.CacheBlockSize
                 # per endpoint, and a disagreement REJECTS the endpoint loudly: the
                 # admission test compares blocks accumulated in one unit against a
@@ -337,7 +337,7 @@ scenario:
                 # and engine.chunkTokens are ONE FACT EXPRESSED TWICE and validation
                 # requires them to agree: S_pf is what is being prefilled in one engine
                 # step, so its cap is the engine's per-step token budget.
-                residentPrefillTokensCap: 2048
+                residentPrefillTokensCap: 32768
 
               # -----------------------------------------------------------------
               # Post-processing -- config.md §5 signal 25

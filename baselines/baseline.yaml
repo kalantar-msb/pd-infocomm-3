@@ -80,9 +80,28 @@ scenario:
 
   decode:
     replicas: 2  # config.md row "Number of decode pods"
+    # acceleratorType:
+    #   labelKey: nvidia.com/gpu.product
+    #   labelValue: NVIDIA-H100-80GB-HBM3  # lookup: HARDWARE_LABELS["H100_SXM_80GB"] via config.md row "decode GPU"
     acceleratorType:
-      labelKey: nvidia.com/gpu.product
-      labelValue: NVIDIA-H100-80GB-HBM3  # lookup: HARDWARE_LABELS["H100_SXM_80GB"] via config.md row "decode GPU"
+      labelKey: kubernetes.io/hostname
+      labelValue: ""
+      labelValues:
+        - pokprod-b93r38s0
+        # - pokprod-b93r38s1
+        - pokprod-b93r38s2
+        - pokprod-b93r38s3
+        - pokprod-b93r39s0
+        - pokprod-b93r39s1
+        - pokprod-b93r39s2
+        - pokprod-b93r43s0
+        - pokprod-b93r43s1
+        - pokprod-b93r43s2
+        - pokprod-b93r43s3
+        - pokprod-b93r44s0
+        - pokprod-b93r44s1
+        - pokprod-b93r44s2
+
     parallelism:
       data: 1  # default (not in config.md)
       dataLocal: 1  # default (not in config.md)
@@ -91,7 +110,7 @@ scenario:
     vllm:
       additionalFlags:
       - "--max-num-seqs=256"  # config.md row "max_num_seqs"
-      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--max-num-batched-tokens=32768"  # try to improve things
       - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
       - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"
     # Computes network and GPU-routing values and writes them to the
@@ -140,9 +159,27 @@ scenario:
   prefill:
     enabled: true  # required: capacity planning defaults prefill to disabled with 0 replicas (pipeline/lib/capacity.py)
     replicas: 1  # config.md row "Number of prefill pods"
+    # acceleratorType:
+    #   labelKey: nvidia.com/gpu.product
+    #   labelValue: NVIDIA-H100-80GB-HBM3  # lookup: HARDWARE_LABELS["H100_SXM_80GB"] via config.md row "prefill GPU"
     acceleratorType:
-      labelKey: nvidia.com/gpu.product
-      labelValue: NVIDIA-H100-80GB-HBM3  # lookup: HARDWARE_LABELS["H100_SXM_80GB"] via config.md row "prefill GPU"
+      labelKey: kubernetes.io/hostname
+      labelValue: ""
+      labelValues:
+        - pokprod-b93r38s0
+        # - pokprod-b93r38s1
+        - pokprod-b93r38s2
+        - pokprod-b93r38s3
+        - pokprod-b93r39s0
+        - pokprod-b93r39s1
+        - pokprod-b93r39s2
+        - pokprod-b93r43s0
+        - pokprod-b93r43s1
+        - pokprod-b93r43s2
+        - pokprod-b93r43s3
+        - pokprod-b93r44s0
+        - pokprod-b93r44s1
+        - pokprod-b93r44s2
     parallelism:
       data: 1  # default (not in config.md)
       dataLocal: 1  # default (not in config.md)
@@ -151,7 +188,7 @@ scenario:
     vllm:
       additionalFlags:
       - "--max-num-seqs=256"  # config.md row "max_num_seqs"
-      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--max-num-batched-tokens=32768"  # try to improve things
       - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
       - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"
     # Computes network and GPU-routing values and writes them to the

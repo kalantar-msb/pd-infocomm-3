@@ -82,6 +82,9 @@ algorithms:
   - name: leastttftjoint
     source: algorithms/least_ttft_joint.go
     defaults: baseline
+  - name: randomdisagg
+    source: algorithms/random_disagg.go
+    defaults: baseline
   # algorithms/kairos_paper.go is deliberately NOT registered, per config.md §9.4,
   # README.md ("Why Kairos is specified but not registered"), and the file's own
   # header. It is blocked on a vLLM `num_pending_prefill_tokens` gauge (K1,

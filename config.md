@@ -37,7 +37,7 @@ match (`generate_from_config.py:443-450`).  <!-- lint-skip -->
 | Number of decode pods | 2 | `--decode-instances 2`, same sites |
 | tensor_parallel_size | 4 | `defaults.yaml:12` (`tensor_parallelism: 4`) |
 | max_num_seqs | 256 | `--max-num-running-reqs 256`, `run_public_workload_heterogeneity_closeout.py:200-201` |
-| max_num_batched_tokens | 2048 | `--max-num-scheduled-tokens` default, `cmd/root.go:1426`; reaches the policy as `ChunkTokens` at `sim/cluster/cluster.go:525` |
+| max_num_batched_tokens | 32768 | `--max-num-scheduled-tokens` default, `cmd/root.go:1426`; reaches the policy as `ChunkTokens` at `sim/cluster/cluster.go:525` |
 | block_size | 16 | `--block-size-in-tokens` default, `cmd/root.go:1429` |
 | max_model_len | 131072 | `model_configs/llama-3.3-70b-instruct/config.json` (`max_position_embeddings`) |
 | gpu_memory_utilization | 0.9 | **operator-stated** — no campaign flag sets it; see §3.1 |
@@ -226,7 +226,7 @@ that, a pod label, config, or built.
 | 19 | SLO class | `sim/edpp.go:682` | direct | request header |
 | 20 | τ_ttft / τ_itl / τ_e2e | `sim/edpp.go:682-708` | config | §6; unresolvable ⇒ **startup failure**, never a zero triple |
 | 21 | θ coefficients | `sim/edpp.go:709` | config | §4, keyed by pod-label value |
-| 22 | `ChunkTokens` | `sim/edpp.go:1220-1228` | config | must equal `max_num_batched_tokens` = 2048 |
+| 22 | `ChunkTokens` | `sim/edpp.go:1220-1228` | config | must equal `max_num_batched_tokens` = 32768 |
 | 23 | `BlockSize` | `sim/edpp.go:1257` | config | must equal `block_size` = 16; **validate against scraped `CacheBlockSize` and fail loudly** |
 | 24 | `MaxBatchSize` | `sim/edpp.go:1607` | config | no metric exists; must equal `max_num_seqs` = 256 |
 | 25 | `OutputTokenProcessingTime` | `sim/edpp.go:1235-1242` | config | added to every TTFT projection; outside the calibrated θ |
@@ -378,7 +378,7 @@ deliberately not registered.
 | knob | value | why |
 |---|---|---|
 | `Joint` | true | the required shape — one argmin over D local plus D×P disaggregated candidates (`sim/edpp.go:1380-1398`) |
-| `ChunkTokens` | 2048 | = `max_num_batched_tokens`, §1 |
+| `ChunkTokens` | 32768 | = `max_num_batched_tokens`, §1 |
 | `BlockSize` | 16 | = `block_size`, §1 |
 | `MaxBatchSize` | 256 | = `max_num_seqs`, §1 |
 | `TAdmEstimator` | `rollforward` | the D1 substitution, §5 |

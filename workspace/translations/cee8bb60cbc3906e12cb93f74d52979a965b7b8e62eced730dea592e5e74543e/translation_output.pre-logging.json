@@ -10,7 +10,7 @@
       "source_sha256": "61392bc27f19b8b027dbab3c1e7141db64dee92a7e021ccee1aa1199d01ba155",
       "config_path": null,
       "image_ref": "ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-causalsloexternality",
-      "image_digest": "sha256:e32c4f07e9cf097e699fad84895ec098fc200b445218cde52fc89f32b2bb8271"
+      "image_digest": "sha256:32ba260836db7e641fac654021e55c41752abbaece74aa6cc96fe42231ed0741"
     },
     {
       "name": "leastttftjoint",
@@ -18,15 +18,15 @@
       "source_sha256": "f6edeb171b7466fa45f9517c09fc1c5f52bdf5d1bf8c8b5326f1a4bb62df6669",
       "config_path": null,
       "image_ref": "ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-leastttftjoint",
-      "image_digest": "sha256:41234a7c8732d31190acf091ca5c92f72f6f9675bfb4deadefa5d1177912fef1"
+      "image_digest": "sha256:87a67a9994d9d398e14dff5948ccb31bc23784bc0c9a39ab1ef19339f1382301"
     },
     {
       "name": "randomdisagg",
-      "source_path": "algorithms/random_disagg.go",
+      "source_path": null,
       "source_sha256": null,
       "config_path": "generated/randomdisagg/randomdisagg_config.yaml",
       "image_ref": "ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-randomdisagg",
-      "image_digest": "sha256:b5fbb1c7170d332f7516860a2abe7bc100fb8eaa45c5f8f3f94762760847b196"
+      "image_digest": "sha256:4550dfa7b2003edd8c7ff2a1d07fcb44c62fe3993271b1330483a0477030a1b0"
     }
   ],
   "created_at": "2026-08-28T14:02:03Z",

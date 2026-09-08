@@ -741,3 +741,215 @@ func TestDecideHonoursANonEmptyPreferenceDeterministically(t *testing.T) {
 		}
 	}
 }
+
+// TestTraceDoesNotPerturbTheDecision is the guard that makes the decision log safe to
+// add to an arm that is being MEASURED.
+//
+// The whole justification for stashing diagnostics on evalCtx is that observation is
+// free of consequence: decide's comparator must not read anything the trace writes, so
+// the winner of a traced decision must equal the winner of an untraced one, bit for
+// bit -- J included, not just the endpoint IDs. If that ever stops holding, a run with
+// logging on and a run with logging off are different experiments, and every
+// cross-arm comparison built on them is void.
+//
+// It exercises the tie case on purpose: an exact tie is where a stray comparison or a
+// reordered enumeration would show up first, and it is the only place the 1e-12
+// threshold is load-bearing.
+func TestTraceDoesNotPerturbTheDecision(t *testing.T) {
+	cfg := focalConfig()
+	residents := []RunningReqState{
+		{StepsDone: 10, SLOClass: sloClassStandard, TTFTSet: true, ArrivalUs: 99_000_000, FirstTokenUs: 99_100_000, KVBlocks: 50},
+	}
+	decodes := []Snapshot{
+		decodeSnap("dB", "H100_SXM_80GB", 4, 0, 20000, residents),
+		decodeSnap("dA", "H100_SXM_80GB", 4, 0, 20000, residents),
+		decodeSnap("dC", "A100_SXM_80GB", 9, 3, 90000, residents),
+	}
+	prefills := []Snapshot{prefillSnap("p1"), prefillSnap("p2")}
+	aps := map[string]int{"dA": 4000, "dB": 4000, "dC": 1200, "p1": 4000, "p2": 900}
+
+	decideOnce := func(armTrace bool) (candidate, *decisionTrace) {
+		p := testPolicy(t, cfg)
+		p.observeCompletedOutput(sloClassStandard, 300)
+		ec := testEvalCtx(p, 4000, aps)
+		if armTrace {
+			ec.trace = &decisionTrace{full: true}
+		}
+		got, ok := p.decide(ec, decodes, prefills, "", "")
+		if !ok {
+			t.Fatal("decide must succeed")
+		}
+		return got, ec.trace
+	}
+
+	untraced, nilTrace := decideOnce(false)
+	if nilTrace != nil {
+		t.Fatal("trace must stay nil when not armed")
+	}
+	traced, tr := decideOnce(true)
+
+	// BIT-FOR-BIT on J, not just the placement: a perturbation that changed the
+	// objective by an epsilon while landing on the same endpoints would still
+	// invalidate a measurement, and == on float64 is the only assertion that sees it.
+	if traced != untraced {
+		t.Fatalf("tracing perturbed the decision: untraced %+v, traced %+v", untraced, traced)
+	}
+
+	// The trace must actually have observed the enumeration it claims to.
+	wantCandidates := len(decodes) + len(decodes)*len(prefills)
+	if tr.nCandidates != wantCandidates {
+		t.Errorf("nCandidates = %d, want %d (D + D*P)", tr.nCandidates, wantCandidates)
+	}
+	if len(tr.all) != wantCandidates {
+		t.Errorf("full table has %d rows, want %d", len(tr.all), wantCandidates)
+	}
+	if !tr.winnerOK {
+		t.Error("the focal arm must stash a breakdown for the winner")
+	}
+	if !tr.runnerUpOK {
+		t.Fatal("with more than one candidate there must be a runner-up")
+	}
+
+	// The recorded winner breakdown must reconstruct the winning J, which is what
+	// makes the DEBUG decomposition line trustworthy rather than decorative.
+	if tr.winner.total != traced.J {
+		t.Errorf("winner breakdown total = %g, want J = %g", tr.winner.total, traced.J)
+	}
+	closeTo(t, cfg.V*tr.winner.netGoodCost+tr.winner.capacityTotal, traced.J,
+		"V*netGoodCost + capacityTotal must reconstruct J")
+	closeTo(t, tr.winner.externality-tr.winner.ownGood, tr.winner.netGoodCost,
+		"externality - ownGood must reconstruct netGoodCost")
+	closeTo(t, tr.winner.externalityBreakdown.total(), tr.winner.externality,
+		"the three resident populations must sum to the externality")
+
+	// The runner-up must be a real, distinct, no-better candidate -- and the margin
+	// must be non-negative, since a negative one would mean the argmin lost.
+	if tr.runnerUp.J < traced.J {
+		t.Errorf("runner-up J %g is better than the winner's %g", tr.runnerUp.J, traced.J)
+	}
+	if tr.runnerUp == traced {
+		t.Error("runner-up must not be the winner itself")
+	}
+
+	// Every row must carry a breakdown that reconstructs its own J, so a TRACE line
+	// cannot pair one candidate's terms with another's -- the failure the
+	// consume-and-clear of lastValid exists to prevent.
+	sawWinner := 0
+	for i, row := range tr.all {
+		if !row.scoreOK {
+			t.Errorf("row %d (%s/%s) carries no breakdown", i, row.c.dID, row.c.pID)
+			continue
+		}
+		if row.score.total != row.c.J {
+			t.Errorf("row %d (%s/%s): breakdown total %g != J %g",
+				i, row.c.dID, row.c.pID, row.score.total, row.c.J)
+		}
+		if row.c == traced {
+			sawWinner++
+		}
+		if row.c.J < traced.J {
+			t.Errorf("row %d (%s/%s) has J %g, better than the winner's %g",
+				i, row.c.dID, row.c.pID, row.c.J, traced.J)
+		}
+	}
+	if sawWinner != 1 {
+		t.Errorf("the winner appears %d times in the candidate table, want exactly 1", sawWinner)
+	}
+}
+
+// nonStashingObjective stands in for an arm that computes its own scalar and never
+// calls scoreCandidate -- which is exactly what the registered comparator does
+// (leastttftjoint.Objective.Cost projects a TTFT from the Eval accessors). It cannot
+// be the real comparator here: that package imports this one, so referencing it would
+// be an import cycle. What is being tested is the SHARED machinery's behaviour when
+// Cost stashes nothing, and this reproduces that faithfully.
+//
+// Its cost is a pure function of the candidate's identity, so the argmin is
+// predictable without depending on the physics.
+type nonStashingObjective struct{}
+
+func (nonStashingObjective) Cost(e Eval, ds Snapshot, ps *Snapshot) float64 {
+	cost := float64(len(ds.ID)) * 100
+	if ps != nil {
+		cost += float64(len(ps.ID))
+	} else {
+		cost += 50
+	}
+	return cost
+}
+func (nonStashingObjective) ScorerFirstEnumeration() bool { return false }
+func (nonStashingObjective) ReadsSLOValueConfig() bool    { return false }
+
+// TestTraceOmitsBreakdownForANonStashingObjective pins the consume-and-clear of
+// lastValid.
+//
+// THE FAILURE IT RULES OUT is the worst one a decomposition log can have: reporting
+// one candidate's terms under another candidate's name. The stash is a single slot
+// shared by every candidate in a decision, so if it were merely written-and-read
+// rather than consumed, an arm that populates no breakdown would inherit whatever sat
+// there, and every TRACE row would carry plausible-looking numbers belonging to
+// something else. Silence is the only correct output here, and this asserts silence.
+func TestTraceOmitsBreakdownForANonStashingObjective(t *testing.T) {
+	cfg := focalConfig()
+	metrics := newPluginMetrics("test", HandlerPluginType)
+	p := newPolicy(cfg, newShadowTable(cfg.ShadowTable, int64(cfg.Engine.BlockSize), metrics),
+		metrics, nonStashingObjective{})
+	p.observeCompletedOutput(sloClassStandard, 300)
+
+	decodes := []Snapshot{
+		decodeSnap("dA", "H100_SXM_80GB", 4, 0, 20000, nil),
+		decodeSnap("dLonger", "A100_SXM_80GB", 9, 3, 90000, nil),
+	}
+	prefills := []Snapshot{prefillSnap("p1")}
+	aps := map[string]int{"dA": 4000, "dLonger": 1200, "p1": 4000}
+
+	ec := testEvalCtx(p, 4000, aps)
+	ec.trace = &decisionTrace{full: true}
+	best, ok := p.decide(ec, decodes, prefills, "", "")
+	if !ok {
+		t.Fatal("decide must succeed")
+	}
+
+	// The enumeration is still fully observed -- only the breakdown is absent.
+	wantCandidates := len(decodes) + len(decodes)*len(prefills)
+	if ec.trace.nCandidates != wantCandidates {
+		t.Errorf("nCandidates = %d, want %d", ec.trace.nCandidates, wantCandidates)
+	}
+	if len(ec.trace.all) != wantCandidates {
+		t.Errorf("full table has %d rows, want %d", len(ec.trace.all), wantCandidates)
+	}
+	if !ec.trace.runnerUpOK {
+		t.Error("the runner-up is arm-independent and must still be recorded")
+	}
+
+	// THE ASSERTION: no breakdown claimed, anywhere.
+	if ec.trace.winnerOK {
+		t.Error("winnerOK must be false: this objective stashed no breakdown")
+	}
+	if ec.trace.winner != (candidateScore{}) {
+		t.Errorf("winner breakdown must stay zero, got %+v", ec.trace.winner)
+	}
+	for i, row := range ec.trace.all {
+		if row.scoreOK {
+			t.Errorf("row %d (%s/%s) claims a breakdown it never computed",
+				i, row.c.dID, row.c.pID)
+		}
+		if row.score != (candidateScore{}) {
+			t.Errorf("row %d (%s/%s) carries a non-zero breakdown %+v",
+				i, row.c.dID, row.c.pID, row.score)
+		}
+	}
+
+	// Sanity: the argmin still ran on THIS objective's own scale, not the focal one.
+	// Costs are dA/p1 = 202, dA local = 250, dLonger/p1 = 702, dLonger local = 750, so
+	// the winner is the disaggregated dA candidate and the runner-up is dA local.
+	if best.dID != "dA" || best.local || best.pID != "p1" {
+		t.Errorf("argmin = %+v, want the disaggregated dA/p1 candidate", best)
+	}
+	if best.J != 202 {
+		t.Errorf("winning J = %g, want 202 on this objective's scale", best.J)
+	}
+	if ec.trace.runnerUp.J != 250 || !ec.trace.runnerUp.local {
+		t.Errorf("runner-up = %+v, want dA local at J = 250", ec.trace.runnerUp)
+	}
+}

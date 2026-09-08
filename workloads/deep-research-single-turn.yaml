@@ -16,8 +16,12 @@
 version: "2"
 seed: 42
 category: language
-aggregate_rate: 1.0
-num_requests: 160
+# original 1.0, 800
+# for max_num_batched_tokens = 2048 try 0.33, 250
+# for max_num_batched_tokens = 32768, try 0.63, 250
+# for try 6, try 0.26, 280
+aggregate_rate: 0.26
+num_requests: 280
 
 cohorts:
   - id: deep-research

@@ -206,7 +206,7 @@ scenario:
               # realized-TTFT factor is placement-INVARIANT, so it factors out of the
               # charge and a zero tau_e2e makes the ENTIRE decode-side externality
               # identically zero, degenerating the arm to its own-good term alone.
-              activeWorkload: interactive
+              activeWorkload: deepResearch
 
               # Microseconds. Source: config.md §6, from
               # run_public_workload_heterogeneity_closeout.py:60-105.
@@ -236,7 +236,7 @@ scenario:
               # -------------------------------------------------------------
               engine:
                 # = max_num_batched_tokens. Signal 22.
-                chunkTokens: 2048
+                chunkTokens: 32768
                 # = block_size. Signal 23. VALIDATED AGAINST THE SCRAPED
                 # `Metrics.CacheBlockSize` WITH A LOUD FAILURE ON DISAGREEMENT:
                 # upstream has ONE block size, and a port carrying two that silently
@@ -437,7 +437,7 @@ scenario:
                 # scheduled. The shadow sum is capped per occupant and capped in
                 # total at engine.chunkTokens. Still an over-estimate => over-states
                 # local prefill inflation => biased toward REMOTE.
-                residentPrefillTokensCap: 2048
+                residentPrefillTokensCap: 32768
 
               # -------------------------------------------------------------
               # Dead-but-declared: the capacity account

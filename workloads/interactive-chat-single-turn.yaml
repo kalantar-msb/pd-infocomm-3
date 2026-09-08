@@ -11,8 +11,11 @@
 version: "2"
 seed: 42
 category: language
-aggregate_rate: 8.0
-num_requests: 300
+# original 8.0, 1500
+# for max_num_batched_tokens = 2048 try 3.6, 750
+# for max_num_batched_tokens = 32768, try 7.63, 4000
+aggregate_rate: 7.63
+num_requests: 4000
 
 cohorts:
   - id: interactive-chat

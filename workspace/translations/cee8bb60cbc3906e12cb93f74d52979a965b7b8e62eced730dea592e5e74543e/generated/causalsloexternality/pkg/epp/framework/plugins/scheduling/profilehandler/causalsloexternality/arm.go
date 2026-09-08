@@ -134,7 +134,21 @@ var FocalArm = Arm{
 type focalObjective struct{}
 
 func (focalObjective) Cost(e Eval, ds Snapshot, ps *Snapshot) float64 {
-	return e.p.scoreCandidate(e.ec, ds, ps).total
+	score := e.p.scoreCandidate(e.ec, ds, ps)
+	// STASH THE BREAKDOWN, because this return statement is where it would otherwise
+	// die. scoreCandidate is the only place the component terms exist, candidate
+	// carries only J, and this signature is the SHARED arm interface -- widening it
+	// to return the breakdown would touch every registered arm and make the two arms
+	// differ in something other than their objective. decide's `consider` consumes
+	// the stash on the statement immediately following this call.
+	//
+	// An arm that does not stash (leastttftjoint computes its own scalar and never
+	// calls scoreCandidate) simply leaves lastValid false, and the log site reports
+	// J without a decomposition rather than reporting a stale one.
+	if t := e.ec.trace; t != nil {
+		t.lastScore, t.lastValid = score, true
+	}
+	return score.total
 }
 
 // ScorerFirstEnumeration is true for the focal arm, and it is not cosmetic: it is what

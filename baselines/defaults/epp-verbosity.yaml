@@ -20,4 +20,6 @@ scenario:
 - name: defaults
   router:
     epp:
-      verbosity: "3"
+      flags:
+        v: "4"
+      # verbosity: "4"

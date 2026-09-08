@@ -117,6 +117,21 @@ type evalCtx struct {
 	// is readable. Picker.Pick receives no request, so this map is how a_p reaches
 	// the argmin.
 	apByEndpoint map[string]int
+
+	// trace is the per-decision diagnostic sink, nil when nothing is listening.
+	//
+	// IT RIDES evalCtx FOR THE SAME REASON a_p DOES. Policy.decide takes no
+	// context.Context and Picker.Pick receives no request, so evalCtx is the only
+	// per-request, single-owner channel between the argmin and the log site. One
+	// request owns one evalCtx (built fresh in Pick), so writes here are race-free
+	// even though ONE Policy instance serves concurrent requests -- the same
+	// property that makes a plugin struct field the wrong place for this.
+	//
+	// IT IS OBSERVATION ONLY. Nothing decide's comparator reads is derived from
+	// it, so a decision taken with trace == nil and the same decision taken with
+	// trace set are bit-identical. That is the property that lets logging be added
+	// to a measured arm without invalidating the measurement.
+	trace *decisionTrace
 }
 
 // pathBreakdown separates the three resident populations a placement can harm.
@@ -161,4 +176,55 @@ type candidate struct {
 	pID   string
 	local bool
 	J     float64
+}
+
+// decisionTrace is the record of ONE argmin, written during enumeration and read
+// by the log site after decide returns.
+//
+// WHY IT EXISTS. candidate carries only J, and Objective.Cost returns only a
+// float64 (arm.go) -- so by the time Pick holds the winner, every component term
+// scoreCandidate computed has been discarded. Widening Cost's return type would
+// change the shared arm interface and touch every registered arm; stashing the
+// breakdown here does not.
+//
+// The zero value is a working disabled-except-for-counting trace. `full` is the
+// only volume knob: the per-candidate table is O(D + D*P) entries per request and
+// stays off until someone asks for it.
+type decisionTrace struct {
+	// full enables the per-candidate table in `all`.
+	full bool
+
+	// nCandidates is the number of candidates ACTUALLY evaluated, which is not
+	// always D + D*P: Ablation.Decomposed truncates the decode enumeration to one.
+	nCandidates int
+
+	// winner is the breakdown of the candidate that won, captured at the moment it
+	// became best rather than by re-evaluating scoreCandidate afterwards -- a
+	// second evaluation would be a second chance to disagree with the decision.
+	winner   candidateScore
+	winnerOK bool
+
+	// runnerUp is the closest competitor, and the margin against it is the point.
+	// A winner reported without one cannot distinguish a decision the objective
+	// made decisively from a coin-flip resolved by the 1e-12 tie threshold.
+	runnerUp   candidate
+	runnerUpOK bool
+
+	// all is the full candidate table, populated only when full is set.
+	all []tracedCandidate
+
+	// lastScore is the single-slot handoff from Objective.Cost to decide's
+	// `consider`. Cost runs as an argument expression to consider, so the stash is
+	// written and then consumed on the very next statement; lastOK is cleared on
+	// consumption so an arm that populates no breakdown cannot inherit the
+	// previous candidate's.
+	lastScore candidateScore
+	lastValid bool
+}
+
+// tracedCandidate is one row of the per-candidate table.
+type tracedCandidate struct {
+	c       candidate
+	score   candidateScore
+	scoreOK bool
 }

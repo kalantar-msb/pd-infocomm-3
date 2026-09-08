@@ -214,7 +214,7 @@ scenario:
     vllm:
       additionalFlags:
       - "--max-num-seqs=256"  # config.md row "max_num_seqs"
-      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--max-num-batched-tokens=32768"  # config.md row "max_num_batched_tokens"
       - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
       - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"; signal 11 needs it
       - "--enable-force-include-usage"  # config.md §11, signals 15 + 16
@@ -223,7 +223,7 @@ scenario:
     vllm:
       additionalFlags:
       - "--max-num-seqs=256"  # config.md row "max_num_seqs"
-      - "--max-num-batched-tokens=2048"  # config.md row "max_num_batched_tokens"
+      - "--max-num-batched-tokens=32768"  # config.md row "max_num_batched_tokens"
       - "--enable-chunked-prefill"  # config.md row "enable_chunked_prefill"
       - "--enable-prefix-caching"  # config.md row "enable_prefix_caching"; signal 11 needs it
       - "--enable-force-include-usage"  # config.md §11, signals 15 + 16
