@@ -66,13 +66,6 @@ repos:
         # when the value is a bare 7-64 char git sha (so `ref: refs/heads/main`
         # and any opaque token are still scanned).
         #
-        # Third alternative: skip Prometheus SAMPLE lines. Collected scrapes
-        # carry pod names as quoted label values (hyphens are url-safe base64),
-        # at entropy 4.18-4.39 -- straddling the 4.25 limit, and the names change
-        # every deployment, so neither the limit nor the baseline can hold them.
-        # Keyed on line shape, so unlabelled samples, HELP text and every
-        # YAML/env line stay in scope.
-        #
         # --word-list: pod names are object names, not secrets, but reach 4.48
         # entropy -- above the 4.391 HF token -- and their suffixes change every
         # deployment, so neither the limit nor the baseline can hold them. Keyed
@@ -87,7 +80,7 @@ repos:
           - --word-list
           - .secrets.wordlist
           - --exclude-lines
-          - '(?i)(?:^[\s"-]*[a-z0-9_.]*(?:sha1|sha256|sha512|hash|digest|checksum|fingerprint|manifest_short)"?\s*[:=])|(?:^\s*-?\s*"?(?:ref|commit|revision)"?\s*[:=]\s*"?[0-9a-f]{7,64}"?\s*,?\s*(?:#.*)?$)|(?:^[a-zA-Z_:][a-zA-Z0-9_:]*\{.*\}\s+\S+(?:\s+[0-9]+)?\s*$)'
+          - '(?i)(?:^[\s"-]*[a-z0-9_.]*(?:sha1|sha256|sha512|hash|digest|checksum|fingerprint|manifest_short)"?\s*[:=])|(?:^\s*-?\s*"?(?:ref|commit|revision)"?\s*[:=]\s*"?[0-9a-f]{7,64}"?\s*,?\s*(?:#.*)?$)'
         # The baseline file records hashes of audited hits; scanning it would
         # be circular.
         #
