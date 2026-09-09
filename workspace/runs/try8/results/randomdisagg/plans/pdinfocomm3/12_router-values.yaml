@@ -1,0 +1,186 @@
+router:
+  epp:
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    extProcPort: 9002
+    extraContainerPorts:
+    - containerPort: 5557
+      name: zmq
+      protocol: TCP
+    flags:
+      allow-experimental-plugins: true
+      v: '4'
+    image:
+      pullPolicy: Always
+      registry: ghcr.io/kalantar
+      repository: llm-d-router
+      tag: cee8bb60cbc3-randomdisagg
+    pluginsConfigFile: custom-plugins.yaml
+    pluginsCustomConfig:
+      custom-plugins.yaml: |
+        apiVersion: llm-d.ai/v1alpha1
+        kind: EndpointPickerConfig
+        plugins:
+        # --- Producers: identical to the baseline ------------------------------
+        # Retained even though this arm reads NEITHER of them. The tokenizer
+        # sidecar and the prefix producer feed prefix-cache-scorer, which still
+        # selects pods. Dropping them would change pod selection and confound the
+        # comparison. The arm's own decision consumes no producer output.
+        - type: token-producer
+          parameters:
+            modelName: meta-llama/Llama-3.3-70B-Instruct
+            vllm:
+              url: "http://localhost:8000"
+        - type: approx-prefix-cache-producer
+
+        # --- The decider: THE ONLY DIFFERENCE FROM THE BASELINE ----------------
+        - type: random-pd-decider
+          parameters:
+            # p -- the expected fraction of requests disaggregated.
+            #
+            # 0.075 IS THE MATCHED RATE FOR interactive-chat ONLY. It is the
+            # focal arm's OWN realized rate in the single cell of run `try2`
+            # that completed: 41 prefill selections over 546 handled requests
+            # (results/causalsloexternality/interactive-chat-single-turn/i1 --
+            # EPP `Request handled` count against prefill POST /v1/completions).
+            #
+            # THE MATCHED RATE IS PER WORKLOAD. The focal arm's realized rate is
+            # a function of the prompt-length distribution, and reasoning and
+            # deep-research differ from interactive-chat. Re-measure the focal
+            # arm's rate for the target workload and set p to it, then run ONE
+            # ASSEMBLE PER WORKLOAD -- the same discipline `activeWorkload`
+            # already forces on the focal arm (config.md S6). Reusing 0.075
+            # across workloads produces a rate-mismatched comparison that still
+            # reports goodput, which is the failure mode S6 warns about.
+            #
+            # For a sweep rather than a matched-rate test, vary p across
+            # assembles: 0 reproduces the simulator's `never` rule and 1 its
+            # `always` rule (inference-sim sim/disaggregation.go:70-74), so the
+            # sweep spans decode-only to always-disaggregated with the endpoints
+            # anchored to rules the simulator already defines.
+            disaggregateProbability: 0.075
+
+            # Selects WHICH subset is disaggregated at that rate. Changing it at
+            # fixed p draws an independent subset without changing the arm --
+            # that is how to get replicate subsets. 42 matches the workload seed
+            # convention (workloads/*.yaml `seed: 42`); the two are unrelated
+            # mechanically, and the shared value is a readability choice only.
+            seed: 42
+
+            # Header whose value keys the decision. EMPTY ON PURPOSE: no header
+            # is currently known to be stable per request across runs, so the
+            # plugin falls back to scheduling.InferenceRequest.RequestID, which
+            # llm-d-router documents as Envoy-generated and therefore fresh every
+            # run. Consequence (R2): the arm is still exactly Bernoulli at rate
+            # p and every comparison stays valid, but two runs of one workload
+            # disaggregate DIFFERENT requests, so results are not bit-replayable.
+            # Set this to a load-generator-stable header to recover replay, and
+            # record which path was used when reporting.
+            identityHeader: ""
+
+        - type: disagg-profile-handler
+          parameters:
+            deciders:
+              prefill: random-pd-decider
+
+        # --- Role filters and load-shaped scorers: identical to the baseline ---
+        # Pod selection is UNCHANGED and remains load-aware. This is what makes
+        # the arm a control on the disaggregation decision rather than a null
+        # model of the whole scheduler.
+        - type: prefill-filter
+        - type: decode-filter
+        - type: prefix-cache-scorer
+          parameters:
+            prefixMatchInfoProducerName: approx-prefix-cache-producer
+        - type: queue-scorer
+        - type: kv-cache-utilization-scorer
+        - type: active-request-scorer
+
+        # --- Scheduling profiles: identical to the baseline, weights included --
+        schedulingProfiles:
+        - name: decode
+          plugins:
+          - pluginRef: decode-filter
+          - pluginRef: active-request-scorer
+            weight: 2
+          - pluginRef: prefix-cache-scorer
+            weight: 3
+        - name: prefill
+          plugins:
+          - pluginRef: prefill-filter
+          - pluginRef: prefix-cache-scorer
+            weight: 3
+          - pluginRef: queue-scorer
+            weight: 2
+          - pluginRef: kv-cache-utilization-scorer
+            weight: 2
+    replicas: 1
+    volumeMounts: []
+    volumes: []
+  extraServicePorts:
+  - name: zmq
+    port: 5557
+    protocol: TCP
+    targetPort: 5557
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8081
+  inferenceObjectives:
+  - name: standard
+    priority: 3
+  inferencePool:
+    failureMode: FailOpen
+  modelServers:
+    matchLabels:
+      llm-d.ai/inferenceServing: 'true'
+      llm-d.ai/model: meta-lla-888e33f1-instruct
+    targetPorts:
+    - number: 8000
+  monitoring:
+    interval: 10s
+    prometheus:
+      auth:
+        enabled: true
+        secretName: inference-gateway-sa-metrics-reader-secret
+      enabled: true
+    secretName: inference-gateway-sa-metrics-reader-secret
+  proxy:
+    args:
+    - --service-node
+    - envoy-sidecar
+    - --log-level
+    - warn
+    - --concurrency
+    - '8'
+    - --drain-strategy
+    - immediate
+    - --drain-time-s
+    - '60'
+    - -c
+    - /etc/envoy/envoy.yaml
+    resources:
+      limits:
+        cpu: '8'
+        memory: 16Gi
+      requests:
+        cpu: '4'
+        memory: 8Gi
+  tokenizer:
+    enabled: true
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    - name: HF_HOME
+      value: /tmp/hf
+    modelName: meta-llama/Llama-3.3-70B-Instruct
+    volumeMounts:
+    - mountPath: /tmp/hf-cache
+      name: model-cache

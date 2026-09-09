@@ -1,0 +1,179 @@
+router:
+  epp:
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    extProcPort: 9002
+    extraContainerPorts:
+    - containerPort: 5557
+      name: zmq
+      protocol: TCP
+    flags:
+      allow-experimental-plugins: true
+      v: '4'
+    image:
+      pullPolicy: Always
+      registry: ghcr.io/llm-d
+      repository: llm-d-router-endpoint-picker
+      tag: v0.10.0
+    pluginsConfigFile: custom-plugins.yaml
+    pluginsCustomConfig:
+      custom-plugins.yaml: |
+        apiVersion: llm-d.ai/v1alpha1
+        kind: EndpointPickerConfig
+        plugins:
+        # --- Producers: the signals both the baseline and both arms read -------
+        #
+        # DECLARED IN THE BASELINE ON PURPOSE. Both treatment arms read a_r
+        # (config.md §5 signal 10) and a_p (signal 11), and signal 11's note is
+        # explicit that the prefix signal must be bound BY PRODUCER NAME so both
+        # arms read ONE signal -- a data key's identity includes its producer
+        # name, so an unbound read can silently become a second,
+        # differently-configured signal. Declaring the producers once here and
+        # inheriting them is what makes that binding shared rather than
+        # per-arm.
+        - type: token-producer
+          parameters:
+            # meta-llama/Llama-3.3-70B-Instruct is expanded by llm-d-benchmark at render time; passed
+            # through verbatim rather than substituted here.
+            modelName: meta-llama/Llama-3.3-70B-Instruct
+            vllm:
+              # The loopback render sidecar in the EPP pod, enabled by the
+              # `tokenizer-sidecar` defaults fragment (NOT in
+              # transfer.yaml:defaults.disable). config.md §11: with nothing
+              # serving :8000 the failure is SILENT -- getUserInputLenInTokens
+              # returns 0 with no error, every prompt reads as shorter than any
+              # threshold, and no disaggregation is ever chosen. The observable
+              # signature is thousands of requests and zero prefill selections.
+              url: "http://localhost:8000"
+        - type: approx-prefix-cache-producer
+
+        # --- The threshold decider --------------------------------------------
+        - type: prefix-based-pd-decider
+          parameters:
+            # UNDERIVABLE FROM THIS BUNDLE, and stated as a decision rather than
+            # left to a default. The simulation arm is named
+            # `llmd_prefix_threshold_workload_tuned` -- the threshold was tuned
+            # PER WORKLOAD -- and no file in sim_results/, config.md, or README.md
+            # records the tuned values. 512 is llm-d's own guide value
+            # (llm-d-benchmark config/scenarios/guides/pd-disaggregation.yaml and
+            # the disagg profile-handler README example).
+            #
+            # WHY IT IS NOT 0: `nonCachedTokens: 0` DISABLES the decider entirely
+            # (the disagg README is explicit -- it always returns false), which
+            # would silently turn the P/D baseline into a decode-only baseline
+            # while still deploying a prefill pod. That is a different arm.
+            #
+            # If the tuned per-workload values are recovered upstream, set them
+            # here and re-assemble; the baseline number in sim_results/ is not
+            # reproducible at an arbitrary threshold, so treat baseline-vs-sim
+            # comparisons as unanchored until then. Arm-vs-arm comparisons are
+            # unaffected: both treatments replace this decider outright.
+            nonCachedTokens: 512
+
+        - type: disagg-profile-handler
+          parameters:
+            deciders:
+              prefill: prefix-based-pd-decider
+
+        # --- Role filters and load-shaped scorers ------------------------------
+        - type: prefill-filter
+        - type: decode-filter
+        - type: prefix-cache-scorer
+          parameters:
+            # BOUND BY PRODUCER NAME -- config.md §5 signal 11. Explicit even
+            # though it matches the producer declared above, so a second
+            # producer cannot silently capture this read.
+            prefixMatchInfoProducerName: approx-prefix-cache-producer
+        - type: queue-scorer
+        - type: kv-cache-utilization-scorer
+        - type: active-request-scorer
+
+        schedulingProfiles:
+        # Profile names match disagg-profile-handler's defaults (`decode`,
+        # `prefill`), so no `profiles:` block is needed.
+        - name: decode
+          plugins:
+          - pluginRef: decode-filter
+          - pluginRef: active-request-scorer
+            weight: 2
+          - pluginRef: prefix-cache-scorer
+            weight: 3
+        - name: prefill
+          plugins:
+          - pluginRef: prefill-filter
+          - pluginRef: prefix-cache-scorer
+            weight: 3
+          - pluginRef: queue-scorer
+            weight: 2
+          - pluginRef: kv-cache-utilization-scorer
+            weight: 2
+    replicas: 1
+    volumeMounts: []
+    volumes: []
+  extraServicePorts:
+  - name: zmq
+    port: 5557
+    protocol: TCP
+    targetPort: 5557
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8081
+  inferenceObjectives:
+  - name: standard
+    priority: 3
+  inferencePool:
+    failureMode: FailOpen
+  modelServers:
+    matchLabels:
+      llm-d.ai/inferenceServing: 'true'
+      llm-d.ai/model: meta-lla-888e33f1-instruct
+    targetPorts:
+    - number: 8000
+  monitoring:
+    interval: 10s
+    prometheus:
+      auth:
+        enabled: true
+        secretName: inference-gateway-sa-metrics-reader-secret
+      enabled: true
+    secretName: inference-gateway-sa-metrics-reader-secret
+  proxy:
+    args:
+    - --service-node
+    - envoy-sidecar
+    - --log-level
+    - warn
+    - --concurrency
+    - '8'
+    - --drain-strategy
+    - immediate
+    - --drain-time-s
+    - '60'
+    - -c
+    - /etc/envoy/envoy.yaml
+    resources:
+      limits:
+        cpu: '8'
+        memory: 16Gi
+      requests:
+        cpu: '4'
+        memory: 8Gi
+  tokenizer:
+    enabled: true
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    - name: HF_HOME
+      value: /tmp/hf
+    modelName: meta-llama/Llama-3.3-70B-Instruct
+    volumeMounts:
+    - mountPath: /tmp/hf-cache
+      name: model-cache

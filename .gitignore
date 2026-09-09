@@ -1,5 +1,14 @@
 tmp/
 
+/workspace/runs/try1
+/workspace/runs/try2
+/workspace/runs/try3
+/workspace/runs/try4
+/workspace/runs/try5
+/workspace/runs/try6
+/workspace/runs/try7
+#/workspace/runs/try8
+/workspace/runs/try9
 /workspace/clusters
 /workspace/**/run_metadata.json
 /workspace/setup_config.json

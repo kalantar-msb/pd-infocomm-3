@@ -1,0 +1,419 @@
+{
+  "snapshots": [
+    {
+      "timestamp": "2026-09-09T02:21:13Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:21:29Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:21:45Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:22:01Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:22:17Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:22:33Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:22:48Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:23:04Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:23:20Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:23:36Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:23:52Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:24:07Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:24:23Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:24:39Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:24:55Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:25:11Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:25:26Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:25:42Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:25:58Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:26:14Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:26:30Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:26:46Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:27:01Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:27:17Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:27:33Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:27:49Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:28:05Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:28:20Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:28:36Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:28:52Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:29:08Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:29:24Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:29:40Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:29:56Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:30:12Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:30:28Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:30:43Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:30:59Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:31:15Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:31:31Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:31:47Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:32:03Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:32:19Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:32:35Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:32:50Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:33:06Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:33:22Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:33:38Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:33:54Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:34:10Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:34:26Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:34:42Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:34:58Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:35:13Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:35:30Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:35:46Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:36:02Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:36:18Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:36:34Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:36:49Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:37:05Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:37:21Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:37:37Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:37:53Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:38:09Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:38:24Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:38:41Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:38:57Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:39:13Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:39:28Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:39:45Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:40:01Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:40:17Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:40:33Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:40:48Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:41:04Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:41:20Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:41:37Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:41:52Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:42:08Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:42:24Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:42:40Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    },
+    {
+      "timestamp": "2026-09-09T02:42:56Z",
+      "namespace": "kalantar-0",
+      "controllers": []
+    }
+  ]
+}

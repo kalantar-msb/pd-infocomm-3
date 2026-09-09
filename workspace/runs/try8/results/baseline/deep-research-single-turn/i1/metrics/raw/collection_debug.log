@@ -1,0 +1,270 @@
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:36:50] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:37:06] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:37:22] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:37:37] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:37:53] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:38:09] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:38:25] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:38:41] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:38:57] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:39:13] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:39:29] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:39:45] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:40:01] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:40:17] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:40:33] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:40:48] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:41:04] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:41:20] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:41:36] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:41:52] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:42:08] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:42:24] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:42:40] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:42:56] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:43:12] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:43:28] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:43:43] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 3 ms: Couldn't connect to server
+  [04:43:59] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:44:15] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:44:31] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:44:47] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:45:03] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:45:19] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:45:35] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:45:51] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:46:06] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:46:22] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:46:38] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:46:54] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 3 ms: Couldn't connect to server
+  [04:47:10] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:47:26] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:47:42] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:47:58] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:48:14] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:48:29] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:48:45] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:49:01] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:49:17] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:49:33] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:49:49] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:50:05] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:50:21] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:50:36] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 3 ms: Couldn't connect to server
+  [04:50:52] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:51:08] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:51:24] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:51:40] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:51:56] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:52:12] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:52:28] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:52:44] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:52:59] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:53:15] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:53:31] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:53:47] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:54:03] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:54:19] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:54:35] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:54:51] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:55:07] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:55:23] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:55:39] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:55:55] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 5 ms: Couldn't connect to server
+  [04:56:11] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [04:56:27] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:56:42] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:56:58] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:57:14] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:57:30] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:57:46] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:58:02] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:58:18] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:58:34] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:58:50] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:59:06] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 2 ms: Couldn't connect to server
+  [04:59:22] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:59:38] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [04:59:54] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 4 ms: Couldn't connect to server
+  [05:00:10] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics
+Error from server (Forbidden): statefulsets.apps is forbidden: User "system:serviceaccount:kalantar-0:helm-installer" cannot list resource "statefulsets" in API group "apps" in the namespace "kalantar-0"
+curl: (7) Failed to connect to 10.130.9.84 port 9090 after 1 ms: Couldn't connect to server
+  [05:00:26] curl failed (rc=7) for baseline-deep-research-single-turn-try8-i1-stream-epp-logs-pod http://10.130.9.84:9090/metrics

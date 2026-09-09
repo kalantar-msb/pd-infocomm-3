@@ -1,0 +1,758 @@
+Metrics directory initialized: /workspace/data/try8/causalsloexternality/deep-research-single-turn/i1/metrics
+Starting continuous metrics collection (interval: 15s)
+Replica status: 0 controller(s), 1 snapshots
+Pod startup times: 3 new (3 total)
+Collecting metrics at 2026-09-09T02:21:14+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 2 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:21:30+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 3 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:21:45+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 4 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:22:01+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 5 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:22:17+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 6 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:22:33+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 7 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:22:49+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 8 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:23:04+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 9 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:23:20+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 10 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:23:36+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 11 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:23:52+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 12 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:24:08+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 13 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:24:23+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 14 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:24:39+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 15 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:24:55+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 16 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:25:11+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 17 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:25:27+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 18 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:25:43+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 19 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:25:58+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 20 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:26:14+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 21 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:26:30+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 22 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:26:46+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 23 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:27:02+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 24 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:27:17+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 25 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:27:33+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 26 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:27:49+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 27 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:28:05+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 28 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:28:21+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 29 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:28:37+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 30 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:28:53+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 31 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:29:09+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 32 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:29:24+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 33 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:29:40+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 34 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:29:56+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 35 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:30:12+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 36 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:30:28+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 37 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:30:44+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 38 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:31:00+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 39 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:31:16+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 40 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:31:31+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 41 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:31:47+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 42 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:32:03+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 43 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:32:19+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 44 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:32:35+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 45 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:32:51+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 46 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:33:07+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 47 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:33:22+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 48 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:33:38+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 49 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:33:54+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 50 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:34:10+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 51 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:34:26+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 52 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:34:42+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 53 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:34:58+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 54 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:35:14+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 55 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:35:30+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 56 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:35:46+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 57 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:36:02+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 58 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:36:18+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 59 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:36:34+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 60 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:36:50+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 61 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:37:06+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 62 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:37:21+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 63 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:37:37+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 64 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:37:53+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 65 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:38:09+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 66 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:38:25+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 67 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:38:41+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 68 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:38:57+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 69 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:39:13+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 70 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:39:29+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 71 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:39:45+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 72 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:40:01+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 73 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:40:17+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 74 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:40:33+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 75 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:40:49+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 76 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:41:04+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 77 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:41:20+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 78 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:41:37+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 79 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:41:53+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 80 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:42:08+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 81 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:42:24+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 82 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:42:40+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Replica status: 0 controller(s), 83 snapshots (unchanged)
+Collecting metrics at 2026-09-09T02:42:56+0000
+Namespace: kalantar-0
+Found vLLM pods:
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-9cxww 10.128.11.120
+meta-lla-888e33f1-instruct-decode-558d9f5fd4-jxnkt 10.129.8.211
+meta-lla-888e33f1-instruct-prefill-6cb8877bd8-vqz5r 10.130.2.120
+Found EPP pods:
+meta-lla-888e33f1-instruct-router-epp-fcc4f76c-n7mrn 10.131.9.148
+Stopping metrics collector (PID: 245)
+Processing collected logs...
+Processing 332 files...
+Aggregated 11 metrics across all pods
+Metrics summary saved to: /workspace/data/try8/causalsloexternality/deep-research-single-turn/i1/metrics/processed/metrics_summary.json
+Processed metrics from 5 pods
+Pod startup stats: 3 pods, mean=223.7s
+Replica stats: 83 snapshots, ready replicas min=0 max=0 mean=0.0

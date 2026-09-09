@@ -1,0 +1,483 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: leastttftjoint-deep-research-single-turn-try8-i1
+  namespace: kalantar-0
+spec:
+  params:
+  - name: experimentId
+    value: try8
+  - name: runName
+    value: try8
+  - name: namespace
+    value: kalantar-0
+  - name: phase
+    value: leastttftjoint
+  - name: scenarioContent
+    value: "scenario:\n- annotations:\n    decode:\n      pod:\n        k8s.v1.cni.cncf.io/networks:\
+      \ openshift-sriov-network-operator/multi-nic-compute\n    prefill:\n      pod:\n\
+      \        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute\n\
+      \  decode:\n    acceleratorType:\n      labelKey: kubernetes.io/hostname\n \
+      \     labelValue: ''\n      labelValues:\n      - pokprod-b93r38s0\n      -\
+      \ pokprod-b93r38s2\n      - pokprod-b93r38s3\n      - pokprod-b93r39s0\n   \
+      \   - pokprod-b93r39s1\n      - pokprod-b93r39s2\n      - pokprod-b93r43s0\n\
+      \      - pokprod-b93r43s1\n      - pokprod-b93r43s2\n      - pokprod-b93r43s3\n\
+      \      - pokprod-b93r44s0\n      - pokprod-b93r44s1\n      - pokprod-b93r44s2\n\
+      \    extraContainerConfig:\n      securityContext:\n        capabilities:\n\
+      \          add:\n          - IPC_LOCK\n          - SYS_RAWIO\n          - NET_ADMIN\n\
+      \          - NET_RAW\n        runAsGroup: 0\n        runAsUser: 0\n    extraEnvVars:\n\
+      \    - name: UCX_LOG_LEVEL\n      value: info\n    - name: UCX_PROTO_INFO\n\
+      \      value: y\n    - name: NIXL_LOG_LEVEL\n      value: debug\n    - name:\
+      \ NCCL_DEBUG\n      value: INFO\n    - name: NVSHMEM_DEBUG\n      value: INFO\n\
+      \    initContainers:\n    - command:\n      - set_llmdbench_environment.py\n\
+      \      - -e\n      - /shared-config/llmdbench_env.sh\n      - -i\n      imageKey:\
+      \ benchmark\n      imagePullPolicy: Always\n      name: preprocess\n      volumeMounts:\n\
+      \      - mountPath: /shared-config\n        name: shared-config\n    parallelism:\n\
+      \      data: 1\n      dataLocal: 1\n      tensor: 4\n      workers: 1\n    replicas:\
+      \ 2\n    resources:\n      limits:\n        cpu: '32'\n        memory: 128Gi\n\
+      \      requests:\n        cpu: '16'\n        memory: 64Gi\n    vllm:\n     \
+      \ additionalFlags:\n      - --max-num-seqs=256\n      - --max-num-batched-tokens=32768\n\
+      \      - --enable-chunked-prefill\n      - --enable-prefix-caching\n      -\
+      \ --enable-force-include-usage\n  gateway:\n    className: epponly\n    externallyManaged:\
+      \ true\n  huggingface:\n    secretName: hf-secret\n  model:\n    blockSize:\
+      \ 16\n    gpuMemoryUtilization: 0.9\n    huggingfaceId: meta-llama/Llama-3.3-70B-Instruct\n\
+      \    maxModelLen: 131072\n    name: meta-llama/Llama-3.3-70B-Instruct\n    path:\
+      \ models/meta-llama/Llama-3.3-70B-Instruct\n    shortName: meta-llama-llama-3.3-70b-instruct\n\
+      \    size: 1Ti\n  modelArtifacts:\n    extraLabels:\n      pd-infocomm.io/gpu-type:\
+      \ H100_SXM_80GB\n  name: pdinfocomm3\n  prefill:\n    acceleratorType:\n   \
+      \   labelKey: kubernetes.io/hostname\n      labelValue: ''\n      labelValues:\n\
+      \      - pokprod-b93r38s0\n      - pokprod-b93r38s2\n      - pokprod-b93r38s3\n\
+      \      - pokprod-b93r39s0\n      - pokprod-b93r39s1\n      - pokprod-b93r39s2\n\
+      \      - pokprod-b93r43s0\n      - pokprod-b93r43s1\n      - pokprod-b93r43s2\n\
+      \      - pokprod-b93r43s3\n      - pokprod-b93r44s0\n      - pokprod-b93r44s1\n\
+      \      - pokprod-b93r44s2\n    enabled: true\n    extraContainerConfig:\n  \
+      \    securityContext:\n        capabilities:\n          add:\n          - IPC_LOCK\n\
+      \          - SYS_RAWIO\n          - NET_ADMIN\n          - NET_RAW\n       \
+      \ runAsGroup: 0\n        runAsUser: 0\n    extraEnvVars:\n    - name: UCX_LOG_LEVEL\n\
+      \      value: info\n    - name: UCX_PROTO_INFO\n      value: y\n    - name:\
+      \ NIXL_LOG_LEVEL\n      value: debug\n    - name: NCCL_DEBUG\n      value: INFO\n\
+      \    - name: NVSHMEM_DEBUG\n      value: INFO\n    initContainers:\n    - command:\n\
+      \      - set_llmdbench_environment.py\n      - -e\n      - /shared-config/llmdbench_env.sh\n\
+      \      - -i\n      imageKey: benchmark\n      imagePullPolicy: Always\n    \
+      \  name: preprocess\n      volumeMounts:\n      - mountPath: /shared-config\n\
+      \        name: shared-config\n    parallelism:\n      data: 1\n      dataLocal:\
+      \ 1\n      tensor: 4\n      workers: 1\n    replicas: 1\n    resources:\n  \
+      \    limits:\n        cpu: '16'\n        memory: 64Gi\n      requests:\n   \
+      \     cpu: '8'\n        memory: 32Gi\n    vllm:\n      additionalFlags:\n  \
+      \    - --max-num-seqs=256\n      - --max-num-batched-tokens=32768\n      - --enable-chunked-prefill\n\
+      \      - --enable-prefix-caching\n      - --enable-force-include-usage\n  router:\n\
+      \    epp:\n      flags:\n        allow-experimental-plugins: true\n        v:\
+      \ '4'\n      image:\n        pullPolicy: Always\n        registry: ghcr.io/kalantar\n\
+      \        repository: llm-d-router\n        tag: cee8bb60cbc3-leastttftjoint\n\
+      \      pluginsConfigFile: custom-plugins.yaml\n      pluginsCustomConfig:\n\
+      \        custom-plugins.yaml: \"apiVersion: llm-d.ai/v1alpha1\\nkind: EndpointPickerConfig\\\
+      n\\\n          plugins:\\n# ===================================================================\\\
+      n\\\n          # Inherited producers -- IDENTICAL to the baseline's AND to the\
+      \ focal\\n\\\n          # arm's, restated because this string replaces the baseline's\
+      \ wholesale.\\n\\\n          # ===================================================================\\\
+      n\\\n          # THE PRODUCER NAMES MUST MATCH THE FOCAL ARM'S EXACTLY. A data\
+      \ key's\\n\\\n          # identity is \\\"<DataType>/<ProducerName>\\\"\\n#\
+      \ (pkg/epp/framework/interface/plugin/datakey.go:45-49),\\\n          \\ so\
+      \ an arm bound to a\\n# differently-named producer reads a DIFFERENT signal\\\
+      \n          \\ -- and then the two\\n# arms are pricing different prompts and\
+      \ different\\\n          \\ prefixes, which\\n# confounds the comparison they\
+      \ exist to make. config.md\\\n          \\ §5 signal 11\\n# states that requirement\
+      \ for a_p; it applies equally to\\\n          \\ a_r.\\n#\\n# a_r, config.md\
+      \ §5 signal 10. BUILT: tokenizer sidecar + this\\\n          \\ plugin.\\n#\
+      \ Read as `request.Body.TokenizedPrompt.TokenCount()`; the field\\\n       \
+      \   \\ is a\\n# NULLABLE pointer and absence is a real runtime state (degradation\\\
+      \n          \\ D8).\\n# On absence THIS ARM COMPUTES NOTHING and the choice\
+      \ falls back\\\n          \\ to a THIRD\\n# policy -- neither arm -- so the\
+      \ per-arm D8 counter must\\\n          \\ be compared between\\n# the arms before\
+      \ any result is read.\\n- type: token-producer\\n\\\n          \\  parameters:\\\
+      n    # ${model.name} is expanded by llm-d-benchmark at render\\\n          \\\
+      \ time; passed\\n    # through verbatim rather than substituted here.\\n \\\n\
+      \          \\   modelName: ${model.name}\\n    vllm:\\n      # The loopback\
+      \ render sidecar\\\n          \\ in the EPP pod, enabled by the\\n      # `tokenizer-sidecar`\
+      \ defaults fragment.\\\n          \\ config.md §11: with nothing\\n      # serving\
+      \ :8000 the failure is SILENT\\\n          \\ -- a_r reads 0, every prompt\\\
+      n      # looks shorter than any threshold,\\\n          \\ and no disaggregation\
+      \ is ever\\n      # chosen.\\n      url: \\\"http://localhost:8000\\\"\\\n \
+      \         \\n# a_p, config.md §5 signal 11. Publishes PrefixCacheMatchInfo as\
+      \ a\\n#\\\n          \\ per-endpoint attribute; the arm binds it BY PRODUCER\
+      \ NAME below.\\n- type:\\\n          \\ approx-prefix-cache-producer\\n\\n#\
+      \ ===================================================================\\n\\\n\
+      \          # THE ARM -- TWO REGISTRATIONS SHARING ONE STATE OBJECT\\n# ===================================================================\\\
+      n\\\n          # NOT one plugin with two interfaces. `ProfileHandler.Pick` and\\\
+      n# `Picker.Pick`\\\n          \\ share a method name with different signatures\\\
+      n# (pkg/epp/framework/interface/scheduling/plugins.go:47,\\\n          \\ :77),\
+      \ so no single\\n# Go type can satisfy both. The split is forced by\\\n    \
+      \      \\ the target's interface\\n# set, not chosen:\\n#\\n#   least-ttft-joint-handler\\\
+      \n          \\  ProfileHandler + PreRequest +\\n#                          \
+      \   ResponseBodyProcessor\\n\\\n          #   least-ttft-joint-picker   Filter\
+      \ + Picker\\n#\\n# THEY ARE THE SAME Go\\\n          \\ TYPES THE FOCAL ARM\
+      \ USES, constructed against a\\n# different objective.\\\n          \\ That\
+      \ is how the verbatim-copy contract of\\n# config.md §9.3 is satisfied\\\n \
+      \         \\ -- by SHARING one implementation rather than by\\n# maintaining\
+      \ two copies\\\n          \\ of forty symbols, which is strictly stronger,\\\
+      n# because a copy can drift\\\n          \\ under an edit to one side and drift\
+      \ is exactly the\\n# failure the contract\\\n          \\ names.\\n#\\n# ONLY\
+      \ ONE ARM CAN BE INSTANTIATED PER EPP. Exactly one ProfileHandler\\\n      \
+      \    \\ is\\n# permitted across all instantiated plugins\\n# (pkg/epp/config/loader/configloader.go:382-391\\\
+      \n          \\ errors with \\\"multiple\\n# profile handlers found\\\"), so\
+      \ this config must\\\n          \\ NOT also declare\\n# causal-slo-externality-handler,\
+      \ disagg-profile-handler,\\\n          \\ or\\n# single-profile-handler. Both\
+      \ arms are registered in the image; the\\\n          \\ arm is\\n# selected\
+      \ by which types THIS FILE names, and one assemble is\\\n          \\ run per\
+      \ arm.\\n#\\n# A PICKER, NOT A SCORER, for two independent reasons\\\n     \
+      \     \\ -- the second of which\\n# is this arm's own rather than inherited:\\\
+      n#\\\n          \\   - a scorer returns a per-endpoint map and has NO WAY TO\
+      \ NAME A PAIR,\\n\\\n          #     while the objective is over (decode endpoint,\
+      \ prefill placement);\\n\\\n          #   - every scorer contribution passes\
+      \ through the profile's score-range\\n\\\n          #     enforcement, which\
+      \ CLAMPS to [0,1]\\n#     (pkg/epp/scheduling/scheduler_profile.go:212,\\\n\
+      \          \\ :364). This arm's\\n#     objective is a LATENCY IN MICROSECONDS\
+      \ -- non-negative\\\n          \\ and unbounded\\n#     above -- so clamping\
+      \ would collapse essentially every\\\n          \\ candidate to a\\n#     single\
+      \ score. The focal arm faces the same hazard\\\n          \\ because its J is\\\
+      n#     signed and unbounded. A picker's own objective\\\n          \\ does not\
+      \ pass through\\n#     the clamp.\\n#\\n# A Filter is required, not\\\n    \
+      \      \\ incidental: `Picker.Pick(ctx, []*ScoredEndpoint)`\\n# receives NO\
+      \ REQUEST,\\\n          \\ so the arriving request's token count reaches the\\\
+      n# argmin no other way.\\\n          \\ There is no CycleState at this pin,\
+      \ so the Filter\\n# hands the request-derived\\\n          \\ operands to the\
+      \ Picker by `Endpoint.Put` on the\\n# per-request endpoint\\\n          \\ clones\
+      \ the director builds fresh for every cycle,\\n# which the Picker\\\n      \
+      \    \\ reads back with `Get`.\\n- type: least-ttft-joint-handler\\n  parameters:\\\
+      n\\\n          \\    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # WHAT IS ABSENT HERE, AND WHY IT IS ABSENT RATHER THAN\
+      \ ZEROED\\n  \\\n          \\  # -----------------------------------------------------------------\\\
+      n\\\n          \\    # `v`               -- this objective is a raw latency,\
+      \ not a weighted\\n\\\n          \\    #                      composite, so\
+      \ there is no multiplier to carry.\\n\\\n          \\    # `activeWorkload`\
+      \  -- and `workloadTargets`. NO tau REACHES THIS ARM\\n\\\n          \\    #\
+      \ `workloadTargets`    ANYWHERE. It has no value kernel, no SLO virtual\\n\\\
+      \n          \\    #                      queues, and no externality over residents,\
+      \ so\\\n          \\ the\\n    #                      tau selector of config.md\
+      \ §6 is IRRELEVANT\\\n          \\ to it.\\n    #                      Note\
+      \ this arm CANNOT be flattened by\\\n          \\ a zero triple\\n    #    \
+      \                  the way the focal arm can, because\\\n          \\ it never\
+      \ reads\\n    #                      one -- the failure mode the\\\n       \
+      \   \\ focal arm's validation\\n    #                      guards against does\\\
+      \n          \\ not exist here.\\n    # `ablation`        -- every switch in\
+      \ it names a\\\n          \\ term this arm does not\\n    #                \
+      \      have. In particular\\\n          \\ there is NO `decomposed`\\n    #\
+      \                      switch: config.md\\\n          \\ §10's knob is\\n  \
+      \  #                      `DecomposedSLOExternality`,\\\n          \\ a focal-arm\
+      \ switch,\\n    #                      and this arm's enumeration\\\n      \
+      \    \\ is plain ascending-ID\\n    #                      order rather than\
+      \ scorer-first,\\\n          \\ so restricting it\\n    #                  \
+      \    to the scorer's pick would\\\n          \\ not reproduce a\\n    #    \
+      \                  decomposition. The +0.0485\\\n          \\ decode-first check\\\
+      n    #                      belongs to the focal arm.\\n\\\n          \\   \
+      \ # `capacity`        -- there is no capacity account.\\n    #\\n    #\\\n \
+      \         \\ Setting any of them is a STARTUP ERROR, by design. See this file's\\\
+      n \\\n          \\   # header.\\n\\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # Engine agreement -- config.md §5 signals 22, 23, 24 and\
+      \ §1\\n    #\\\n          \\ -----------------------------------------------------------------\\\
+      n  \\\n          \\  # IDENTICAL TO THE FOCAL ARM'S. These are facts about the\
+      \ deployed\\n\\\n          \\    # engine, not policy, so a difference between\
+      \ the arms would mean one\\\n          \\ of\\n    # them is wrong about the\
+      \ engine it is scheduling onto.\\n    engine:\\n\\\n          \\      # = max_num_batched_tokens.\
+      \ Sets the prefill chunk budget, so\\n \\\n          \\     # nChunks = ceil(a_p\
+      \ / min(a_p, 32768)) on every candidate.\\n    \\\n          \\  chunkTokens:\
+      \ 32768\\n      # = block_size. VALIDATED against the scraped\\\n          \\\
+      \ Metrics.CacheBlockSize\\n      # per endpoint, and a disagreement REJECTS\\\
+      \n          \\ the endpoint loudly: the\\n      # admission test compares blocks\
+      \ accumulated\\\n          \\ in one unit against a\\n      # need expressed\
+      \ in another, so a silent\\\n          \\ unit mismatch is a latent bug\\n \
+      \     # rather than an approximation.\\n\\\n          \\      blockSize: 16\\\
+      n      # = max_num_seqs. No metric exposes it, so it\\\n          \\ is config:\
+      \ the\\n      # rollforward estimator needs the batch ceiling\\\n          \\\
+      \ to know whether a slot\\n      # is free at all.\\n      maxBatchSize: 256\\\
+      n\\\n          \\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # Signal bindings -- config.md §5 signals 8, 10, 11\\n\
+      \    # -----------------------------------------------------------------\\n\\\
+      \n          \\    signals:\\n      # theta is keyed by THIS POD LABEL, not by\
+      \ the scenario's\\n\\\n          \\      # acceleratorType (config.md §2, §5\
+      \ signal 8). An absent or unmapped\\n\\\n          \\      # value REJECTS the\
+      \ endpoint and counts the rejection; it is never\\n\\\n          \\      # defaulted,\
+      \ because heterogeneity rides the per-iteration intercept\\n\\\n          \\\
+      \      # -- 25563.82 us on A100 against 16613.54 us on H100, a factor of\\n\\\
+      \n          \\      # 1.539 present on EVERY iteration regardless of KV state\
+      \ -- so a\\n\\\n          \\      # defaulted label is wrong on every decision\
+      \ rather than only under\\n\\\n          \\      # load.\\n      gpuTypeLabelKey:\
+      \ pd-infocomm.io/gpu-type\\n      #\\\n          \\ BOUND BY PRODUCER NAME,\
+      \ and it must be the SAME NAME the focal arm\\n \\\n          \\     # binds.\
+      \ An empty value would leave the data key at its type-string\\n\\\n        \
+      \  \\      # default; if the operator declared the producer under any other\\\
+      n\\\n          \\      # instance name the required key looks unproduced and\
+      \ a SECOND,\\n\\\n          \\      # nil-parameter producer is auto-created\
+      \ and read instead -- two\\n\\\n          \\      # indexers with two block\
+      \ sizes, and possibly the two arms bound\\\n          \\ to\\n      # different\
+      \ prefix signals.\\n      prefixMatchInfoProducerName:\\\n          \\ approx-prefix-cache-producer\\\
+      n      # Same requirement, and the more dangerous\\\n          \\ of the two:\
+      \ with nil\\n      # parameters the tokenizer falls through to\\\n         \
+      \ \\ the `estimate` backend,\\n      # which does not tokenize -- it packs raw\\\
+      \n          \\ request bytes into\\n      # pseudo-tokens at 4 bytes each. a_r\
+      \ becomes\\\n          \\ a byte-count heuristic,\\n      # TokenizedPrompt\
+      \ is NON-NIL, and the D8\\\n          \\ counter stays at zero because\\n  \
+      \    # nothing is absent. Every candidate\\\n          \\ is then priced on\
+      \ a wrong prompt\\n      # length with no observable signal.\\n\\\n        \
+      \  \\      tokenizedPromptProducerName: token-producer\\n\\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # The admission estimator -- DEGRADATION D1, config.md\
+      \ §5 signal 28\\n\\\n          \\    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # `rollforward` is the SUBSTITUTE for the scheduler-rollout\
+      \ TTFT model\\n\\\n          \\    # that produced every number in sim_results/.\
+      \ The rollout needs the\\n\\\n          \\    # engine's ordered wait queue,\
+      \ its current grants, and its step start\\n\\\n          \\    # instant; the\
+      \ target exposes Metrics.WaitingQueueSize, one integer.\\\n          \\ Every\\\
+      n    # call is counted (causal_slo_externality_estimator_substitution_total,\\\
+      n\\\n          \\    # labelled by plugin_name and plugin_type), because the\
+      \ fallback is\\n\\\n          \\    # acceptable and the silence would be the\
+      \ defect.\\n    #\\n    # D1'S\\\n          \\ DIRECTION IS NOT A SINGLE SIGN\
+      \ FOR THIS ARM, and the focal arm's\\n   \\\n          \\ # one-line summary\
+      \ must not be carried over. The two placements join\\n\\\n          \\    #\
+      \ their clocks differently -- local ADDS decode admission with slope\\\n   \
+      \       \\ 1,\\n    # while disaggregated takes max(remoteLead, tAdmD) -- so\
+      \ understating\\n\\\n          \\    # DECODE admission either cancels (when\
+      \ tAdmD dominates the max, it\\\n          \\ is\\n    # charged identically\
+      \ to both placements) or biases toward LOCAL\\\n          \\ (when\\n    # remoteLead\
+      \ dominates, the disaggregated candidate is insensitive\\\n          \\ to\\\
+      n    # tAdmD, so only the local candidate gets cheaper). The toward-remote\\\
+      n\\\n          \\    # direction survives only through the PREFILL admission\
+      \ channel. The\\\n          \\ net\\n    # is load- and pool-dependent.\\n \
+      \   #\\n    # CONSEQUENCE FOR\\\n          \\ READING RESULTS: treat the arm-vs-arm\
+      \ comparison as\\n    # fair only where\\\n          \\ the substitution counter\
+      \ shows the SAME ESTIMATOR\\n    # REGIME on both\\\n          \\ arms. Under\
+      \ decode-side congestion -- the regime the\\n    # high-load\\\n          \\\
+      \ and burst cohorts target -- D1 shifts the two arms'\\n    # local/remote\\\
+      \n          \\ splits by different amounts.\\n    admissionEstimator: rollforward\\\
+      n\\n\\\n          \\    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # Transfer model -- DEGRADATION D5, config.md §7. UNMEASURED.\\\
+      n   \\\n          \\ # -----------------------------------------------------------------\\\
+      n\\\n          \\    # IDENTICAL VALUES TO THE FOCAL ARM'S, necessarily: a different\
+      \ transfer\\n\\\n          \\    # price between the arms would move their local/remote\
+      \ boundaries\\n\\\n          \\    # differently and the comparison would measure\
+      \ the difference in c_xfer\\n\\\n          \\    # rather than the difference\
+      \ in objective.\\n    #\\n    # D5 MATTERS\\\n          \\ MORE HERE THAN IN\
+      \ THE FOCAL ARM. There is no externality\\n    # term to\\\n          \\ partially\
+      \ offset a mis-priced transfer, so an unmeasured c_xfer\\n    #\\\n        \
+      \  \\ moves this arm's decisions systematically. It enters at exactly one\\\
+      n\\\n          \\    # place, the remote lead.\\n    #\\n    # It is NOT the\
+      \ only size-dependent\\\n          \\ price of going remote: the\\n    # disaggregated\
+      \ projection also adds the\\\n          \\ re-timed B+1 first decode\\n    #\
+      \ iteration, whose KV component scales\\\n          \\ with the request's own\
+      \ input\\n    # length, so prompt size prices the\\\n          \\ remote path\
+      \ through TWO channels.\\n    transfer:\\n      sizeAware: true\\\n        \
+      \  \\            # config.md §9.1\\n      xferBaseUs: 50.0           # simulator\\\
+      \n          \\ value -- UNMEASURED on target\\n      xferBandwidthGbps: 25.0\
+      \    # simulator\\\n          \\ value -- UNMEASURED on target\\n      # Derived\
+      \ arithmetic, not measured:\\\n          \\ 81920 B per token per GPU\\n   \
+      \   # (config.md §5 signal 27). Leaving it\\\n          \\ 0 would make transferBytes\
+      \ 0, so\\n      # every request is charged a flat\\\n          \\ xferBaseUs\
+      \ -- a 4k-token prompt should\\n      # be charged ~13500 us,\\\n          \\\
+      \ roughly 270x under-priced, with the error\\n      # growing linearly in\\\n\
+      \          \\ prompt length.\\n      kvBytesPerTokenPerGpu: 81920\\n      #\
+      \ Read ONLY\\\n          \\ when sizeAware is false. Carried so the size-aware\
+      \ model\\n      # can\\\n          \\ be switched off for a diagnostic without\
+      \ inventing a value.\\n      flatCXferUs:\\\n          \\ 5000\\n\\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # theta per GPU type -- config.md §4, keyed by the POD\
+      \ LABEL VALUE\\n\\\n          \\    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # BYTE-FOR-BYTE THE FOCAL ARM'S COEFFICIENTS. If the two\
+      \ arms carried\\n\\\n          \\    # different physics constants every measured\
+      \ difference between them\\n\\\n          \\    # would be uninterpretable,\
+      \ and no single-arm test would notice.\\n\\\n          \\    #\\n    # BOTH\
+      \ SETS ARE PRESENT even though the generated scenario names\\\n          \\\
+      \ H100 for\\n    # both roles: config.md §2's capability gap means the A100\\\
+      \n          \\ decode pod is\\n    # deployed outside the generated scenario\
+      \ or the scenario\\\n          \\ is hand-edited,\\n    # and it must carry\
+      \ `pd-infocomm.io/gpu-type: A100_SXM_80GB`\\\n          \\ with its\\n    #\
+      \ nodeSelector pinned to matching hardware. With both sets\\\n          \\ here\
+      \ that pod\\n    # is priced correctly the moment it carries the label,\\\n\
+      \          \\ with no\\n    # plugin-config change.\\n    #\\n    # There is\
+      \ deliberately\\\n          \\ NO FALLBACK ENTRY. An unmapped label must already\\\
+      n    # have caused the\\\n          \\ endpoint to be rejected.\\n    #\\n \
+      \   # Each pair's alphaD and alphaP agree\\\n          \\ within 0.03%; validation\
+      \ rejects a\\n    # pair diverging by more than\\\n          \\ 10%, which would\
+      \ mean the coefficients were\\n    # fit on mismatched hardware\\\n        \
+      \  \\ or regimes.\\n    coeffsByGpuType:\\n      H100_SXM_80GB:\\n        alphaD:\\\
+      \n          \\ 16613.537554540144\\n        alphaP: 16617.85321583337\\n   \
+      \     c0: 5.347316038602452\\n\\\n          \\        c1: 0.04761401141756073\\\
+      n        cPf: 6.144687138665833\\n     \\\n          \\   cAttn: 0.00010075247918809842\\\
+      n      A100_SXM_80GB:\\n        alphaD:\\\n          \\ 25563.819286862163\\\
+      n        alphaP: 25568.34953836831\\n        c0: 5.945331876073271\\n\\\n  \
+      \        \\        c1: 0.07822809856114352\\n        cPf: 9.794219053944662\\\
+      n     \\\n          \\   cAttn: 0.00015977670754642687\\n\\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # The shadow table -- config.md §5 signals 12-18, degradations\
+      \ D2/D4/D6\\n\\\n          \\    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # STILL REQUIRED ON THIS ARM, and it is worth saying why,\
+      \ because this\\n\\\n          \\    # arm reads no resident VALUE. It reads\
+      \ the resident POPULATIONS, in\\n\\\n          \\    # three places:\\n    #\
+      \   D4  ResidentPrefillTokens enters both iteration-time\\\n          \\ laws\
+      \ as S_pf, on\\n    #       every candidate.\\n    #   D2  RunningDecode\\\n\
+      \          \\ feeds the remaining-steps estimate and the\\n    #       rollforward\
+      \ KV\\\n          \\ walk, so StepsDone and KVBlocks are read.\\n    #   D6\
+      \  RunningPrefill\\\n          \\ feeds the prefill remaining-steps estimate.\\\
+      n    # What it does NOT inherit\\\n          \\ is D2c, the late-first-token\
+      \ bias: no kernel\\n    # here reads ArrivalUs,\\\n          \\ FirstTokenUs,\
+      \ or TTFTSet.\\n    #\\n    # IDENTICAL SETTINGS TO THE FOCAL\\\n          \\\
+      \ ARM'S, because the table is a view of\\n    # the same fleet and a different\\\
+      \n          \\ TTL would give the two arms different\\n    # resident populations\
+      \ for\\\n          \\ the same traffic.\\n    #\\n    # `epp.replicas: 1` is\
+      \ pinned in the BASELINE\\\n          \\ overlay, not here: two\\n    # replicas\
+      \ PARTITION this table (D2), so each\\\n          \\ would see a fraction of\
+      \ the\\n    # residents. Pinning it in the baseline\\\n          \\ is what\
+      \ makes the baseline and\\n    # both treatments run identical EPP\\\n     \
+      \     \\ topology.\\n    shadowTable:\\n      # A request that terminates without\\\
+      \n          \\ a final chunk would otherwise be\\n      # charged as a resident\
+      \ forever\\\n          \\ and permanently inflate every estimate\\n      # on\
+      \ its endpoint.\\n   \\\n          \\   entryTtlSeconds: 900\\n      sweepIntervalSeconds:\
+      \ 30\\n      # config.md\\\n          \\ §5 signal 14 caps S_pf at max_num_batched_tokens,\
+      \ so this\\n      # and\\\n          \\ engine.chunkTokens are ONE FACT EXPRESSED\
+      \ TWICE and validation\\n     \\\n          \\ # requires them to agree: S_pf\
+      \ is what is being prefilled in one engine\\n\\\n          \\      # step, so\
+      \ its cap is the engine's per-step token budget.\\n     \\\n          \\ residentPrefillTokensCap:\
+      \ 32768\\n\\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # Post-processing -- config.md §5 signal 25\\n    # -----------------------------------------------------------------\\\
+      n\\\n          \\    # The client-visible per-token post-processing latency\
+      \ (streaming\\n\\\n          \\    # detokenization), added explicitly to EVERY\
+      \ TTFT projection because\\\n          \\ it\\n    # sits outside the calibrated\
+      \ theta.\\n    #\\n    # config.md gives\\\n          \\ no value for it, and\
+      \ 0.0 is the honest statement of\\n    # that rather\\\n          \\ than a\
+      \ measurement. For THIS arm it is genuinely\\n    # decision-neutral\\\n   \
+      \       \\ -- the objective IS the projected TTFT, so a common\\n    # additive\
+      \ constant\\\n          \\ shifts every candidate equally and cannot change\
+      \ the\\n    # argmin. That\\\n          \\ is NOT true of the focal arm, where\
+      \ tHat enters a sigmoid.\\n    # The\\\n          \\ value is nonetheless kept\
+      \ identical between the arms, because\\n    # differing\\\n          \\ here\
+      \ would put the two arms on different clocks for no gain.\\n    outputTokenProcessingUs:\\\
+      \n          \\ 0.0\\n\\n# -------------------------------------------------------------------\\\
+      n\\\n          # The picker registration -- Filter + Picker, reads the handler's\
+      \ state.\\n\\\n          # -------------------------------------------------------------------\\\
+      n\\\n          # Filter  splits the two pools by role label, REJECTS endpoints\
+      \ whose\\n\\\n          #         GPU-type label is absent or unmapped (counting\
+      \ each rejection\\\n          \\ by\\n#         reason), and -- because `Picker.Pick`\
+      \ receives no request\\\n          \\ -- is the\\n#         only place the arriving\
+      \ request's operands (a_r,\\\n          \\ SLO class, the\\n#         per-endpoint\
+      \ a_p, the request ID) can be attached\\\n          \\ for the Picker.\\n# Picker\
+      \  runs the joint argmin over D local plus D*P\\\n          \\ disaggregated\\\
+      n#         candidates in PLAIN ASCENDING-ID ORDER and returns\\\n          \\\
+      \ BOTH picks in\\n#         one ProfileRunResult.\\n#\\n# ASCENDING-ID, NOT\\\
+      \n          \\ SCORER-FIRST, and that is this arm's one declared\\n# enumeration\
+      \ divergence\\\n          \\ from the focal arm. Upstream's least-ttft branch\\\
+      n# iterates the decode\\\n          \\ snapshots directly (sim/edpp.go:1456)\
+      \ while the\\n# scorer-first reordering\\\n          \\ is applied only in the\
+      \ SLO-externality and\\n# causal-VaR branches (sim/edpp.go:2176-2178).\\\n \
+      \         \\ It is a TIE-BREAK order, so\\n# copying the focal arm's would change\
+      \ which\\\n          \\ candidate wins an EXACT tie --\\n# silently, and only\
+      \ sometimes.\\n#\\n#\\\n          \\ CONSTRUCTION ORDER IS CARRIED BY `handlerPluginName`,\
+      \ NOT BY POSITION\\\n          \\ IN\\n# THIS LIST. `instantiatePlugins` topologically\
+      \ sorts a plugin DAG\\\n          \\ before\\n# building anything (pkg/epp/config/loader/configloader.go:244-250)\\\
+      \n          \\ and\\n# dependencies are constructed first. The edge comes from\
+      \ the `pluginRef`\\\n          \\ tag\\n# on the picker's handlerPluginName\
+      \ field, discovered by reflection\\n\\\n          # (configloader.go:304-336).\
+      \ Removing the reference would break STARTUP\\n\\\n          # rather than ordering:\
+      \ both plugins would sit at in-degree 0 and their\\\n          \\ order\\n#\
+      \ would come from ranging a Go map, so the EPP crashloops on roughly\\\n   \
+      \       \\ 5 starts\\n# out of 6.\\n#\\n# THE NAME MUST BE THIS ARM'S HANDLER.\
+      \ Pointing\\\n          \\ it at\\n# causal-slo-externality-handler is REFUSED\
+      \ at startup: both arms\\\n          \\ are the\\n# same Go type, so the binding\
+      \ would otherwise succeed and then\\\n          \\ run the FOCAL\\n# objective\
+      \ while every log line and every plugin_type\\\n          \\ metric label reported\\\
+      n# this arm -- a comparison of one arm with itself,\\\n          \\ reported\
+      \ as a comparison\\n# between two.\\n- type: least-ttft-joint-picker\\n\\\n\
+      \          \\  parameters:\\n    handlerPluginName: least-ttft-joint-handler\\\
+      n\\nschedulingProfiles:\\n\\\n          # ONE ROLE-BLIND PROFILE, and this is\
+      \ the required shape rather than a\\n\\\n          # simplification. All profiles\
+      \ receive the same candidateEndpoints slice\\n\\\n          # (pkg/epp/scheduling/scheduler.go:81),\
+      \ so an unfiltered profile sees BOTH\\n\\\n          # pools -- which is exactly\
+      \ what the joint argmin needs: D local candidates\\n\\\n          # plus D*P\
+      \ disaggregated candidates, scored on one scale in one argmin.\\n\\\n      \
+      \    #\\n# NO SCORERS ARE ATTACHED, and that is deliberate, for the clamping\
+      \ reason\\n\\\n          # above. Every ScoredEndpoint therefore reaches the\
+      \ picker with Score 0.\\\n          \\ For\\n# THIS arm that field is doubly\
+      \ irrelevant: it ignores Score entirely\\\n          \\ and,\\n# unlike the\
+      \ focal arm, does not even use it as a tie-break order.\\n\\\n          #\\\
+      n# IDENTICAL TO THE FOCAL ARM'S PROFILE SHAPE. The two arms must see the\\\n\
+      \          \\ same\\n# candidate set, so the profile that supplies it cannot\
+      \ differ between\\\n          \\ them.\\n#\\n# The handler is NOT referenced\
+      \ here and does not need to be:\\\n          \\ every\\n# instantiated plugin\
+      \ is offered to the requestcontrol config and\\\n          \\ sorted into\\\
+      n# hook lists by interface assertion, so its ProfileHandler,\\\n          \\\
+      \ PreRequest and\\n# ResponseBody hooks are wired by its mere presence in\\\n\
+      \          \\ `plugins:`.\\n- name: default\\n  plugins:\\n  - pluginRef: least-ttft-joint-picker\\\
+      n\"\n      replicas: 1\n    inferenceObjectives:\n    - name: standard\n   \
+      \   priority: 3\n    proxy:\n      args:\n      - --service-node\n      - envoy-sidecar\n\
+      \      - --log-level\n      - warn\n      - --concurrency\n      - '8'\n   \
+      \   - --drain-strategy\n      - immediate\n      - --drain-time-s\n      - '60'\n\
+      \      - -c\n      - /etc/envoy/envoy.yaml\n      resources:\n        limits:\n\
+      \          cpu: '8'\n          memory: 16Gi\n        requests:\n          cpu:\
+      \ '4'\n          memory: 8Gi\n    tokenizer:\n      enabled: true\n      env:\n\
+      \      - name: HF_TOKEN\n        valueFrom:\n          secretKeyRef:\n     \
+      \       key: HF_TOKEN\n            name: hf-secret\n      - name: HF_HOME\n\
+      \        value: /tmp/hf\n  routing:\n    connector: nixlv2\n    proxy:\n   \
+      \   resources:\n        limits:\n          cpu: '8'\n          memory: 16Gi\n\
+      \        requests:\n          cpu: '4'\n          memory: 8Gi\n  storage:\n\
+      \    modelPvc:\n      size: 1Ti\n  vllmCommon:\n    flags:\n      disableUvicornAccessLog:\
+      \ false\n      enforceEager: false\n    kvTransfer:\n      connector: NixlConnector\n\
+      \      enabled: true\n      role: kv_both\n    networkNr: '1'\n    networkResource:\
+      \ rdma/roce_gdr\n    preprocessScript: export LD_LIBRARY_PATH=$(find / -name\
+      \ libcuda.so.1 -printf '%h\\n'\n      2>/dev/null | sed ':a; N; $!ba; s/\\n/:/g'):${LD_LIBRARY_PATH};\
+      \ export LIBRARY_PATH=$(find\n      / -name libcuda.so.1 -printf '%h\\n' 2>/dev/null\
+      \ | head -1):${LIBRARY_PATH};\n      . /shared-config/llmdbench_env.sh\n   \
+      \ ucxTls: rc,sm,cuda_ipc,cuda_copy\n    volumeMounts:\n    - mountPath: /shared-config\n\
+      \      name: shared-config\n    - mountPath: /dev/shm\n      name: dshm\n  \
+      \  volumes:\n    - emptyDir: {}\n      name: shared-config\n      type: emptyDir\n\
+      \    - emptyDir:\n        medium: Memory\n        sizeLimit: 16Gi\n      name:\
+      \ dshm\n      type: emptyDir\n"
+  - name: specContent
+    value: "base_dir: /workspace/source/llm-d-benchmark\n\nvalues_file:\n  path: /workspace/source/llm-d-benchmark/config/templates/values/defaults.yaml\n\
+      \ntemplate_dir:\n  path: /workspace/source/llm-d-benchmark/config/templates/jinja\n\
+      \nscenario_file:\n  path: /tmp/llmdbench-config/scenario.yaml\n"
+  - name: workloadName
+    value: deep-research-single-turn
+  - name: workloadSpec
+    value: "{aggregate_rate: 0.26, category: language, cohorts: [{arrival: {process:\
+      \ poisson},\n      id: deep-research, input_distribution: {params: {max: 121000,\
+      \ min: 2000, mu: 10.477875,\n          sigma: 0.687812}, type: lognormal}, output_distribution:\
+      \ {params: {max: 4000,\n          mean: 300, min: 50, std_dev: 850}, type: gaussian},\
+      \ population: 5, prefix_group: deep-research-system-prompt,\n      prefix_length:\
+      \ 2000, prefix_sharing: per_member, rate_fraction: 1.0, slo_class: standard,\n\
+      \      streaming: true, tenant_id: research-agents}], num_requests: 280, seed:\
+      \ 42,\n  version: '2'}"
+  - name: benchmarkGitRepoUrl
+    value: https://github.com/llm-d/llm-d-benchmark.git
+  - name: benchmarkGitCommit
+    value: 1b18402b9ae2c12ef86628533c6b03c37b732a6c
+  - name: blisGitRepoUrl
+    value: https://github.com/kalantar/inference-sim.git
+  - name: blisGitCommit
+    value: 583f719507f31c24dd675d30daa79c33950c5516
+  - name: model
+    value: meta-llama/Llama-3.3-70B-Instruct
+  - name: replica
+    value: '1'
+  - name: maxConcurrency
+    value: '10000'
+  - name: timeout
+    value: '1800'
+  - name: warmupRequests
+    value: '50'
+  - name: prewarmDuration
+    value: 60s
+  pipelineRef:
+    name: sim2real
+  taskRunSpecs:
+  - pipelineTaskName: stream-epp-logs
+    timeout: 3h
+  - pipelineTaskName: stream-gpu-stats
+    timeout: 3h
+  - pipelineTaskName: run-workload-blis-observe-binary
+    timeout: 3h
+  taskRunTemplate:
+    serviceAccountName: helm-installer
+  timeouts:
+    pipeline: 4h
+  workspaces:
+  - name: data-storage
+    persistentVolumeClaim:
+      claimName: data-pvc
+  - name: source
+    persistentVolumeClaim:
+      claimName: source-pvc

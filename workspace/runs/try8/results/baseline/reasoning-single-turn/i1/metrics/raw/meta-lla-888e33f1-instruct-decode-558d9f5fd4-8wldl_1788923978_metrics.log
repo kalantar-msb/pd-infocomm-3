@@ -1,0 +1,6 @@
+# Timestamp: 2026-09-09T03:19:38+0000
+# Pod: meta-lla-888e33f1-instruct-decode-558d9f5fd4-8wldl
+# PodIP: 10.129.8.215
+# Source: prometheus_metrics
+
+{"object":"error","message":"The decode node is not ready. Please check that the vLLM service is running and the port configuration is correct.","type":"ServiceUnavailable","param":"","code":503}

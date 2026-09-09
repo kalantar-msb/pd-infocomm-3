@@ -1,0 +1,12 @@
+{
+  "level": "STABLE",
+  "score": 0,
+  "confidence": 1,
+  "signals": {
+    "latency_trend": 0,
+    "latency_trend_raw": 0.07289055954380996,
+    "noise_floor": 0.0659380473395787,
+    "quartile_monotone": 0,
+    "rate_deficit": 0
+  }
+}

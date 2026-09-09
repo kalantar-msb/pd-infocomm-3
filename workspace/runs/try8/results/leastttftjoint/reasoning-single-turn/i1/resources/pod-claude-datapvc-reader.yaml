@@ -1,0 +1,157 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.ovn.org/pod-networks: '{"default":{"ip_addresses":["10.128.6.94/23"],"mac_address":"0a:58:0a:80:06:5e","gateway_ips":["10.128.6.1"],"routes":[{"dest":"10.128.0.0/14","nextHop":"10.128.6.1"},{"dest":"172.30.0.0/16","nextHop":"10.128.6.1"},{"dest":"169.254.0.5/32","nextHop":"10.128.6.1"},{"dest":"100.64.0.0/16","nextHop":"10.128.6.1"}],"ip_address":"10.128.6.94/23","gateway_ip":"10.128.6.1","role":"primary"}}'
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "ovn-kubernetes",
+          "interface": "eth0",
+          "ips": [
+              "10.128.6.94"
+          ],
+          "mac": "0a:58:0a:80:06:5e",
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: openshift-ai-llminferenceservice-multi-node-scc
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  creationTimestamp: "2026-09-04T21:30:11Z"
+  name: claude-datapvc-reader
+  namespace: kalantar-0
+  resourceVersion: "2183214118"
+  uid: fb0fc86d-1499-4954-8412-a7eeae8556aa
+spec:
+  containers:
+  - command:
+    - sh
+    - -c
+    - sleep 21600
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imagePullPolicy: IfNotPresent
+    name: reader
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1002710000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data
+      name: data
+      readOnly: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-nv8tw
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: pokprod-b93r38s1
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Never
+  schedulerName: default-scheduler
+  securityContext:
+    seLinuxOptions:
+      level: s0:c52,c29
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: data
+    persistentVolumeClaim:
+      claimName: data-pvc
+      readOnly: true
+  - name: kube-api-access-nv8tw
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+      - configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: openshift-service-ca.crt
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-05T03:30:19Z"
+    status: "False"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-04T21:30:11Z"
+    reason: PodCompleted
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-05T03:30:18Z"
+    reason: PodCompleted
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-05T03:30:18Z"
+    reason: PodCompleted
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-04T21:30:11Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://1189ad53f9fcae5fef0ec0a06270fbf86fd1236954384716f0d92299aa79dee0
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imageID: 6dc5ac8151c5a93455968b274e03a1acf6a3c67c679cc9103b0f35104cf0e8de
+    lastState: {}
+    name: reader
+    ready: false
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: cri-o://1189ad53f9fcae5fef0ec0a06270fbf86fd1236954384716f0d92299aa79dee0
+        exitCode: 0
+        finishedAt: "2026-09-05T03:30:18Z"
+        reason: Completed
+        startedAt: "2026-09-04T21:30:18Z"
+    volumeMounts:
+    - mountPath: /data
+      name: data
+      readOnly: true
+      recursiveReadOnly: Disabled
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-nv8tw
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.98.32
+  hostIPs:
+  - ip: 192.168.98.32
+  phase: Succeeded
+  qosClass: BestEffort
+  startTime: "2026-09-04T21:30:11Z"

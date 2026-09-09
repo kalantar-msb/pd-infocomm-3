@@ -1,0 +1,1 @@
+{"level":"debug","ts":1788924965.9839694,"logger":"controller-runtime.cache","caller":"cache/reflector.go:991","msg":"Watch close","reflector":"pkg/mod/k8s.io/client-go@v0.35.7/tools/cache/reflector.go:289","type":"*v1.Pod","totalItems":40}

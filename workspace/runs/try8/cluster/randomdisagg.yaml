@@ -1,0 +1,315 @@
+scenario:
+- annotations:
+    decode:
+      pod:
+        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute
+    prefill:
+      pod:
+        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute
+  decode:
+    acceleratorType:
+      labelKey: kubernetes.io/hostname
+      labelValue: ''
+      labelValues:
+      - pokprod-b93r38s0
+      - pokprod-b93r38s2
+      - pokprod-b93r38s3
+      - pokprod-b93r39s0
+      - pokprod-b93r39s1
+      - pokprod-b93r39s2
+      - pokprod-b93r43s0
+      - pokprod-b93r43s1
+      - pokprod-b93r43s2
+      - pokprod-b93r43s3
+      - pokprod-b93r44s0
+      - pokprod-b93r44s1
+      - pokprod-b93r44s2
+    extraContainerConfig:
+      securityContext:
+        capabilities:
+          add:
+          - IPC_LOCK
+          - SYS_RAWIO
+          - NET_ADMIN
+          - NET_RAW
+        runAsGroup: 0
+        runAsUser: 0
+    extraEnvVars:
+    - name: UCX_LOG_LEVEL
+      value: info
+    - name: UCX_PROTO_INFO
+      value: y
+    - name: NIXL_LOG_LEVEL
+      value: debug
+    - name: NCCL_DEBUG
+      value: INFO
+    - name: NVSHMEM_DEBUG
+      value: INFO
+    initContainers:
+    - command:
+      - set_llmdbench_environment.py
+      - -e
+      - /shared-config/llmdbench_env.sh
+      - -i
+      imageKey: benchmark
+      imagePullPolicy: Always
+      name: preprocess
+      volumeMounts:
+      - mountPath: /shared-config
+        name: shared-config
+    parallelism:
+      data: 1
+      dataLocal: 1
+      tensor: 4
+      workers: 1
+    replicas: 2
+    resources:
+      limits:
+        cpu: '32'
+        memory: 128Gi
+      requests:
+        cpu: '16'
+        memory: 64Gi
+    vllm:
+      additionalFlags:
+      - --max-num-seqs=256
+      - --max-num-batched-tokens=32768
+      - --enable-chunked-prefill
+      - --enable-prefix-caching
+      - --enable-force-include-usage
+  gateway:
+    className: epponly
+    externallyManaged: true
+  huggingface:
+    secretName: hf-secret
+  model:
+    blockSize: 16
+    gpuMemoryUtilization: 0.9
+    huggingfaceId: meta-llama/Llama-3.3-70B-Instruct
+    maxModelLen: 131072
+    name: meta-llama/Llama-3.3-70B-Instruct
+    path: models/meta-llama/Llama-3.3-70B-Instruct
+    shortName: meta-llama-llama-3.3-70b-instruct
+    size: 1Ti
+  modelArtifacts:
+    extraLabels:
+      pd-infocomm.io/gpu-type: H100_SXM_80GB
+  name: pdinfocomm3
+  prefill:
+    acceleratorType:
+      labelKey: kubernetes.io/hostname
+      labelValue: ''
+      labelValues:
+      - pokprod-b93r38s0
+      - pokprod-b93r38s2
+      - pokprod-b93r38s3
+      - pokprod-b93r39s0
+      - pokprod-b93r39s1
+      - pokprod-b93r39s2
+      - pokprod-b93r43s0
+      - pokprod-b93r43s1
+      - pokprod-b93r43s2
+      - pokprod-b93r43s3
+      - pokprod-b93r44s0
+      - pokprod-b93r44s1
+      - pokprod-b93r44s2
+    enabled: true
+    extraContainerConfig:
+      securityContext:
+        capabilities:
+          add:
+          - IPC_LOCK
+          - SYS_RAWIO
+          - NET_ADMIN
+          - NET_RAW
+        runAsGroup: 0
+        runAsUser: 0
+    extraEnvVars:
+    - name: UCX_LOG_LEVEL
+      value: info
+    - name: UCX_PROTO_INFO
+      value: y
+    - name: NIXL_LOG_LEVEL
+      value: debug
+    - name: NCCL_DEBUG
+      value: INFO
+    - name: NVSHMEM_DEBUG
+      value: INFO
+    initContainers:
+    - command:
+      - set_llmdbench_environment.py
+      - -e
+      - /shared-config/llmdbench_env.sh
+      - -i
+      imageKey: benchmark
+      imagePullPolicy: Always
+      name: preprocess
+      volumeMounts:
+      - mountPath: /shared-config
+        name: shared-config
+    parallelism:
+      data: 1
+      dataLocal: 1
+      tensor: 4
+      workers: 1
+    replicas: 1
+    resources:
+      limits:
+        cpu: '16'
+        memory: 64Gi
+      requests:
+        cpu: '8'
+        memory: 32Gi
+    vllm:
+      additionalFlags:
+      - --max-num-seqs=256
+      - --max-num-batched-tokens=32768
+      - --enable-chunked-prefill
+      - --enable-prefix-caching
+      - --enable-force-include-usage
+  router:
+    epp:
+      flags:
+        allow-experimental-plugins: true
+        v: '4'
+      image:
+        pullPolicy: Always
+        registry: ghcr.io/kalantar
+        repository: llm-d-router
+        tag: cee8bb60cbc3-randomdisagg
+      pluginsConfigFile: custom-plugins.yaml
+      pluginsCustomConfig:
+        custom-plugins.yaml: "apiVersion: llm-d.ai/v1alpha1\nkind: EndpointPickerConfig\n\
+          plugins:\n# --- Producers: identical to the baseline ------------------------------\n\
+          # Retained even though this arm reads NEITHER of them. The tokenizer\n#\
+          \ sidecar and the prefix producer feed prefix-cache-scorer, which still\n\
+          # selects pods. Dropping them would change pod selection and confound the\n\
+          # comparison. The arm's own decision consumes no producer output.\n- type:\
+          \ token-producer\n  parameters:\n    modelName: ${model.name}\n    vllm:\n\
+          \      url: \"http://localhost:8000\"\n- type: approx-prefix-cache-producer\n\
+          \n# --- The decider: THE ONLY DIFFERENCE FROM THE BASELINE ----------------\n\
+          - type: random-pd-decider\n  parameters:\n    # p -- the expected fraction\
+          \ of requests disaggregated.\n    #\n    # 0.075 IS THE MATCHED RATE FOR\
+          \ interactive-chat ONLY. It is the\n    # focal arm's OWN realized rate\
+          \ in the single cell of run `try2`\n    # that completed: 41 prefill selections\
+          \ over 546 handled requests\n    # (results/causalsloexternality/interactive-chat-single-turn/i1\
+          \ --\n    # EPP `Request handled` count against prefill POST /v1/completions).\n\
+          \    #\n    # THE MATCHED RATE IS PER WORKLOAD. The focal arm's realized\
+          \ rate is\n    # a function of the prompt-length distribution, and reasoning\
+          \ and\n    # deep-research differ from interactive-chat. Re-measure the\
+          \ focal\n    # arm's rate for the target workload and set p to it, then\
+          \ run ONE\n    # ASSEMBLE PER WORKLOAD -- the same discipline `activeWorkload`\n\
+          \    # already forces on the focal arm (config.md S6). Reusing 0.075\n \
+          \   # across workloads produces a rate-mismatched comparison that still\n\
+          \    # reports goodput, which is the failure mode S6 warns about.\n    #\n\
+          \    # For a sweep rather than a matched-rate test, vary p across\n    #\
+          \ assembles: 0 reproduces the simulator's `never` rule and 1 its\n    #\
+          \ `always` rule (inference-sim sim/disaggregation.go:70-74), so the\n  \
+          \  # sweep spans decode-only to always-disaggregated with the endpoints\n\
+          \    # anchored to rules the simulator already defines.\n    disaggregateProbability:\
+          \ 0.075\n\n    # Selects WHICH subset is disaggregated at that rate. Changing\
+          \ it at\n    # fixed p draws an independent subset without changing the\
+          \ arm --\n    # that is how to get replicate subsets. 42 matches the workload\
+          \ seed\n    # convention (workloads/*.yaml `seed: 42`); the two are unrelated\n\
+          \    # mechanically, and the shared value is a readability choice only.\n\
+          \    seed: 42\n\n    # Header whose value keys the decision. EMPTY ON PURPOSE:\
+          \ no header\n    # is currently known to be stable per request across runs,\
+          \ so the\n    # plugin falls back to scheduling.InferenceRequest.RequestID,\
+          \ which\n    # llm-d-router documents as Envoy-generated and therefore fresh\
+          \ every\n    # run. Consequence (R2): the arm is still exactly Bernoulli\
+          \ at rate\n    # p and every comparison stays valid, but two runs of one\
+          \ workload\n    # disaggregate DIFFERENT requests, so results are not bit-replayable.\n\
+          \    # Set this to a load-generator-stable header to recover replay, and\n\
+          \    # record which path was used when reporting.\n    identityHeader: \"\
+          \"\n\n- type: disagg-profile-handler\n  parameters:\n    deciders:\n   \
+          \   prefill: random-pd-decider\n\n# --- Role filters and load-shaped scorers:\
+          \ identical to the baseline ---\n# Pod selection is UNCHANGED and remains\
+          \ load-aware. This is what makes\n# the arm a control on the disaggregation\
+          \ decision rather than a null\n# model of the whole scheduler.\n- type:\
+          \ prefill-filter\n- type: decode-filter\n- type: prefix-cache-scorer\n \
+          \ parameters:\n    prefixMatchInfoProducerName: approx-prefix-cache-producer\n\
+          - type: queue-scorer\n- type: kv-cache-utilization-scorer\n- type: active-request-scorer\n\
+          \n# --- Scheduling profiles: identical to the baseline, weights included\
+          \ --\nschedulingProfiles:\n- name: decode\n  plugins:\n  - pluginRef: decode-filter\n\
+          \  - pluginRef: active-request-scorer\n    weight: 2\n  - pluginRef: prefix-cache-scorer\n\
+          \    weight: 3\n- name: prefill\n  plugins:\n  - pluginRef: prefill-filter\n\
+          \  - pluginRef: prefix-cache-scorer\n    weight: 3\n  - pluginRef: queue-scorer\n\
+          \    weight: 2\n  - pluginRef: kv-cache-utilization-scorer\n    weight:\
+          \ 2\n"
+      replicas: 1
+    inferenceObjectives:
+    - name: standard
+      priority: 3
+    proxy:
+      args:
+      - --service-node
+      - envoy-sidecar
+      - --log-level
+      - warn
+      - --concurrency
+      - '8'
+      - --drain-strategy
+      - immediate
+      - --drain-time-s
+      - '60'
+      - -c
+      - /etc/envoy/envoy.yaml
+      resources:
+        limits:
+          cpu: '8'
+          memory: 16Gi
+        requests:
+          cpu: '4'
+          memory: 8Gi
+    tokenizer:
+      enabled: true
+      env:
+      - name: HF_TOKEN
+        valueFrom:
+          secretKeyRef:
+            key: HF_TOKEN
+            name: hf-secret
+      - name: HF_HOME
+        value: /tmp/hf
+  routing:
+    connector: nixlv2
+    proxy:
+      resources:
+        limits:
+          cpu: '8'
+          memory: 16Gi
+        requests:
+          cpu: '4'
+          memory: 8Gi
+  storage:
+    modelPvc:
+      size: 1Ti
+  vllmCommon:
+    flags:
+      disableUvicornAccessLog: false
+      enforceEager: false
+    kvTransfer:
+      connector: NixlConnector
+      enabled: true
+      role: kv_both
+    networkNr: '1'
+    networkResource: rdma/roce_gdr
+    preprocessScript: export LD_LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n'
+      2>/dev/null | sed ':a; N; $!ba; s/\n/:/g'):${LD_LIBRARY_PATH}; export LIBRARY_PATH=$(find
+      / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | head -1):${LIBRARY_PATH};
+      . /shared-config/llmdbench_env.sh
+    ucxTls: rc,sm,cuda_ipc,cuda_copy
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+    - mountPath: /dev/shm
+      name: dshm
+    volumes:
+    - emptyDir: {}
+      name: shared-config
+      type: emptyDir
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 16Gi
+      name: dshm
+      type: emptyDir

@@ -1,0 +1,32 @@
+apiVersion: inference.networking.k8s.io/v1
+kind: InferencePool
+metadata:
+  annotations:
+    meta.helm.sh/release-name: meta-lla-888e33f1-instruct-router
+    meta.helm.sh/release-namespace: kalantar-0
+  creationTimestamp: "2026-09-09T06:57:43Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: meta-lla-888e33f1-instruct-router-epp
+    app.kubernetes.io/version: v0.10.0
+  name: meta-lla-888e33f1-instruct-router
+  namespace: kalantar-0
+  resourceVersion: "2211613490"
+  uid: d12dc935-6351-4288-952e-d1b9c069d15e
+spec:
+  appProtocol: http
+  endpointPickerRef:
+    failureMode: FailOpen
+    group: ""
+    kind: Service
+    name: meta-lla-888e33f1-instruct-router-epp
+    port:
+      number: 9002
+  selector:
+    matchLabels:
+      llm-d.ai/inferenceServing: "true"
+      llm-d.ai/model: meta-lla-888e33f1-instruct
+  targetPorts:
+  - number: 8000
+status: {}

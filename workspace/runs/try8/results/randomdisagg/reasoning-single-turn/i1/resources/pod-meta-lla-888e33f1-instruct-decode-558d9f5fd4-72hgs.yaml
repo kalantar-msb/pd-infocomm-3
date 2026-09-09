@@ -1,0 +1,631 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.ovn.org/pod-networks: '{"default":{"ip_addresses":["10.129.8.220/23"],"mac_address":"0a:58:0a:81:08:dc","gateway_ips":["10.129.8.1"],"routes":[{"dest":"10.128.0.0/14","nextHop":"10.129.8.1"},{"dest":"172.30.0.0/16","nextHop":"10.129.8.1"},{"dest":"169.254.0.5/32","nextHop":"10.129.8.1"},{"dest":"100.64.0.0/16","nextHop":"10.129.8.1"}],"ip_address":"10.129.8.220/23","gateway_ip":"10.129.8.1","role":"primary"}}'
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "ovn-kubernetes",
+          "interface": "eth0",
+          "ips": [
+              "10.129.8.220"
+          ],
+          "mac": "0a:58:0a:81:08:dc",
+          "default": true,
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-0",
+          "ips": [
+              "172.22.131.193"
+          ],
+          "mac": "94:6d:ae:87:93:d8",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-1",
+          "ips": [
+              "172.22.139.193"
+          ],
+          "mac": "94:6d:ae:87:93:d9",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-2",
+          "ips": [
+              "172.22.147.129"
+          ],
+          "mac": "08:c0:eb:81:6b:84",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-3",
+          "ips": [
+              "172.22.155.129"
+          ],
+          "mac": "08:c0:eb:81:6b:85",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-4",
+          "ips": [
+              "172.22.161.129"
+          ],
+          "mac": "94:6d:ae:87:88:50",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-5",
+          "ips": [
+              "172.22.169.129"
+          ],
+          "mac": "94:6d:ae:87:88:51",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-6",
+          "ips": [
+              "172.22.177.129"
+          ],
+          "mac": "94:6d:ae:87:86:dc",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-7",
+          "ips": [
+              "172.22.185.129"
+          ],
+          "mac": "94:6d:ae:87:86:dd",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-8",
+          "ips": [
+              "172.22.193.129"
+          ],
+          "mac": "b8:3f:d2:16:e5:2c",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-9",
+          "ips": [
+              "172.22.201.129"
+          ],
+          "mac": "b8:3f:d2:16:e5:2d",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-10",
+          "ips": [
+              "172.22.209.129"
+          ],
+          "mac": "b8:3f:d2:16:e5:54",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-11",
+          "ips": [
+              "172.22.217.129"
+          ],
+          "mac": "b8:3f:d2:16:e5:55",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-12",
+          "ips": [
+              "172.22.225.129"
+          ],
+          "mac": "94:6d:ae:87:9e:9c",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-13",
+          "ips": [
+              "172.22.233.129"
+          ],
+          "mac": "94:6d:ae:87:9e:9d",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-14",
+          "ips": [
+              "172.22.241.129"
+          ],
+          "mac": "08:c0:eb:81:6f:c8",
+          "dns": {}
+      },{
+          "name": "openshift-sriov-network-operator/multi-nic-compute",
+          "interface": "net1-15",
+          "ips": [
+              "172.22.249.129"
+          ],
+          "mac": "08:c0:eb:81:6f:c9",
+          "dns": {}
+      }]
+    k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute
+    openshift.io/scc: privileged
+  creationTimestamp: "2026-09-09T03:29:12Z"
+  generateName: meta-lla-888e33f1-instruct-decode-558d9f5fd4-
+  labels:
+    llm-d.ai/guide: scenario
+    llm-d.ai/inference-serving: "true"
+    llm-d.ai/inferenceServing: "true"
+    llm-d.ai/model: meta-lla-888e33f1-instruct
+    llm-d.ai/role: decode
+    pd-infocomm.io/gpu-type: H100_SXM_80GB
+    pod-template-hash: 558d9f5fd4
+  name: meta-lla-888e33f1-instruct-decode-558d9f5fd4-72hgs
+  namespace: kalantar-0
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: meta-lla-888e33f1-instruct-decode-558d9f5fd4
+    uid: ebdd7fe6-7af9-4061-8d3c-c72f304f67c3
+  resourceVersion: "2210193406"
+  uid: d3f6b843-29f5-45f3-ab33-4539e5afef91
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - pokprod-b93r38s0
+            - pokprod-b93r38s2
+            - pokprod-b93r38s3
+            - pokprod-b93r39s0
+            - pokprod-b93r39s1
+            - pokprod-b93r39s2
+            - pokprod-b93r43s0
+            - pokprod-b93r43s1
+            - pokprod-b93r43s2
+            - pokprod-b93r43s3
+            - pokprod-b93r44s0
+            - pokprod-b93r44s1
+            - pokprod-b93r44s2
+  containers:
+  - args:
+    - |
+      export LD_LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | sed ':a; N; $!ba; s/\n/:/g'):${LD_LIBRARY_PATH}; export LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | head -1):${LIBRARY_PATH}; . /shared-config/llmdbench_env.sh ; vllm serve /model-cache/models/meta-llama/Llama-3.3-70B-Instruct \
+        --host 0.0.0.0 \
+        --served-model-name meta-llama/Llama-3.3-70B-Instruct \
+        --port $VLLM_METRICS_PORT \
+        --block-size $VLLM_BLOCK_SIZE \
+        --max-model-len $VLLM_MAX_MODEL_LEN \
+        --tensor-parallel-size $VLLM_TENSOR_PARALLELISM \
+        --gpu-memory-utilization $VLLM_ACCELERATOR_MEM_UTIL \
+        --no-enable-log-requests \
+        --kv-transfer-config '{"kv_connector":"NixlConnector","kv_role":"kv_both"}' \
+        --max-num-seqs=256 \
+        --max-num-batched-tokens=32768 \
+        --enable-chunked-prefill \
+        --enable-prefix-caching \
+        --enable-force-include-usage
+    command:
+    - /bin/bash
+    - -c
+    env:
+    - name: VLLM_IS_DECODE
+      value: "1"
+    - name: HOME
+      value: /tmp
+    - name: USER
+      value: llm-d
+    - name: HF_HOME
+      value: /tmp/huggingface
+    - name: MODEL_NAME
+      value: meta-llama/Llama-3.3-70B-Instruct
+    - name: MODEL_PATH
+      value: models/meta-llama/Llama-3.3-70B-Instruct
+    - name: VLLM_CACHE_ROOT
+      value: /tmp/vllm
+    - name: VLLM_WORKER_MULTIPROC_METHOD
+      value: spawn
+    - name: VLLM_LOGGING_LEVEL
+      value: INFO
+    - name: VLLM_HTTP_TIMEOUT_KEEP_ALIVE
+      value: "120"
+    - name: VLLM_ALLOW_LONG_MAX_MODEL_LEN
+      value: "1"
+    - name: VLLM_SERVER_DEV_MODE
+      value: "1"
+    - name: VLLM_INFERENCE_PORT
+      value: "8000"
+    - name: VLLM_METRICS_PORT
+      value: "8200"
+    - name: VLLM_BLOCK_SIZE
+      value: "16"
+    - name: VLLM_MAX_MODEL_LEN
+      value: "131072"
+    - name: VLLM_LOAD_FORMAT
+      value: auto
+    - name: VLLM_ACCELERATOR_MEM_UTIL
+      value: "0.9"
+    - name: VLLM_MAX_NUM_SEQ
+      value: "256"
+    - name: VLLM_TENSOR_PARALLELISM
+      value: "4"
+    - name: VLLM_MAX_NUM_BATCHED_TOKENS
+      value: "256"
+    - name: VLLM_NIXL_SIDE_CHANNEL_HOST
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: VLLM_NIXL_SIDE_CHANNEL_PORT
+      value: "5557"
+    - name: UCX_TLS
+      value: rc,sm,cuda_ipc,cuda_copy
+    - name: UCX_SOCKADDR_TLS_PRIORITY
+      value: tcp
+    - name: POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: LLMDBENCH_POD_NS
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: UCX_LOG_LEVEL
+      value: info
+    - name: UCX_PROTO_INFO
+      value: "y"
+    - name: NIXL_LOG_LEVEL
+      value: debug
+    - name: NCCL_DEBUG
+      value: INFO
+    - name: NVSHMEM_DEBUG
+      value: INFO
+    - name: DP_SIZE
+      value: "1"
+    - name: TP_SIZE
+      value: "4"
+    - name: DP_SIZE_LOCAL
+      value: "1"
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    image: docker.io/vllm/vllm-openai:v0.26.0
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      failureThreshold: 10
+      periodSeconds: 5
+      successThreshold: 1
+      tcpSocket:
+        port: 8200
+      timeoutSeconds: 15
+    name: vllm
+    readinessProbe:
+      failureThreshold: 10
+      httpGet:
+        path: /health
+        port: 8200
+        scheme: HTTP
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 15
+    resources:
+      limits:
+        cpu: "32"
+        memory: 128Gi
+        nvidia.com/gpu: "4"
+        rdma/roce_gdr: "1"
+      requests:
+        cpu: "16"
+        memory: 64Gi
+        nvidia.com/gpu: "4"
+        rdma/roce_gdr: "1"
+    securityContext:
+      capabilities:
+        add:
+        - IPC_LOCK
+        - SYS_RAWIO
+        - NET_ADMIN
+        - NET_RAW
+      runAsGroup: 0
+      runAsUser: 0
+    startupProbe:
+      failureThreshold: 60
+      httpGet:
+        path: /health
+        port: 8200
+        scheme: HTTP
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      successThreshold: 1
+      timeoutSeconds: 5
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+    - mountPath: /dev/shm
+      name: dshm
+    - mountPath: /model-cache
+      name: model-storage
+      readOnly: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mx6fr
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  initContainers:
+  - args:
+    - --port=8000
+    - --model-server-port=8200
+    - --kv-connector=nixlv2
+    - --zap-encoder=json
+    - --zap-log-level=debug
+    - --secure-proxy=false
+    image: ghcr.io/llm-d/llm-d-router-disagg-sidecar:v0.10.0
+    imagePullPolicy: Always
+    name: routing-proxy
+    ports:
+    - containerPort: 8000
+      protocol: TCP
+    resources:
+      limits:
+        cpu: "8"
+        memory: 16Gi
+      requests:
+        cpu: "4"
+        memory: 8Gi
+    restartPolicy: Always
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsNonRoot: true
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mx6fr
+      readOnly: true
+  - command:
+    - set_llmdbench_environment.py
+    - -e
+    - /shared-config/llmdbench_env.sh
+    - -i
+    env:
+    - name: VLLM_IS_DECODE
+      value: "1"
+    - name: HOME
+      value: /tmp
+    - name: USER
+      value: llm-d
+    - name: HF_HOME
+      value: /tmp/huggingface
+    - name: MODEL_NAME
+      value: meta-llama/Llama-3.3-70B-Instruct
+    - name: MODEL_PATH
+      value: models/meta-llama/Llama-3.3-70B-Instruct
+    - name: VLLM_CACHE_ROOT
+      value: /tmp/vllm
+    - name: VLLM_WORKER_MULTIPROC_METHOD
+      value: spawn
+    - name: VLLM_LOGGING_LEVEL
+      value: INFO
+    - name: VLLM_HTTP_TIMEOUT_KEEP_ALIVE
+      value: "120"
+    - name: VLLM_ALLOW_LONG_MAX_MODEL_LEN
+      value: "1"
+    - name: VLLM_SERVER_DEV_MODE
+      value: "1"
+    - name: VLLM_INFERENCE_PORT
+      value: "8000"
+    - name: VLLM_METRICS_PORT
+      value: "8200"
+    - name: VLLM_BLOCK_SIZE
+      value: "16"
+    - name: VLLM_MAX_MODEL_LEN
+      value: "131072"
+    - name: VLLM_LOAD_FORMAT
+      value: auto
+    - name: VLLM_ACCELERATOR_MEM_UTIL
+      value: "0.9"
+    - name: VLLM_MAX_NUM_SEQ
+      value: "256"
+    - name: VLLM_TENSOR_PARALLELISM
+      value: "4"
+    - name: VLLM_MAX_NUM_BATCHED_TOKENS
+      value: "256"
+    - name: VLLM_NIXL_SIDE_CHANNEL_HOST
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: VLLM_NIXL_SIDE_CHANNEL_PORT
+      value: "5557"
+    - name: UCX_TLS
+      value: rc,sm,cuda_ipc,cuda_copy
+    - name: UCX_SOCKADDR_TLS_PRIORITY
+      value: tcp
+    - name: POD_IP
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: status.podIP
+    - name: LLMDBENCH_POD_NS
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: UCX_LOG_LEVEL
+      value: info
+    - name: UCX_PROTO_INFO
+      value: "y"
+    - name: NIXL_LOG_LEVEL
+      value: debug
+    - name: NCCL_DEBUG
+      value: INFO
+    - name: NVSHMEM_DEBUG
+      value: INFO
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imagePullPolicy: Always
+    name: preprocess
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mx6fr
+      readOnly: true
+  nodeName: pokprod-b93r39s2
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: meta-lla-888e33f1-instruct
+  serviceAccountName: meta-lla-888e33f1-instruct
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoSchedule
+    key: node.kubernetes.io/memory-pressure
+    operator: Exists
+  volumes:
+  - emptyDir: {}
+    name: shared-config
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 16Gi
+    name: dshm
+  - name: model-storage
+    persistentVolumeClaim:
+      claimName: model-pvc
+      readOnly: true
+  - name: kube-api-access-mx6fr
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+      - configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: openshift-service-ca.crt
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:35:14Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:35:25Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:39:07Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:39:07Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:35:02Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://03505b8401d0777f1c40286b216f98a7ef3969942f21eaa2511bd42f44ac4b5d
+    image: docker.io/vllm/vllm-openai:v0.26.0
+    imageID: docker.io/vllm/vllm-openai@sha256:770fe65b2c73ee74a5c42165cf3433de4048cc2cd9c57a937ca4e35aba5aa87b
+    lastState: {}
+    name: vllm
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-09-09T03:35:25Z"
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+    - mountPath: /dev/shm
+      name: dshm
+    - mountPath: /model-cache
+      name: model-storage
+      readOnly: true
+      recursiveReadOnly: Disabled
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mx6fr
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.98.37
+  hostIPs:
+  - ip: 192.168.98.37
+  initContainerStatuses:
+  - containerID: cri-o://ea4cac9bfaf8fbc27d3f701cd2d42159f9ad24d8b428e0d10db79c848910e32c
+    image: ghcr.io/llm-d/llm-d-router-disagg-sidecar:v0.10.0
+    imageID: ghcr.io/llm-d/llm-d-router-disagg-sidecar@sha256:1344adff65f96f76fc00c6003a1c63c1e9bb70f3628307f61f748a89a265b260
+    lastState: {}
+    name: routing-proxy
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-09-09T03:35:13Z"
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mx6fr
+      readOnly: true
+      recursiveReadOnly: Disabled
+  - containerID: cri-o://67357bc6954aca9e7401bec3a98b8a2f984b2392a87330855e0ae9714f90a617
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imageID: ghcr.io/llm-d/llm-d-benchmark@sha256:90168bcfa7f1080efdbe9e00e9bee45486ca9420b6c0742f27e025ff2618508a
+    lastState: {}
+    name: preprocess
+    ready: true
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: cri-o://67357bc6954aca9e7401bec3a98b8a2f984b2392a87330855e0ae9714f90a617
+        exitCode: 0
+        finishedAt: "2026-09-09T03:35:24Z"
+        reason: Completed
+        startedAt: "2026-09-09T03:35:15Z"
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-mx6fr
+      readOnly: true
+      recursiveReadOnly: Disabled
+  phase: Running
+  podIP: 10.129.8.220
+  podIPs:
+  - ip: 10.129.8.220
+  qosClass: Burstable
+  startTime: "2026-09-09T03:35:02Z"

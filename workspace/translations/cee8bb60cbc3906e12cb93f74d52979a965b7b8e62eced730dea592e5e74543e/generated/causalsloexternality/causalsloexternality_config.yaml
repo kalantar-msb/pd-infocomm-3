@@ -206,7 +206,7 @@ scenario:
               # realized-TTFT factor is placement-INVARIANT, so it factors out of the
               # charge and a zero tau_e2e makes the ENTIRE decode-side externality
               # identically zero, degenerating the arm to its own-good term alone.
-              activeWorkload: deepResearch
+              activeWorkload: interactive
 
               # Microseconds. Source: config.md §6, from
               # run_public_workload_heterogeneity_closeout.py:60-105.
@@ -346,8 +346,10 @@ scenario:
               # record the deviation as a stated degradation.
               transfer:
                 sizeAware: true            # config.md §9.1
-                xferBaseUs: 50.0           # simulator value -- UNMEASURED on target
-                xferBandwidthGbps: 25.0    # simulator value -- UNMEASURED on target
+                # xferBaseUs: 50.0           # simulator value -- UNMEASURED on target               
+                xferBaseUs: 5826.0           # measured in try7               
+                # xferBandwidthGbps: 25.0    # simulator value -- UNMEASURED on target
+                xferBandwidthGbps: 11.0    # measured in try7
                 # 2 (K,V) x 80 layers x 8 KV heads x 128 head_dim x 2 B / TP 4.
                 # DERIVED ARITHMETIC, not measured. Leaving it 0 is severe with
                 # sizeAware: transferBytes becomes 0 so every request is charged a

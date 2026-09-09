@@ -1,0 +1,399 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.ovn.org/pod-networks: '{"default":{"ip_addresses":["10.131.9.157/23"],"mac_address":"0a:58:0a:83:09:9d","gateway_ips":["10.131.8.1"],"routes":[{"dest":"10.128.0.0/14","nextHop":"10.131.8.1"},{"dest":"172.30.0.0/16","nextHop":"10.131.8.1"},{"dest":"169.254.0.5/32","nextHop":"10.131.8.1"},{"dest":"100.64.0.0/16","nextHop":"10.131.8.1"}],"ip_address":"10.131.9.157/23","gateway_ip":"10.131.8.1","role":"primary"}}'
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "ovn-kubernetes",
+          "interface": "eth0",
+          "ips": [
+              "10.131.9.157"
+          ],
+          "mac": "0a:58:0a:83:09:9d",
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: restricted-v2
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  creationTimestamp: "2026-09-09T02:44:29Z"
+  generateName: meta-lla-888e33f1-instruct-router-epp-fcc4f76c-
+  labels:
+    llm-d-router-gateway: meta-lla-888e33f1-instruct-router-epp
+    llm-d.ai/igw-mode: llm-d-router-gateway
+    pod-template-hash: fcc4f76c
+  name: meta-lla-888e33f1-instruct-router-epp-fcc4f76c-glp42
+  namespace: kalantar-0
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: meta-lla-888e33f1-instruct-router-epp-fcc4f76c
+    uid: c8d5c40b-eab7-4c27-91b4-80b4e410f46a
+  resourceVersion: "2209790721"
+  uid: 380e2dca-c12c-4033-8b53-1c635b86c775
+spec:
+  containers:
+  - args:
+    - --service-node
+    - envoy-sidecar
+    - --log-level
+    - warn
+    - --concurrency
+    - "8"
+    - --drain-strategy
+    - immediate
+    - --drain-time-s
+    - "60"
+    - -c
+    - /etc/envoy/envoy.yaml
+    command:
+    - envoy
+    env:
+    - name: NS_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    image: docker.io/envoyproxy/envoy:distroless-v1.33.2
+    imagePullPolicy: IfNotPresent
+    name: envoy-proxy
+    ports:
+    - containerPort: 8081
+      name: http-8081
+      protocol: TCP
+    - containerPort: 19001
+      name: metrics-19001
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 1
+      httpGet:
+        path: /ready
+        port: 19001
+        scheme: HTTP
+      periodSeconds: 5
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        cpu: "8"
+        memory: 16Gi
+      requests:
+        cpu: "4"
+        memory: 8Gi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1002710000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /etc/envoy
+      name: config
+      readOnly: true
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-b97zp
+      readOnly: true
+  - args:
+    - --pool-name
+    - meta-lla-888e33f1-instruct-router
+    - --pool-namespace
+    - kalantar-0
+    - --pool-group
+    - inference.networking.k8s.io
+    - --zap-encoder
+    - json
+    - --config-file
+    - /config/custom-plugins.yaml
+    - --grpc-health-port
+    - "9003"
+    - --allow-experimental-plugins=true
+    - --v=4
+    - --tracing=false
+    env:
+    - name: NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.name
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    image: ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-causalsloexternality
+    imagePullPolicy: Always
+    livenessProbe:
+      failureThreshold: 3
+      grpc:
+        port: 9003
+        service: inference-extension
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    name: epp
+    ports:
+    - containerPort: 9002
+      name: grpc
+      protocol: TCP
+    - containerPort: 9003
+      name: grpc-health
+      protocol: TCP
+    - containerPort: 9090
+      name: metrics
+      protocol: TCP
+    - containerPort: 5557
+      name: zmq
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 3
+      grpc:
+        port: 9003
+        service: inference-extension
+      periodSeconds: 2
+      successThreshold: 1
+      timeoutSeconds: 1
+    resources:
+      limits:
+        memory: 16Gi
+      requests:
+        cpu: "8"
+        memory: 8Gi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1002710000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /config
+      name: plugins-config-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-b97zp
+      readOnly: true
+  - args:
+    - meta-llama/Llama-3.3-70B-Instruct
+    - --port=8000
+    command:
+    - vllm
+    - launch
+    - render
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    - name: HF_HOME
+      value: /tmp/hf
+    image: docker.io/vllm/vllm-openai-cpu:v0.19.1
+    imagePullPolicy: IfNotPresent
+    name: vllm-render
+    ports:
+    - containerPort: 8000
+      name: render-http
+      protocol: TCP
+    readinessProbe:
+      failureThreshold: 60
+      httpGet:
+        path: /health
+        port: render-http
+        scheme: HTTP
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    resources:
+      requests:
+        cpu: "4"
+        memory: 8Gi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1002710000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /root/.cache/huggingface
+      name: model-cache
+    - mountPath: /tmp/hf-cache
+      name: model-cache
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-b97zp
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: pokprod-b93r38s3
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext:
+    fsGroup: 1002710000
+    seLinuxOptions:
+      level: s0:c52,c29
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: meta-lla-888e33f1-instruct-router-epp
+  serviceAccountName: meta-lla-888e33f1-instruct-router-epp
+  terminationGracePeriodSeconds: 130
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoSchedule
+    key: node.kubernetes.io/memory-pressure
+    operator: Exists
+  volumes:
+  - emptyDir: {}
+    name: model-cache
+  - configMap:
+      defaultMode: 420
+      items:
+      - key: envoy.yaml
+        path: envoy.yaml
+      name: envoy
+    name: config
+  - configMap:
+      defaultMode: 420
+      name: meta-lla-888e33f1-instruct-router-epp
+    name: plugins-config-volume
+  - name: kube-api-access-b97zp
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+      - configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: openshift-service-ca.crt
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:44:31Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:44:29Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:45:03Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:45:03Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:44:29Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://2e289abceb6a8ee56b3b86baa03f3d7e31db44cfdf1eb1a73188a78e45ee660b
+    image: docker.io/envoyproxy/envoy:distroless-v1.33.2
+    imageID: docker.io/envoyproxy/envoy@sha256:0d8c8b3fc3250b5f664dd93ac305738f9c4e6ff38fcb8499088cca1b827f787e
+    lastState: {}
+    name: envoy-proxy
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-09-09T02:44:30Z"
+    volumeMounts:
+    - mountPath: /etc/envoy
+      name: config
+      readOnly: true
+      recursiveReadOnly: Disabled
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-b97zp
+      readOnly: true
+      recursiveReadOnly: Disabled
+  - containerID: cri-o://4cbaaa1094958da764f2a1198c4088a2c7587a5c9600f47b8353ef688ebe40ad
+    image: ghcr.io/kalantar/llm-d-router:cee8bb60cbc3-causalsloexternality
+    imageID: ghcr.io/kalantar/llm-d-router@sha256:e32c4f07e9cf097e699fad84895ec098fc200b445218cde52fc89f32b2bb8271
+    lastState: {}
+    name: epp
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-09-09T02:44:31Z"
+    volumeMounts:
+    - mountPath: /config
+      name: plugins-config-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-b97zp
+      readOnly: true
+      recursiveReadOnly: Disabled
+  - containerID: cri-o://6c43708770b7750eaaeb64f881855d30dfae2757523993cc534bab8920e9a18a
+    image: docker.io/vllm/vllm-openai-cpu:v0.19.1
+    imageID: docker.io/vllm/vllm-openai-cpu@sha256:4c697ae650ebeb3a41f3c9c7020913d4c84d2729dc428ce39d60ca353975a4ce
+    lastState: {}
+    name: vllm-render
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-09-09T02:44:31Z"
+    volumeMounts:
+    - mountPath: /root/.cache/huggingface
+      name: model-cache
+    - mountPath: /tmp/hf-cache
+      name: model-cache
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-b97zp
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.98.34
+  hostIPs:
+  - ip: 192.168.98.34
+  phase: Running
+  podIP: 10.131.9.157
+  podIPs:
+  - ip: 10.131.9.157
+  qosClass: Burstable
+  startTime: "2026-09-09T02:44:29Z"

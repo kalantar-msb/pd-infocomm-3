@@ -1,0 +1,216 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: randomdisagg-interactive-chat-single-turn-try8-i1
+  namespace: kalantar-0
+spec:
+  params:
+  - name: experimentId
+    value: try8
+  - name: runName
+    value: try8
+  - name: namespace
+    value: kalantar-0
+  - name: phase
+    value: randomdisagg
+  - name: scenarioContent
+    value: "scenario:\n- annotations:\n    decode:\n      pod:\n        k8s.v1.cni.cncf.io/networks:\
+      \ openshift-sriov-network-operator/multi-nic-compute\n    prefill:\n      pod:\n\
+      \        k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute\n\
+      \  decode:\n    acceleratorType:\n      labelKey: kubernetes.io/hostname\n \
+      \     labelValue: ''\n      labelValues:\n      - pokprod-b93r38s0\n      -\
+      \ pokprod-b93r38s2\n      - pokprod-b93r38s3\n      - pokprod-b93r39s0\n   \
+      \   - pokprod-b93r39s1\n      - pokprod-b93r39s2\n      - pokprod-b93r43s0\n\
+      \      - pokprod-b93r43s1\n      - pokprod-b93r43s2\n      - pokprod-b93r43s3\n\
+      \      - pokprod-b93r44s0\n      - pokprod-b93r44s1\n      - pokprod-b93r44s2\n\
+      \    extraContainerConfig:\n      securityContext:\n        capabilities:\n\
+      \          add:\n          - IPC_LOCK\n          - SYS_RAWIO\n          - NET_ADMIN\n\
+      \          - NET_RAW\n        runAsGroup: 0\n        runAsUser: 0\n    extraEnvVars:\n\
+      \    - name: UCX_LOG_LEVEL\n      value: info\n    - name: UCX_PROTO_INFO\n\
+      \      value: y\n    - name: NIXL_LOG_LEVEL\n      value: debug\n    - name:\
+      \ NCCL_DEBUG\n      value: INFO\n    - name: NVSHMEM_DEBUG\n      value: INFO\n\
+      \    initContainers:\n    - command:\n      - set_llmdbench_environment.py\n\
+      \      - -e\n      - /shared-config/llmdbench_env.sh\n      - -i\n      imageKey:\
+      \ benchmark\n      imagePullPolicy: Always\n      name: preprocess\n      volumeMounts:\n\
+      \      - mountPath: /shared-config\n        name: shared-config\n    parallelism:\n\
+      \      data: 1\n      dataLocal: 1\n      tensor: 4\n      workers: 1\n    replicas:\
+      \ 2\n    resources:\n      limits:\n        cpu: '32'\n        memory: 128Gi\n\
+      \      requests:\n        cpu: '16'\n        memory: 64Gi\n    vllm:\n     \
+      \ additionalFlags:\n      - --max-num-seqs=256\n      - --max-num-batched-tokens=32768\n\
+      \      - --enable-chunked-prefill\n      - --enable-prefix-caching\n      -\
+      \ --enable-force-include-usage\n  gateway:\n    className: epponly\n    externallyManaged:\
+      \ true\n  huggingface:\n    secretName: hf-secret\n  model:\n    blockSize:\
+      \ 16\n    gpuMemoryUtilization: 0.9\n    huggingfaceId: meta-llama/Llama-3.3-70B-Instruct\n\
+      \    maxModelLen: 131072\n    name: meta-llama/Llama-3.3-70B-Instruct\n    path:\
+      \ models/meta-llama/Llama-3.3-70B-Instruct\n    shortName: meta-llama-llama-3.3-70b-instruct\n\
+      \    size: 1Ti\n  modelArtifacts:\n    extraLabels:\n      pd-infocomm.io/gpu-type:\
+      \ H100_SXM_80GB\n  name: pdinfocomm3\n  prefill:\n    acceleratorType:\n   \
+      \   labelKey: kubernetes.io/hostname\n      labelValue: ''\n      labelValues:\n\
+      \      - pokprod-b93r38s0\n      - pokprod-b93r38s2\n      - pokprod-b93r38s3\n\
+      \      - pokprod-b93r39s0\n      - pokprod-b93r39s1\n      - pokprod-b93r39s2\n\
+      \      - pokprod-b93r43s0\n      - pokprod-b93r43s1\n      - pokprod-b93r43s2\n\
+      \      - pokprod-b93r43s3\n      - pokprod-b93r44s0\n      - pokprod-b93r44s1\n\
+      \      - pokprod-b93r44s2\n    enabled: true\n    extraContainerConfig:\n  \
+      \    securityContext:\n        capabilities:\n          add:\n          - IPC_LOCK\n\
+      \          - SYS_RAWIO\n          - NET_ADMIN\n          - NET_RAW\n       \
+      \ runAsGroup: 0\n        runAsUser: 0\n    extraEnvVars:\n    - name: UCX_LOG_LEVEL\n\
+      \      value: info\n    - name: UCX_PROTO_INFO\n      value: y\n    - name:\
+      \ NIXL_LOG_LEVEL\n      value: debug\n    - name: NCCL_DEBUG\n      value: INFO\n\
+      \    - name: NVSHMEM_DEBUG\n      value: INFO\n    initContainers:\n    - command:\n\
+      \      - set_llmdbench_environment.py\n      - -e\n      - /shared-config/llmdbench_env.sh\n\
+      \      - -i\n      imageKey: benchmark\n      imagePullPolicy: Always\n    \
+      \  name: preprocess\n      volumeMounts:\n      - mountPath: /shared-config\n\
+      \        name: shared-config\n    parallelism:\n      data: 1\n      dataLocal:\
+      \ 1\n      tensor: 4\n      workers: 1\n    replicas: 1\n    resources:\n  \
+      \    limits:\n        cpu: '16'\n        memory: 64Gi\n      requests:\n   \
+      \     cpu: '8'\n        memory: 32Gi\n    vllm:\n      additionalFlags:\n  \
+      \    - --max-num-seqs=256\n      - --max-num-batched-tokens=32768\n      - --enable-chunked-prefill\n\
+      \      - --enable-prefix-caching\n      - --enable-force-include-usage\n  router:\n\
+      \    epp:\n      flags:\n        allow-experimental-plugins: true\n        v:\
+      \ '4'\n      image:\n        pullPolicy: Always\n        registry: ghcr.io/kalantar\n\
+      \        repository: llm-d-router\n        tag: cee8bb60cbc3-randomdisagg\n\
+      \      pluginsConfigFile: custom-plugins.yaml\n      pluginsCustomConfig:\n\
+      \        custom-plugins.yaml: \"apiVersion: llm-d.ai/v1alpha1\\nkind: EndpointPickerConfig\\\
+      n\\\n          plugins:\\n# --- Producers: identical to the baseline ------------------------------\\\
+      n\\\n          # Retained even though this arm reads NEITHER of them. The tokenizer\\\
+      n#\\\n          \\ sidecar and the prefix producer feed prefix-cache-scorer,\
+      \ which still\\n\\\n          # selects pods. Dropping them would change pod\
+      \ selection and confound the\\n\\\n          # comparison. The arm's own decision\
+      \ consumes no producer output.\\n- type:\\\n          \\ token-producer\\n \
+      \ parameters:\\n    modelName: ${model.name}\\n    vllm:\\n\\\n          \\\
+      \      url: \\\"http://localhost:8000\\\"\\n- type: approx-prefix-cache-producer\\\
+      n\\\n          \\n# --- The decider: THE ONLY DIFFERENCE FROM THE BASELINE ----------------\\\
+      n\\\n          - type: random-pd-decider\\n  parameters:\\n    # p -- the expected\
+      \ fraction\\\n          \\ of requests disaggregated.\\n    #\\n    # 0.075\
+      \ IS THE MATCHED RATE FOR\\\n          \\ interactive-chat ONLY. It is the\\\
+      n    # focal arm's OWN realized rate\\\n          \\ in the single cell of run\
+      \ `try2`\\n    # that completed: 41 prefill selections\\\n          \\ over\
+      \ 546 handled requests\\n    # (results/causalsloexternality/interactive-chat-single-turn/i1\\\
+      \n          \\ --\\n    # EPP `Request handled` count against prefill POST /v1/completions).\\\
+      n\\\n          \\    #\\n    # THE MATCHED RATE IS PER WORKLOAD. The focal arm's\
+      \ realized\\\n          \\ rate is\\n    # a function of the prompt-length distribution,\
+      \ and reasoning\\\n          \\ and\\n    # deep-research differ from interactive-chat.\
+      \ Re-measure the\\\n          \\ focal\\n    # arm's rate for the target workload\
+      \ and set p to it, then\\\n          \\ run ONE\\n    # ASSEMBLE PER WORKLOAD\
+      \ -- the same discipline `activeWorkload`\\n\\\n          \\    # already forces\
+      \ on the focal arm (config.md S6). Reusing 0.075\\n \\\n          \\   # across\
+      \ workloads produces a rate-mismatched comparison that still\\n\\\n        \
+      \  \\    # reports goodput, which is the failure mode S6 warns about.\\n   \
+      \ #\\n\\\n          \\    # For a sweep rather than a matched-rate test, vary\
+      \ p across\\n    #\\\n          \\ assembles: 0 reproduces the simulator's `never`\
+      \ rule and 1 its\\n    #\\\n          \\ `always` rule (inference-sim sim/disaggregation.go:70-74),\
+      \ so the\\n  \\\n          \\  # sweep spans decode-only to always-disaggregated\
+      \ with the endpoints\\n\\\n          \\    # anchored to rules the simulator\
+      \ already defines.\\n    disaggregateProbability:\\\n          \\ 0.075\\n\\\
+      n    # Selects WHICH subset is disaggregated at that rate. Changing\\\n    \
+      \      \\ it at\\n    # fixed p draws an independent subset without changing\
+      \ the\\\n          \\ arm --\\n    # that is how to get replicate subsets. 42\
+      \ matches the workload\\\n          \\ seed\\n    # convention (workloads/*.yaml\
+      \ `seed: 42`); the two are unrelated\\n\\\n          \\    # mechanically, and\
+      \ the shared value is a readability choice only.\\n\\\n          \\    seed:\
+      \ 42\\n\\n    # Header whose value keys the decision. EMPTY ON PURPOSE:\\\n\
+      \          \\ no header\\n    # is currently known to be stable per request\
+      \ across runs,\\\n          \\ so the\\n    # plugin falls back to scheduling.InferenceRequest.RequestID,\\\
+      \n          \\ which\\n    # llm-d-router documents as Envoy-generated and therefore\
+      \ fresh\\\n          \\ every\\n    # run. Consequence (R2): the arm is still\
+      \ exactly Bernoulli\\\n          \\ at rate\\n    # p and every comparison stays\
+      \ valid, but two runs of one\\\n          \\ workload\\n    # disaggregate DIFFERENT\
+      \ requests, so results are not bit-replayable.\\n\\\n          \\    # Set this\
+      \ to a load-generator-stable header to recover replay, and\\n\\\n          \\\
+      \    # record which path was used when reporting.\\n    identityHeader: \\\"\
+      \\\n          \\\"\\n\\n- type: disagg-profile-handler\\n  parameters:\\n  \
+      \  deciders:\\n   \\\n          \\   prefill: random-pd-decider\\n\\n# --- Role\
+      \ filters and load-shaped scorers:\\\n          \\ identical to the baseline\
+      \ ---\\n# Pod selection is UNCHANGED and remains\\\n          \\ load-aware.\
+      \ This is what makes\\n# the arm a control on the disaggregation\\\n       \
+      \   \\ decision rather than a null\\n# model of the whole scheduler.\\n- type:\\\
+      \n          \\ prefill-filter\\n- type: decode-filter\\n- type: prefix-cache-scorer\\\
+      n \\\n          \\ parameters:\\n    prefixMatchInfoProducerName: approx-prefix-cache-producer\\\
+      n\\\n          - type: queue-scorer\\n- type: kv-cache-utilization-scorer\\\
+      n- type: active-request-scorer\\n\\\n          \\n# --- Scheduling profiles:\
+      \ identical to the baseline, weights included\\\n          \\ --\\nschedulingProfiles:\\\
+      n- name: decode\\n  plugins:\\n  - pluginRef: decode-filter\\n\\\n         \
+      \ \\  - pluginRef: active-request-scorer\\n    weight: 2\\n  - pluginRef: prefix-cache-scorer\\\
+      n\\\n          \\    weight: 3\\n- name: prefill\\n  plugins:\\n  - pluginRef:\
+      \ prefill-filter\\n\\\n          \\  - pluginRef: prefix-cache-scorer\\n   \
+      \ weight: 3\\n  - pluginRef: queue-scorer\\n\\\n          \\    weight: 2\\\
+      n  - pluginRef: kv-cache-utilization-scorer\\n    weight:\\\n          \\ 2\\\
+      n\"\n      replicas: 1\n    inferenceObjectives:\n    - name: standard\n   \
+      \   priority: 3\n    proxy:\n      args:\n      - --service-node\n      - envoy-sidecar\n\
+      \      - --log-level\n      - warn\n      - --concurrency\n      - '8'\n   \
+      \   - --drain-strategy\n      - immediate\n      - --drain-time-s\n      - '60'\n\
+      \      - -c\n      - /etc/envoy/envoy.yaml\n      resources:\n        limits:\n\
+      \          cpu: '8'\n          memory: 16Gi\n        requests:\n          cpu:\
+      \ '4'\n          memory: 8Gi\n    tokenizer:\n      enabled: true\n      env:\n\
+      \      - name: HF_TOKEN\n        valueFrom:\n          secretKeyRef:\n     \
+      \       key: HF_TOKEN\n            name: hf-secret\n      - name: HF_HOME\n\
+      \        value: /tmp/hf\n  routing:\n    connector: nixlv2\n    proxy:\n   \
+      \   resources:\n        limits:\n          cpu: '8'\n          memory: 16Gi\n\
+      \        requests:\n          cpu: '4'\n          memory: 8Gi\n  storage:\n\
+      \    modelPvc:\n      size: 1Ti\n  vllmCommon:\n    flags:\n      disableUvicornAccessLog:\
+      \ false\n      enforceEager: false\n    kvTransfer:\n      connector: NixlConnector\n\
+      \      enabled: true\n      role: kv_both\n    networkNr: '1'\n    networkResource:\
+      \ rdma/roce_gdr\n    preprocessScript: export LD_LIBRARY_PATH=$(find / -name\
+      \ libcuda.so.1 -printf '%h\\n'\n      2>/dev/null | sed ':a; N; $!ba; s/\\n/:/g'):${LD_LIBRARY_PATH};\
+      \ export LIBRARY_PATH=$(find\n      / -name libcuda.so.1 -printf '%h\\n' 2>/dev/null\
+      \ | head -1):${LIBRARY_PATH};\n      . /shared-config/llmdbench_env.sh\n   \
+      \ ucxTls: rc,sm,cuda_ipc,cuda_copy\n    volumeMounts:\n    - mountPath: /shared-config\n\
+      \      name: shared-config\n    - mountPath: /dev/shm\n      name: dshm\n  \
+      \  volumes:\n    - emptyDir: {}\n      name: shared-config\n      type: emptyDir\n\
+      \    - emptyDir:\n        medium: Memory\n        sizeLimit: 16Gi\n      name:\
+      \ dshm\n      type: emptyDir\n"
+  - name: specContent
+    value: "base_dir: /workspace/source/llm-d-benchmark\n\nvalues_file:\n  path: /workspace/source/llm-d-benchmark/config/templates/values/defaults.yaml\n\
+      \ntemplate_dir:\n  path: /workspace/source/llm-d-benchmark/config/templates/jinja\n\
+      \nscenario_file:\n  path: /tmp/llmdbench-config/scenario.yaml\n"
+  - name: workloadName
+    value: interactive-chat-single-turn
+  - name: workloadSpec
+    value: "{aggregate_rate: 4.8, category: language, cohorts: [{arrival: {process:\
+      \ poisson},\n      id: interactive-chat, input_distribution: {params: {max:\
+      \ 15000, min: 500, mu: 8.129173,\n          sigma: 0.574241}, type: lognormal},\
+      \ output_distribution: {params: {max: 1000,\n          mean: 300, min: 10, std_dev:\
+      \ 150}, type: gaussian}, population: 50, prefix_group: interactive-system-prompt,\n\
+      \      prefix_length: 1000, prefix_sharing: per_member, rate_fraction: 1.0,\
+      \ slo_class: standard,\n      streaming: true, tenant_id: interactive-users}],\
+      \ num_requests: 5800, seed: 42,\n  version: '2'}"
+  - name: benchmarkGitRepoUrl
+    value: https://github.com/llm-d/llm-d-benchmark.git
+  - name: benchmarkGitCommit
+    value: 1b18402b9ae2c12ef86628533c6b03c37b732a6c
+  - name: blisGitRepoUrl
+    value: https://github.com/kalantar/inference-sim.git
+  - name: blisGitCommit
+    value: 583f719507f31c24dd675d30daa79c33950c5516
+  - name: model
+    value: meta-llama/Llama-3.3-70B-Instruct
+  - name: replica
+    value: '1'
+  - name: maxConcurrency
+    value: '10000'
+  - name: timeout
+    value: '1800'
+  - name: warmupRequests
+    value: '50'
+  - name: prewarmDuration
+    value: 60s
+  pipelineRef:
+    name: sim2real
+  taskRunSpecs:
+  - pipelineTaskName: stream-epp-logs
+    timeout: 3h
+  - pipelineTaskName: stream-gpu-stats
+    timeout: 3h
+  - pipelineTaskName: run-workload-blis-observe-binary
+    timeout: 3h
+  taskRunTemplate:
+    serviceAccountName: helm-installer
+  timeouts:
+    pipeline: 4h
+  workspaces:
+  - name: data-storage
+    persistentVolumeClaim:
+      claimName: data-pvc
+  - name: source
+    persistentVolumeClaim:
+      claimName: source-pvc

@@ -1,0 +1,1519 @@
+# REDACTED by sim2real collect: 1 document stubbed
+_anchors:
+  agentgateway_version: v1.4.1
+  app_label: llm-d-benchmark-harness
+  block_size: 64
+  container_home: /tmp
+  cpu_16: '16'
+  cpu_32: '32'
+  cpu_4: '4'
+  ext_proc_port: 9002
+  gaie_version: v1.5.0
+  gpu_label_key: nvidia.com/gpu.product
+  gpu_label_value: auto
+  gpu_memory_util: 0.95
+  hf_home: /tmp/huggingface
+  inference_serving_label: 'true'
+  istio_version: 1.29.2
+  kv_connector: NixlConnector
+  kv_role: kv_both
+  llm-d-benchmark_version: v0.7.9
+  llm-d-cuda_version: v0.8.1
+  llm-d-inference-sim_version: v0.10.2
+  llm-d-router-endpoint-picker_version: v0.10.0
+  llm-d-routing-sidecar_version: v0.10.0
+  llm-d-uds-tokenizer_version: v0.26.0
+  logging_level: INFO
+  lws_version: v0.10.0
+  max_model_len: 16384
+  memory_128gi: 128Gi
+  memory_16gi: 16Gi
+  memory_256gi: 256Gi
+  memory_40gi: 40Gi
+  memory_4gi: 4Gi
+  memory_64gi: 64Gi
+  model_cache_base: /model-cache
+  model_name: facebook/opt-125m
+  model_path: models/facebook/opt-125m
+  model_short_name: facebook-opt-125m
+  parallelism_4gpu:
+    data: 1
+    dataLocal: 1
+    tensor: 4
+    workers: 4
+  parallelism_8gpu:
+    data: 1
+    dataLocal: 1
+    tensor: 8
+    workers: 8
+  parallelism_single:
+    data: 1
+    dataLocal: 1
+    tensor: 1
+    workers: 1
+  preprocess_script: /bin/true
+  probe_liveness:
+    failureThreshold: 3
+    periodSeconds: 5
+  probe_readiness:
+    failureThreshold: 3
+    path: /health
+    periodSeconds: 5
+  probe_startup:
+    failureThreshold: 60
+    initialDelaySeconds: 30
+    path: /health
+    periodSeconds: 30
+    timeoutSeconds: 5
+  pull_always: Always
+  pull_if_not_present: IfNotPresent
+  router_chart_version: v0.10.0
+  rsync_port: 20873
+  shm_16gi: 16Gi
+  shm_32gi: 32Gi
+  shm_64gi: 64Gi
+  storage_class: auto
+  vllm-openai_version: v0.26.0
+  vllm_port: 8200
+  vllm_service_port: 8000
+  worker_method: spawn
+  zmq_port: 5557
+accelerator:
+  resource: nvidia.com/gpu
+  type: nvidia
+affinity:
+  enabled: false
+  nodeSelector: {}
+  podAffinity: {}
+  podAntiAffinity: {}
+annotations:
+  common: {}
+  decode:
+    container: {}
+    pod:
+      k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute
+  prefill:
+    container: {}
+    pod:
+      k8s.v1.cni.cncf.io/networks: openshift-sriov-network-operator/multi-nic-compute
+chartVersions:
+  agentgateway: v1.4.1
+  inferencePool: v1.5.0
+  istioBase: 1.29.2
+  istiod: 1.29.2
+  llmDInfra: v1.4.0
+  llmDModelservice: v0.4.16
+  llmDRouter: v0.10.0
+  lws: v0.10.0
+common: {}
+control:
+  contextSecretName: llmdbench-context
+  ignoreFailedValidation: true
+  waitPeriod: 10
+  waitTimeout: 900
+dataAccess:
+  nodeSelector: {}
+  rsyncPort: 20873
+  runAsUser: null
+  tolerations: []
+decode:
+  acceleratorType:
+    labelKey: kubernetes.io/hostname
+    labelValue: ''
+    labelValues:
+    - pokprod-b93r38s0
+    - pokprod-b93r38s2
+    - pokprod-b93r38s3
+    - pokprod-b93r39s0
+    - pokprod-b93r39s1
+    - pokprod-b93r39s2
+    - pokprod-b93r43s0
+    - pokprod-b93r43s1
+    - pokprod-b93r43s2
+    - pokprod-b93r43s3
+    - pokprod-b93r44s0
+    - pokprod-b93r44s1
+    - pokprod-b93r44s2
+  additionalVolumeMounts: []
+  additionalVolumes: []
+  autoscaling:
+    enabled: false
+  enabled: true
+  extraContainerConfig:
+    securityContext:
+      capabilities:
+        add:
+        - IPC_LOCK
+        - SYS_RAWIO
+        - NET_ADMIN
+        - NET_RAW
+      runAsGroup: 0
+      runAsUser: 0
+  extraEnvVars:
+  - name: UCX_LOG_LEVEL
+    value: info
+  - name: UCX_PROTO_INFO
+    value: y
+  - name: NIXL_LOG_LEVEL
+    value: debug
+  - name: NCCL_DEBUG
+    value: INFO
+  - name: NVSHMEM_DEBUG
+    value: INFO
+  extraPodConfig: {}
+  initContainers:
+  - command:
+    - set_llmdbench_environment.py
+    - -e
+    - /shared-config/llmdbench_env.sh
+    - -i
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imagePullPolicy: Always
+    name: preprocess
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+  monitoring:
+    podmonitor:
+      annotations: {}
+      enabled: false
+      interval: 30s
+      labels: {}
+      metricRelabelings: []
+      path: /metrics
+      portName: metrics
+      relabelings: []
+  mountModelVolume: true
+  networkNr: '1'
+  networkResource: rdma/roce_gdr
+  nodeSelector: {}
+  parallelism:
+    data: 1
+    dataLocal: 1
+    tensor: 4
+    workers: 1
+  probes:
+    liveness:
+      failureThreshold: 10
+      periodSeconds: 5
+      timeoutSeconds: 15
+    readiness:
+      failureThreshold: 10
+      path: /health
+      periodSeconds: 5
+      timeoutSeconds: 15
+    startup:
+      failureThreshold: 60
+      initialDelaySeconds: 30
+      path: /health
+      periodSeconds: 30
+      timeoutSeconds: 5
+  replicas: 2
+  resources:
+    limits:
+      cpu: '32'
+      memory: 128Gi
+    requests:
+      cpu: '16'
+      memory: 64Gi
+  shm:
+    size: 16Gi
+  vllm:
+    additionalFlags:
+    - --max-num-seqs=256
+    - --max-num-batched-tokens=32768
+    - --enable-chunked-prefill
+    - --enable-prefix-caching
+    - --enable-force-include-usage
+    customCommand: null
+    customPreprocessCommand: null
+    imagePullPolicy: IfNotPresent
+    loggingLevel: INFO
+    port: 8200
+    servicePort: 8000
+    workerMultiprocMethod: spawn
+description:
+  keywords: []
+  text: ''
+downloadJob:
+  backoffLimit: 3
+  mountPath: /cache
+  name: download-model
+dra:
+  enabled: false
+  type: nvidia
+eppKedaSaturation:
+  enabled: false
+  epp:
+    metricsPort: 9090
+    metricsPortName: http-metrics
+    poolName: ''
+    prometheusServiceAccount: thanos-querier
+    prometheusServiceAccountNamespace: openshift-monitoring
+    serviceLabelSelector: {}
+  namespace: ''
+  prometheus:
+    baseUrl: https://thanos-querier.openshift-monitoring.svc.cluster.local
+    port: 9091
+  scaledObject:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 300
+          type: Pods
+          value: 1
+        stabilizationWindowSeconds: 300
+      scaleUp:
+        policies:
+        - periodSeconds: 180
+          type: Pods
+          value: 1
+        stabilizationWindowSeconds: 0
+    maxReplicas: 10
+    minReplicas: 1
+    pollingInterval: 15
+    triggers:
+    - activationThreshold: '0'
+      name: pool-saturation
+      query: max(llm_d_epp_flow_control_pool_saturation{inference_pool="${poolName}"})
+      threshold: '0.7'
+    - activationThreshold: '0'
+      name: running-requests
+      query: sum(llm_d_epp_request_running{model_name="${modelName}"})
+      threshold: '16'
+    unsafeSsl: true
+experiment:
+  analyzeLocally: false
+  datasetDir: ''
+  datasetUrl: ''
+  resultsDir: /requests
+  workspaceDir: /workspace
+extraObjects: []
+fma:
+  chart:
+    url: oci://ghcr.io/llm-d-incubation/llm-d-fast-model-actuation/charts/fma-controllers
+    version: 0.6.4
+  crds:
+    inferenceServerConfig: https://raw.githubusercontent.com/llm-d-incubation/llm-d-fast-model-actuation/v0.6.4/config/crd/fma.llm-d.ai_inferenceserverconfigs.yaml
+    launcherConfig: https://raw.githubusercontent.com/llm-d-incubation/llm-d-fast-model-actuation/v0.6.4/config/crd/fma.llm-d.ai_launcherconfigs.yaml
+    launcherPopulatorConfig: https://raw.githubusercontent.com/llm-d-incubation/llm-d-fast-model-actuation/v0.6.4/config/crd/fma.llm-d.ai_launcherpopulationpolicies.yaml
+  deployment:
+    name: null
+  dualPod:
+    debugAcceleratorMemory: false
+    sleeperLimit: 2
+  enabled: false
+  image:
+    pullPolicy: IfNotPresent
+    repository: ghcr.io/llm-d-incubation/llm-d-fast-model-actuation
+    tag: v0.6.4
+  iterations: 1
+  labels:
+    stood-up-by: auto
+    stood-up-from: llm-d-benchmark
+    stood-up-via: fma
+  launcher:
+    customPreprocessCommands: []
+    image:
+      pullPolicy: IfNotPresent
+      repository: ghcr.io/llm-d-incubation/llm-d-fast-model-actuation/launcher
+      tag: v0.6.4
+    maxInstances: 4
+    podTemplate:
+      metadata:
+        annotations: {}
+        labels:
+          stood-up-by: auto
+          stood-up-from: llm-d-benchmark
+          stood-up-via: fma
+    runtimeClassName: nvidia-legacy
+  launcherConfigurator:
+    port: 8001
+  launcherNodeSelection:
+    enabled: false
+    nodeLabel: fma-hotstart
+  launcherPopulatorConfigurator:
+    limitsCPU: 2
+    limitsMemory: 2Gi
+    requestsCPU: 100m
+    requestsMemory: 128Mi
+  modelMountPath: /model-cache
+  modelPvcName: model-pvc
+  mountModelVolume: true
+  requester:
+    image:
+      pullPolicy: IfNotPresent
+      repository: ghcr.io/llm-d-incubation/llm-d-fast-model-actuation/requester
+      tag: v0.6.4
+    limitsCPU: 1
+    limitsGPU: 1
+    limitsMemory: 250Mi
+    probePort: 8080
+    readinessProbeInitialDelay: 5
+    readinessProbePeriod: 10
+    spiPort: 8081
+gateway:
+  className: epponly
+  externallyManaged: true
+  logLevel: error
+  name: infra-llmdbench-inference-gateway
+  namespace: kalantar-0
+  providerNamespace: istio-system
+  resources:
+    limits:
+      cpu: '16'
+      memory: 16Gi
+    requests:
+      cpu: '4'
+      memory: 4Gi
+  service:
+    type: NodePort
+gatewayApiCrd:
+  crdUrlTemplate: github.com/kubernetes-sigs/gateway-api/config/crd?ref={revision}
+  inferenceExtensionRevision: v1.5.0
+  inferenceExtensionUrlTemplate: https://github.com/kubernetes-sigs/gateway-api-inference-extension/releases/download/{revision}/manifests.yaml
+  revision: v1.5.1
+gatewayProviders:
+  agentgateway:
+    helmRepository: oci://cr.agentgateway.dev/charts/
+    namespace: agentgateway-system
+harness:
+  condaEnvName: inference-perf-env
+  debug: false
+  executable: llm-d-benchmark.sh
+  inferencePerf:
+    rayonNumThreads: 4
+  loadParallelism: 1
+  name: inference-perf
+  namespace: kalantar-0
+  nodeSelector: {}
+  output: local
+  podLabel: llmdbench-harness-launcher
+  profile: sanity_random.yaml
+  resources:
+    cpu: 16
+    memory: 32Gi
+  tolerations: []
+  waitTimeout: 3600
+helmRepositories:
+  agentgateway:
+    name: agentgateway
+    sourceRepo: https://github.com/agentgateway/agentgateway
+    url: oci://cr.agentgateway.dev/charts/
+  gaie:
+    sourceRepo: https://github.com/kubernetes-sigs/gateway-api-inference-extension
+  inferencePool:
+    sourceRepo: https://github.com/kubernetes-sigs/gateway-api-inference-extension
+  istio:
+    sourceRepo: https://github.com/istio/istio
+    url: https://istio-release.storage.googleapis.com/charts
+  llmDInfra:
+    sourceRepo: https://github.com/llm-d-incubation/llm-d-infra
+    url: https://llm-d-incubation.github.io/llm-d-infra/
+  llmDModelservice:
+    sourceRepo: https://github.com/llm-d-incubation/llm-d-modelservice
+    url: https://llm-d-incubation.github.io/llm-d-modelservice/
+  llmDRouter:
+    sourceRepo: https://github.com/llm-d/llm-d-router
+  lws:
+    sourceRepo: https://github.com/kubernetes-sigs/lws
+httpRoute:
+  backendRequestTimeout: 0s
+  requestTimeout: 300s
+huggingface:
+  enabled: true
+  secretName: hf-secret
+  token: REDACTED
+  tokenBase64: REDACTED
+  tokenKey: HF_TOKEN
+idleCleanup:
+  dryRun: false
+  enabled: false
+  idleWindow: 24h
+  image: ''
+  prometheusUrl: ''
+  schedule: 0 * * * *
+images:
+  benchmark:
+    pullPolicy: Always
+    repository: ghcr.io/llm-d/llm-d-benchmark
+    sourceRepo: https://github.com/llm-d/llm-d-benchmark
+    tag: v0.7.9
+  python:
+    repository: python
+    sourceRepo: https://hub.docker.com/_/python
+    tag: '3.10'
+  routerEndpointPicker:
+    pullPolicy: Always
+    repository: ghcr.io/llm-d/llm-d-router-endpoint-picker
+    sourceRepo: https://github.com/llm-d/llm-d-router
+    tag: v0.10.0
+  routingSidecar:
+    pullPolicy: IfNotPresent
+    repository: ghcr.io/llm-d/llm-d-router-disagg-sidecar
+    sourceRepo: https://github.com/llm-d/llm-d-router
+    tag: v0.10.0
+  udsTokenizer:
+    pullPolicy: Always
+    repository: docker.io/vllm/vllm-openai
+    sourceRepo: https://github.com/vllm-project/vllm
+    tag: v0.26.0
+  vllm:
+    pullPolicy: Always
+    repository: docker.io/vllm/vllm-openai
+    sourceRepo: https://github.com/vllm-project/vllm
+    tag: v0.26.0
+  vllmOpenai:
+    pullPolicy: Always
+    repository: docker.io/vllm/vllm-openai
+    sourceRepo: https://github.com/vllm-project/vllm
+    tag: v0.26.0
+keda:
+  prometheus:
+    authMode: none
+    baseUrl: http://prometheus
+    port: 9090
+    secretName: ''
+    unsafeSsl: false
+  scaledObjects: []
+kustomize:
+  enabled: false
+labels:
+  app: llm-d-benchmark-harness
+  inferenceServing: 'true'
+lws:
+  helmRepository: oci://registry.k8s.io/lws/charts/
+  namespace: lws-system
+model:
+  blockSize: 16
+  cacheBase: /model-cache
+  gpuMemoryUtilization: 0.9
+  huggingfaceId: meta-llama/Llama-3.3-70B-Instruct
+  idLabel: meta-lla-888e33f1-instruct
+  maxModelLen: 131072
+  name: meta-llama/Llama-3.3-70B-Instruct
+  path: models/meta-llama/Llama-3.3-70B-Instruct
+  shortName: meta-llama-llama-3.3-70b-instruct
+  size: 1Ti
+modelArtifacts:
+  extraLabels:
+    pd-infocomm.io/gpu-type: H100_SXM_80GB
+  mountPath: /model-cache
+model_id_label: meta-lla-888e33f1-instruct
+modelservice:
+  enabled: true
+  uriProtocol: pvc
+monitoring:
+  embedTimeSeries: true
+  enableUserWorkload: true
+  enabled: true
+  installPrometheusCrds: false
+  metricsPath: /metrics
+  metricsScrapeEnabled: false
+  podmonitor:
+    enabled: true
+  prometheusCrdUrls:
+  - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+  - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+  scrapeInterval: 30s
+  timeSeriesMaxPoints: 256
+  timeSeriesMetrics:
+  - vllm:kv_cache_usage_perc
+  - vllm:gpu_cache_usage_perc
+  - vllm:cpu_cache_usage_perc
+  - vllm:gpu_memory_usage_bytes
+  - vllm:cpu_memory_usage_bytes
+  - container_memory_usage_bytes
+  - DCGM_FI_DEV_GPU_UTIL
+  - DCGM_FI_DEV_POWER_USAGE
+  - vllm:num_requests_running
+  - vllm:num_requests_waiting
+  - vllm:prefix_cache_hits_total
+  - vllm:prefix_cache_queries_total
+  - vllm:external_prefix_cache_hits_total
+  - vllm:external_prefix_cache_queries_total
+  - vllm:prefix_cache_hit_rate
+  - vllm:external_prefix_cache_hit_rate
+  - vllm:nixl_xfer_time_seconds_sum
+  - vllm:nixl_xfer_time_seconds_count
+  - vllm:nixl_bytes_transferred_sum
+  - vllm:nixl_bytes_transferred_count
+  - vllm:num_preemptions_total
+  - vllm:prompt_tokens_total
+  - vllm:generation_tokens_total
+  - inference_pool_average_kv_cache_utilization
+  - inference_pool_average_queue_size
+  - inference_pool_average_running_requests
+  - inference_pool_ready_pods
+  - llm_d_epp_flow_control_pool_saturation
+  - llm_d_epp_flow_control_queue_size
+  - llm_d_epp_request_running
+multinode:
+  enabled: false
+namespace:
+  labels:
+    podSecurity:
+      audit: privileged
+      warn: privileged
+  name: kalantar-0
+nok8s:
+  enabled: false
+  envoy:
+    adminPort: 19000
+    configMountPath: /etc/envoy/envoy.yaml
+    image: docker.io/envoyproxy/envoy
+    listenPort: 8081
+    tag: distroless-v1.33.2
+  epp:
+    configMountDir: /etc/epp
+    grpcHealthPort: 9003
+    grpcPort: 9002
+    image: ghcr.io/llm-d/llm-d-router-endpoint-picker
+    metricsPort: 9090
+    poolName: file-discovery
+    poolNamespace: default
+    tag: v0.10.0
+  hfTokenEnv: HUGGING_FACE_HUB_TOKEN
+  nameSuffix: ''
+  runtime: docker
+  vllm:
+    accelerator: nvidia
+    containerPort: 8000
+    deviceArgs: []
+    extraArgs: []
+    gpus: all
+    hfCacheDir: ~/.cache/huggingface
+    hostPort: 8000
+    image: docker.io/vllm/vllm-openai
+    replicas: 1
+    shmSize: 20g
+    tag: v0.26.0
+    tensorParallel: 1
+  workspaceHostDir: ~/.llmdbench/nok8s
+openshiftMonitoring:
+  userWorkloadMonitoringNamespace: openshift-user-workload-monitoring
+prefill:
+  acceleratorType:
+    labelKey: kubernetes.io/hostname
+    labelValue: ''
+    labelValues:
+    - pokprod-b93r38s0
+    - pokprod-b93r38s2
+    - pokprod-b93r38s3
+    - pokprod-b93r39s0
+    - pokprod-b93r39s1
+    - pokprod-b93r39s2
+    - pokprod-b93r43s0
+    - pokprod-b93r43s1
+    - pokprod-b93r43s2
+    - pokprod-b93r43s3
+    - pokprod-b93r44s0
+    - pokprod-b93r44s1
+    - pokprod-b93r44s2
+  additionalVolumeMounts: []
+  additionalVolumes: []
+  autoscaling:
+    enabled: false
+  enabled: true
+  extraContainerConfig:
+    securityContext:
+      capabilities:
+        add:
+        - IPC_LOCK
+        - SYS_RAWIO
+        - NET_ADMIN
+        - NET_RAW
+      runAsGroup: 0
+      runAsUser: 0
+  extraEnvVars:
+  - name: UCX_LOG_LEVEL
+    value: info
+  - name: UCX_PROTO_INFO
+    value: y
+  - name: NIXL_LOG_LEVEL
+    value: debug
+  - name: NCCL_DEBUG
+    value: INFO
+  - name: NVSHMEM_DEBUG
+    value: INFO
+  extraPodConfig: {}
+  initContainers:
+  - command:
+    - set_llmdbench_environment.py
+    - -e
+    - /shared-config/llmdbench_env.sh
+    - -i
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imagePullPolicy: Always
+    name: preprocess
+    volumeMounts:
+    - mountPath: /shared-config
+      name: shared-config
+  monitoring:
+    podmonitor:
+      annotations: {}
+      enabled: false
+      interval: 30s
+      labels: {}
+      metricRelabelings: []
+      path: /metrics
+      portName: metrics
+      relabelings: []
+  mountModelVolume: true
+  networkNr: '1'
+  networkResource: rdma/roce_gdr
+  nodeSelector: {}
+  parallelism:
+    data: 1
+    dataLocal: 1
+    tensor: 4
+    workers: 1
+  probes:
+    liveness:
+      failureThreshold: 3
+      periodSeconds: 5
+    readiness:
+      failureThreshold: 3
+      path: /health
+      periodSeconds: 5
+    startup:
+      failureThreshold: 60
+      initialDelaySeconds: 30
+      path: /health
+      periodSeconds: 30
+      timeoutSeconds: 5
+  replicas: 1
+  resources:
+    limits:
+      cpu: '16'
+      memory: 64Gi
+    requests:
+      cpu: '8'
+      memory: 32Gi
+  vllm:
+    additionalFlags:
+    - --max-num-seqs=256
+    - --max-num-batched-tokens=32768
+    - --enable-chunked-prefill
+    - --enable-prefix-caching
+    - --enable-force-include-usage
+    customCommand: null
+    customPreprocessCommand: null
+    imagePullPolicy: IfNotPresent
+    loggingLevel: INFO
+    port: 8200
+    servicePort: 8000
+    workerMultiprocMethod: spawn
+release: llmdbench
+resourcePresets:
+  large:
+    decode:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 4
+        workers: 4
+      resources:
+        limits:
+          cpu: '32'
+          memory: 256Gi
+        requests:
+          cpu: '32'
+          memory: 256Gi
+      shm:
+        size: 64Gi
+    prefill:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 4
+        workers: 4
+      resources:
+        limits:
+          cpu: '32'
+          memory: 256Gi
+        requests:
+          cpu: '32'
+          memory: 256Gi
+  medium:
+    decode:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 1
+        workers: 1
+      resources:
+        limits:
+          cpu: '16'
+          memory: 64Gi
+        requests:
+          cpu: '16'
+          memory: 64Gi
+      shm:
+        size: 16Gi
+    prefill:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 1
+        workers: 1
+      resources:
+        limits:
+          cpu: '16'
+          memory: 64Gi
+        requests:
+          cpu: '16'
+          memory: 64Gi
+  small:
+    decode:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 1
+        workers: 1
+      resources:
+        limits:
+          cpu: '4'
+          memory: 40Gi
+        requests:
+          cpu: '4'
+          memory: 40Gi
+      shm:
+        size: 16Gi
+    prefill:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 1
+        workers: 1
+      resources:
+        limits:
+          cpu: '4'
+          memory: 40Gi
+        requests:
+          cpu: '4'
+          memory: 40Gi
+  xlarge:
+    decode:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 8
+        workers: 8
+      resources:
+        limits:
+          cpu: '32'
+          memory: 256Gi
+        requests:
+          cpu: '32'
+          memory: 256Gi
+      shm:
+        size: 64Gi
+    prefill:
+      parallelism:
+        data: 1
+        dataLocal: 1
+        tensor: 8
+        workers: 8
+      resources:
+        limits:
+          cpu: '32'
+          memory: 256Gi
+        requests:
+          cpu: '32'
+          memory: 256Gi
+router:
+  epp:
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    extProcPort: 9002
+    extraContainerPorts:
+    - containerPort: 5557
+      name: zmq
+      protocol: TCP
+    flags:
+      allow-experimental-plugins: true
+      v: '4'
+    image:
+      pullPolicy: Always
+      registry: ghcr.io/kalantar
+      repository: llm-d-router
+      tag: cee8bb60cbc3-causalsloexternality
+    pluginsConfigFile: custom-plugins.yaml
+    pluginsCustomConfig:
+      custom-plugins.yaml: "apiVersion: llm-d.ai/v1alpha1\nkind: EndpointPickerConfig\n\
+        plugins:\n# ===================================================================\n\
+        # Inherited producers -- IDENTICAL to the baseline's, restated because\n#\
+        \ this string replaces the baseline's wholesale.\n# ===================================================================\n\
+        # a_r, config.md \xA75 signal 10. BUILT: tokenizer sidecar + this plugin.\n\
+        # Read as `request.Body.TokenizedPrompt.TokenCount()`; the field is a\n# NULLABLE\
+        \ pointer and absence is a real runtime state (degradation D8).\n- type: token-producer\n\
+        \  parameters:\n    modelName: meta-llama/Llama-3.3-70B-Instruct\n    vllm:\n\
+        \      url: \"http://localhost:8000\"\n# a_p, config.md \xA75 signal 11. Publishes\
+        \ PrefixCacheMatchInfo as a\n# per-endpoint attribute; the arm binds it BY\
+        \ PRODUCER NAME below.\n- type: approx-prefix-cache-producer\n\n# ===================================================================\n\
+        # THE ARM -- TWO REGISTRATIONS SHARING ONE STATE OBJECT\n# ===================================================================\n\
+        # NOT one plugin with two interfaces. `ProfileHandler.Pick` and\n# `Picker.Pick`\
+        \ share a method name with different signatures\n# (pkg/epp/framework/interface/scheduling/plugins.go:47,\
+        \ :77), so no single\n# Go type can satisfy both. The split is forced by the\
+        \ target's interface\n# set, not chosen:\n#\n#   causal-slo-externality-handler\
+        \  ProfileHandler + PreRequest +\n#                                   ResponseBodyProcessor\n\
+        #   causal-slo-externality-picker   Filter + Picker\n#\n# THE HANDLER OWNS\
+        \ THE STATE -- the Policy, the coefficient table, and the\n# shadow table.\
+        \ The picker names it in `handlerPluginName` and looks it up\n# with `handle.Plugin`.\n\
+        #\n# CONSTRUCTION ORDER IS CARRIED BY THAT REFERENCE, NOT BY POSITION IN THIS\n\
+        # LIST. `instantiatePlugins` topologically sorts a plugin DAG before building\n\
+        # anything (pkg/epp/config/loader/configloader.go:244-250), and dependencies\n\
+        # are constructed first because `TopologicalSort` reverses its result -- edges\n\
+        # point from consumer to producer (pkg/epp/util/utils.go:75-76). The edge\
+        \ here\n# comes from the `pluginRef` tag on the picker's `handlerPluginName`\
+        \ field,\n# which `findPluginDependencies` discovers by reflection (configloader.go:304-336).\n\
+        #\n# So reordering these two entries changes nothing, and REMOVING the reference\n\
+        # would break startup rather than ordering: two plugins with no edge between\n\
+        # them both sit at in-degree 0, and their relative order comes from ranging\
+        \ a\n# Go map (pkg/epp/util/utils.go:42-46), which is randomized per process.\
+        \ The\n# picker's factory errors on a nil lookup rather than constructing\
+        \ a second,\n# divergent copy of the shadow table, so the EPP would crashloop\
+        \ on roughly\n# 5 starts out of 6 instead of silently splitting the resident\
+        \ population.\n#\n# The handler is nonetheless written first here for readability.\n\
+        #\n# State ownership follows lifecycle ownership: the handler holds the\n\
+        # response hooks that WRITE the table (PreRequest stamps the arrival,\n# ResponseBody\
+        \ advances StepsDone and the realized first token), so it owns\n# it and the\
+        \ picker reads through a pointer.\n#\n# NOTE: llm-d's `PluginState` is deliberately\
+        \ NOT used for this link. Its\n# own doc forbids it -- \"PluginState is not\
+        \ a cross-plugin handoff channel\"\n# (pkg/epp/framework/interface/plugin/plugin_state.go:51-54)\
+        \ -- and it is\n# keyed per request, whereas the shadow table must outlive\
+        \ every request in\n# it.\n#\n# WHY THE ARGMIN IS A PICKER AND NOT A SCORER,\
+        \ verified at the pin and\n# restated because getting it wrong still runs\
+        \ and still reports goodput:\n#   - a scorer returns a per-endpoint map and\
+        \ has NO WAY TO NAME A PAIR,\n#     while the objective is over (decode endpoint,\
+        \ prefill placement);\n#   - every scorer contribution passes through the\
+        \ profile's score-range\n#     enforcement, which CLAMPS to [0,1], while J\
+        \ is signed and unbounded.\n#     Clamping does not degrade the ranking, it\
+        \ DESTROYS it: every candidate\n#     with J <= 0 collapses to one score.\n\
+        #\n# A Filter is required, not incidental: `Picker.Pick(ctx, []*ScoredEndpoint)`\n\
+        # receives NO REQUEST, so the arriving request's token count reaches the\n\
+        # argmin no other way. There is no CycleState at this pin -- the type does\n\
+        # not exist -- so the Filter hands the request-derived operands to the\n#\
+        \ Picker by `Endpoint.Put` on the per-request endpoint clones the director\n\
+        # builds fresh for every cycle (director.go:479-486), which the Picker reads\n\
+        # back with `Get`. Those clones are private to one request, which is what\n\
+        # makes the handoff race-free.\n#\n# `disagg-profile-handler` MUST NOT APPEAR\
+        \ IN THIS CONFIG, and its absence\n# above is deliberate: exactly ONE ProfileHandler\
+        \ is permitted across all\n# instantiated plugins (configloader.go:380-394\
+        \ errors with \"multiple\n# profile handlers found\"). This arm's handler\
+        \ therefore does the whole job\n# itself, including setting the prefill routing\
+        \ header.\n- type: causal-slo-externality-handler\n  parameters:\n\n    #\
+        \ -------------------------------------------------------------\n    # The\
+        \ objective -- config.md \xA79.2\n    # -------------------------------------------------------------\n\
+        \    # J(d, p) = V * (externality - ownGood) + capacity, capacity disabled.\n\
+        \    #\n    # V IS KEPT, NOT FOLDED AWAY, even though with capacity disabled\
+        \ it is\n    # a common positive multiplier that cannot change the argmin:\
+        \ the\n    # ablation cohort's validity gate asserts\n    # score = 8 * (externality\
+        \ - own_good) EXACTLY, and a port that folds\n    # V away cannot reproduce\
+        \ that check.\n    v: 8\n\n    ablation:\n      # THE `no_capacity` CONTROLLER.\
+        \ Capacity drift disabled, so\n      # total = 8 * (externality - ownGood).\n\
+        \      noCapacity: true\n      # Keep the externality -- it IS the mechanism.\
+        \ Removing it costs\n      # 0.0154 equal-cell mean goodput, CI [+0.0112,\
+        \ +0.0195]\n      # (config.md \xA710) -- the only term with a supported effect.\n\
+        \      noExternality: false\n      # Keep the arriving request's own good.\
+        \ CARRIED DESPITE NO MEASURED\n      # BENEFIT: removing it GAINS 0.0016 and\
+        \ the CI crosses zero,\n      # [-0.0053, +0.0022] (config.md \xA710), and\
+        \ `joint resident-only`\n      # reaches 0.9280 equal-cell mean against the\
+        \ full policy's 0.9264.\n      # The focal arm keeps it (`SLOExternalityNoOwnGood:\
+        \ false`), so the\n      # transfer carries a term with no measured benefit\
+        \ -- see README.md\n      # \"Where the policy did NOT win\".\n      noOwnGood:\
+        \ false\n      # Selects the occupancy-time capacity account instead of the\n\
+        \      # quadratic-drift one. Doubly dead here: capacity is off.\n      occupancyCapacity:\
+        \ false\n      # THE DECOMPOSITION SWITCH -- config.md \xA710, exposed rather\
+        \ than\n      # compiled out because \xA710 makes the decomposition comparison\
+        \ the\n      # cheapest on-cluster check that the joint shape survived the\
+        \ port:\n      # +0.0485 equal-cell mean goodput in favour of the joint shape,\
+        \ 95% CI\n      # [+0.0305, +0.0665], worst cell falling 0.918 -> 0.700 at\n\
+        \      # h100_a100_realistic:interactive:medium_0p80.\n      #\n      # READ\
+        \ THIS BEFORE FLIPPING IT. `true` restricts the decode enumeration\n     \
+        \ # to ONE endpoint. Which endpoint depends on the profile, and with the\n\
+        \      # profile as shipped below -- NO SCORERS, which the joint argmin requires\n\
+        \      # -- every inherited score is 0, so the restriction lands on the\n\
+        \      # LOWEST-ID decode pod: a fixed arbitrary pod, not a load-shaped choice.\n\
+        \      #\n      # So flipping this switch ALONE does NOT reproduce \xA710's\n\
+        \      # `decode-first full` arm, which fixes decode to a LOAD-SHAPED scorer's\n\
+        \      # pick. It measures \"always decode on one particular pod\" -- a different\n\
+        \      # and weaker control. A run that flipped only this and lost goodput\
+        \ would\n      # look like it confirmed the pre-registered expectation while\
+        \ measuring\n      # something else.\n      #\n      # TO REPRODUCE THE \xA7\
+        10 ABLATION, also attach the baseline's decode\n      # scorers to the `default`\
+        \ profile below (active-request-scorer,\n      # prefix-cache-scorer, ...),\
+        \ so there is a real preference to restrict\n      # to. That is safe even\
+        \ though scorer contributions are clamped to [0,1]:\n      # the picker ignores\
+        \ ScoredEndpoint.Score when computing J, so the clamp\n      # never reaches\
+        \ the objective -- the scores would supply only the\n      # tie-break and\
+        \ this restriction.\n      decomposed: false\n\n    # -------------------------------------------------------------\n\
+        \    # SLO targets -- config.md \xA76\n    # -------------------------------------------------------------\n\
+        \    # ALL THREE TRIPLES ARE CARRIED AND ONE IS SELECTED. This is not\n  \
+        \  # belt-and-braces: every cohort in all three workloads declares\n    #\
+        \ `slo_class: standard`, so the class is ONE CONSTANT STRING across the\n\
+        \    # whole grid and a per-request lookup by SLO class CANNOT select the\n\
+        \    # triple -- the simulation varies tau PER INVOCATION. Carrying all\n\
+        \    # three here and selecting one means the thresholds are never retyped\n\
+        \    # and cannot drift between arms; run one assemble per workload,\n   \
+        \ # changing only `activeWorkload`.\n    #\n    # `interactive` IS THE COMMITTED\
+        \ DEFAULT (config.md \xA76). The composite\n    # kernel reads only tau_ttft\
+        \ and tau_e2e, and a resident's charge\n    # scales roughly as 1/tau_e2e,\
+        \ so interactive's 16 s deadline gives\n    # ~50x the discrimination of reasoning's\
+        \ 802 s -- where the E2E sigmoid\n    # saturates and the externality stops\
+        \ separating candidates at all.\n    #\n    # AN UNRESOLVABLE SELECTION FAILS\
+        \ AT STARTUP, and so does a\n    # non-positive tau_ttft or tau_e2e in the\
+        \ SELECTED triple. A zero triple\n    # does not loosen the policy, it FLATTENS\
+        \ it: sloCompositeValue returns\n    # 1.0 for every disabled target, so every\
+        \ resident charge becomes\n    # 1.0 - 1.0 = 0, the externality is 0 on every\
+        \ candidate, and the argmin\n    # is a tie broken by enumeration order --\
+        \ while the policy keeps running\n    # and keeps reporting goodput. tau_e2e\
+        \ = 0 is the sharper trap: the\n    # realized-TTFT factor is placement-INVARIANT,\
+        \ so it factors out of the\n    # charge and a zero tau_e2e makes the ENTIRE\
+        \ decode-side externality\n    # identically zero, degenerating the arm to\
+        \ its own-good term alone.\n    activeWorkload: deepResearch\n\n    # Microseconds.\
+        \ Source: config.md \xA76, from\n    # run_public_workload_heterogeneity_closeout.py:60-105.\n\
+        \    #\n    # tauItlUs is CARRIED BUT NEVER READ BY THE ROUTING KERNEL. The\n\
+        \    # composite kernel reads only tau_ttft and tau_e2e; mean ITL is an\n\
+        \    # EVALUATION gate on reported goodput, not a routing term. It is\n  \
+        \  # present because muDNom() consumes it if the capacity account is ever\n\
+        \    # re-enabled, and because omitting a threshold config.md states would\n\
+        \    # make this config look like it disagreed with \xA76.\n    workloadTargets:\n\
+        \      interactive:\n        tauTtftUs: 1000000      # 1 000 ms\n        tauItlUs:\
+        \ 50000         # 50 ms   -- evaluation gate only\n        tauE2eUs: 16000000\
+        \      # 16 000 ms\n      reasoning:\n        tauTtftUs: 2000000      # 2\
+        \ 000 ms\n        tauItlUs: 100000        # 100 ms  -- evaluation gate only\n\
+        \        tauE2eUs: 802000000     # 802 000 ms -- saturates the E2E sigmoid\n\
+        \      deepResearch:\n        tauTtftUs: 10000000     # 10 000 ms\n      \
+        \  tauItlUs: 100000        # 100 ms  -- evaluation gate only\n        tauE2eUs:\
+        \ 40000000      # 40 000 ms\n\n    # -------------------------------------------------------------\n\
+        \    # Engine agreement -- config.md \xA75 signals 22-24, \xA79.1\n    # -------------------------------------------------------------\n\
+        \    engine:\n      # = max_num_batched_tokens. Signal 22.\n      chunkTokens:\
+        \ 32768\n      # = block_size. Signal 23. VALIDATED AGAINST THE SCRAPED\n\
+        \      # `Metrics.CacheBlockSize` WITH A LOUD FAILURE ON DISAGREEMENT:\n \
+        \     # upstream has ONE block size, and a port carrying two that silently\n\
+        \      # convert leaves a latent unit bug in the admission test, which\n \
+        \     # compares blocks accumulated in one unit against a need expressed in\n\
+        \      # another.\n      blockSize: 16\n      # = max_num_seqs. Signal 24.\
+        \ No metric exposes it -- and\n      # `Metrics.KvCacheMaxTokenCapacity` is\
+        \ NOT a substitute for anything\n      # here: it is assigned nowhere outside\
+        \ tests at this pin, so it always\n      # reads 0 and any branch guarded\
+        \ on it being positive is dead code.\n      # KV capacity is derived from\
+        \ CacheNumBlocks * CacheBlockSize instead.\n      maxBatchSize: 256\n\n  \
+        \  # -------------------------------------------------------------\n    #\
+        \ Signal plumbing -- config.md \xA75 signals 8, 9, 11\n    # -------------------------------------------------------------\n\
+        \    signals:\n      # Signal 8. theta is keyed by THIS POD LABEL, read from\n\
+        \      # `Endpoint.GetMetadata().Labels` (a map[string]string,\n      # datalayer/endpoint_metadata.go:33),\
+        \ NOT from the node's\n      # nvidia.com/gpu.product -- plugins see endpoints,\
+        \ not nodes.\n      #\n      # An endpoint whose label is ABSENT, or whose\
+        \ value is not a key of\n      # `coeffsByGpuType` below, is REJECTED from\
+        \ the candidate set and the\n      # rejection COUNTED -- never defaulted.\
+        \ Heterogeneity rides the\n      # per-iteration intercept alpha, present\
+        \ on every iteration\n      # regardless of KV state, so a defaulted label\
+        \ is wrong on EVERY\n      # decision rather than only under load; without\
+        \ the counter the\n      # removal would look like a routing PREFERENCE.\n\
+        \      gpuTypeLabelKey: pd-infocomm.io/gpu-type\n\n      # Signal 11. BOUND\
+        \ BY PRODUCER NAME so both arms read the SAME prefix\n      # signal: a data\
+        \ key's identity is \"<DataType>/<ProducerName>\"\n      # (plugin/datakey.go:46-48),\
+        \ so an unbound read can silently become a\n      # second, differently-configured\
+        \ signal. The plugin also declares this\n      # key through `Consumes()`,\
+        \ which makes the producer DAG order it\n      # before the arm and turns\
+        \ a missing producer into a startup error\n      # rather than a per-request\
+        \ miss.\n      prefixMatchInfoProducerName: approx-prefix-cache-producer\n\
+        \n      # Signal 10. Bound BY PRODUCER NAME for the same reason as the prefix\n\
+        \      # read above. NOTE WHAT THIS CANNOT DO: the token-producer's `estimate`\n\
+        \      # backend is the ZERO-CONFIG DEFAULT and TokenizedPrompt carries no\n\
+        \      # provenance marker, so an unreachable tokenizer does NOT surface as\
+        \ an\n      # absent prompt -- it surfaces as a plausible ESTIMATED a_r that\n\
+        \      # mis-prices every candidate. There is no runtime discriminator. Binding\n\
+        \      # the name makes the DAG fail at init if no such producer exists; the\n\
+        \      # operator preflight in config.md section 11 (curl the render sidecar)\
+        \ is\n      # the only check that it is the real tokenizer, and the plugin's\
+        \ D8\n      # counter covers the genuinely-absent case only.\n      tokenizedPromptProducerName:\
+        \ token-producer\n\n      # THERE IS DELIBERATELY NO prefixBlockSizeTokens\
+        \ KNOB.\n      #\n      # The two-block-size problem is real -- the engine\
+        \ reports 16 while\n      # `approx-prefix-cache-producer` clamps its own\
+        \ block size up to a\n      # 64-token floor (approximateprefix/plugin.go:42-50,\n\
+        \      # minBlockSizeTokens = 64), so multiplying the producer's block COUNT\
+        \ by\n      # the ENGINE's block SIZE understates the cached span by 4x, inflating\n\
+        \      # a_p and OVER-pricing prefill work, which biases toward remote prefill.\n\
+        \      #\n      # But it needs no config: `PrefixCacheMatchInfo` publishes\n\
+        \      # `BlockSizeTokens()` alongside `CachedBlockCount()`, so the plugin\
+        \ reads\n      # BOTH off the same attribute, per endpoint, per request. That\
+        \ is\n      # strictly better than a knob -- a producer reconfiguration cannot\n\
+        \      # silently rescale a_p, because there is no second value to drift from.\n\
+        \      # engine.blockSize above stays the ENGINE's 16, which is what reqKVNeed\n\
+        \      # and the rollout need.\n\n    # -------------------------------------------------------------\n\
+        \    # Admission-delay estimator -- DEGRADATION D1\n    # -------------------------------------------------------------\n\
+        \    # config.md \xA79.1 declares `rollforward`, and `rollforward` is the\
+        \ ONLY\n    # accepted value at this pin. Any other value FAILS AT STARTUP\
+        \ rather\n    # than silently degrading:\n    #   `waiting` reads QWork --\
+        \ no per-endpoint work account exists;\n    #   `little`  reads AdmissionRate\
+        \ -- no route;\n    #   the published `scheduler-rollout` needs the engine's\
+        \ ordered wait\n    #   queue, its current grants, and its step start instant.\
+        \ The target\n    #   exposes `Metrics.WaitingQueueSize` -- ONE INTEGER\n\
+        \    #   (pkg/epp/framework/interface/datalayer/metrics.go:33).\n    #\n \
+        \   # THIS IS THE SUBSTITUTION, NOT THE PUBLISHED ESTIMATOR. Every number\n\
+        \    # in sim_results/ was produced by the scheduler rollout. rollforward\
+        \ is\n    # what the simulation ITSELF falls back to when its rollout guard\n\
+        \    # fails, so the substitution is principled -- but past one batch drain\n\
+        \    # it UNDERSTATES admission delay => smaller admissionSteps => residents\n\
+        \    # charged for more of the arrival's interference => the local candidate\n\
+        \    # is OVER-priced => biased toward REMOTE prefill.\n    #\n    # The plugin\
+        \ increments a substitution counter on every call that lands\n    # here instead\
+        \ of the rollout. That counter is a REQUIREMENT, not\n    # instrumentation:\
+        \ the fallback is acceptable, the silence is the\n    # defect. Without it,\
+        \ running a different TTFT estimator than the one\n    # that produced every\
+        \ published number is invisible in the goodput\n    # figure.\n    admissionEstimator:\
+        \ rollforward\n\n    # -------------------------------------------------------------\n\
+        \    # Transfer model -- DEGRADATION D5, config.md \xA77. UNMEASURED.\n  \
+        \  # -------------------------------------------------------------\n    #\
+        \ c_xfer is the ONLY size-dependent price of going remote, entering the\n\
+        \    # objective at exactly ONE place (remoteLeadUs), so an unmeasured value\n\
+        \    # mis-prices SYSTEMATICALLY rather than noisily. MEASURE xferBaseUs and\n\
+        \    # xferBandwidthGbps ON THE TARGET before trusting any magnitude, and\n\
+        \    # record the deviation as a stated degradation.\n    transfer:\n    \
+        \  sizeAware: true            # config.md \xA79.1\n      # xferBaseUs: 50.0\
+        \           # simulator value -- UNMEASURED on target               \n   \
+        \   xferBaseUs: 5826.0           # measured in try7               \n     \
+        \ # xferBandwidthGbps: 25.0    # simulator value -- UNMEASURED on target\n\
+        \      xferBandwidthGbps: 11.0    # measured in try7\n      # 2 (K,V) x 80\
+        \ layers x 8 KV heads x 128 head_dim x 2 B / TP 4.\n      # DERIVED ARITHMETIC,\
+        \ not measured. Leaving it 0 is severe with\n      # sizeAware: transferBytes\
+        \ becomes 0 so every request is charged a\n      # flat xferBaseUs -- a 4k-token\
+        \ prompt should be charged ~13 500 us,\n      # roughly 270x under-priced,\
+        \ with the error growing linearly toward\n      # the deep-research workload's\
+        \ ~45k-token prompts.\n      kvBytesPerTokenPerGpu: 81920\n      # The FLAT\
+        \ KV-transfer cost, used only when sizeAware is false. A\n      # DISTINCT\
+        \ field from xferBaseUs, which is only the additive base of\n      # the size-aware\
+        \ form (upstream sim/edpp.go:77, default 5 ms at\n      # cmd/root.go:1505).\
+        \ Conflating the two makes the flat path\n      # unrepresentable and silently\
+        \ reprices every disaggregated candidate\n      # if sizeAware is ever turned\
+        \ off.\n      flatCXferUs: 5000\n\n    # -------------------------------------------------------------\n\
+        \    # theta -- config.md \xA74, keyed by the signal-8 POD LABEL value\n \
+        \   # -------------------------------------------------------------\n    #\
+        \ BOTH FILES ARE TRANSCRIBED, keyed by label value, so the A100 decode\n \
+        \   # instance is priced correctly WHETHER OR NOT the generated scenario\n\
+        \    # names it (config.md \xA72, \xA74). The generated scenario names H100\
+        \ for\n    # both roles; the hand-added A100 decode pod is priced the moment\
+        \ it\n    # carries `pd-infocomm.io/gpu-type: A100_SXM_80GB`, with no\n  \
+        \  # plugin-config change.\n    #\n    # THERE IS NO FALLBACK ENTRY, ON PURPOSE.\
+        \ An unmapped label must have\n    # already caused the endpoint to be REJECTED;\
+        \ a silent default here\n    # would price the endpoint under the wrong physics\
+        \ on every decision.\n    # The intercepts differ by a factor of 1.539 (25\
+        \ 563.82 us A100 against\n    # 16 613.54 us H100) on EVERY iteration regardless\
+        \ of KV state.\n    #\n    # Values copied verbatim from inputs/coeffs-llama70b-h100-tp4.json\
+        \ and\n    # inputs/coeffs-llama70b-a100real-tp4.json. Units: alphaD/alphaP\
+        \ us,\n    # c0 us/req, c1 and cPf us/token, cAttn us/token^2. The plugin\
+        \ runs\n    # upstream's validate() on each entry (sim/edpp_coeffs.go:127-146),\n\
+        \    # whose alpha ~= alpha_p bound rejects a pair diverging by more than\n\
+        \    # 10% -- a divergence that large means the JSON was fit on mismatched\n\
+        \    # hardware or regimes. Both pairs below are within 0.03%.\n    coeffsByGpuType:\n\
+        \      H100_SXM_80GB:\n        alphaD: 16613.537554540144\n        alphaP:\
+        \ 16617.85321583337\n        c0: 5.347316038602452\n        c1: 0.04761401141756073\n\
+        \        cPf: 6.144687138665833\n        cAttn: 0.00010075247918809842\n \
+        \     A100_SXM_80GB:\n        alphaD: 25563.819286862163\n        alphaP:\
+        \ 25568.34953836831\n        c0: 5.945331876073271\n        c1: 0.07822809856114352\n\
+        \        cPf: 9.794219053944662\n        cAttn: 0.00015977670754642687\n\n\
+        \    # -------------------------------------------------------------\n   \
+        \ # The shadow table -- signals 12-18, DEGRADATIONS D2, D4, D6\n    # -------------------------------------------------------------\n\
+        \    # The externality is a sum over INDIVIDUAL residents' deadline slack,\n\
+        \    # but vLLM exports resident state only in aggregate, so the plugin\n\
+        \    # maintains an EPP-side index of the requests it placed. It is a\n  \
+        \  # mutex-guarded LONG-LIVED index, not framework per-request state, and\n\
+        \    # the target's own dispatch is what forces that: non-final response\n\
+        \    # chunks are drained on a SEPARATE GOROUTINE from an async queue\n  \
+        \  # (director.go:541-552, :668+) while the final chunk runs on the request\n\
+        \    # goroutine (:539), so writes genuinely arrive concurrently with\n  \
+        \  # scheduling-path reads.\n    shadowTable:\n      # THE TTL SWEEP IS REQUIRED,\
+        \ NOT HYGIENE. Requests terminate without\n      # a final chunk (client disconnect,\
+        \ upstream error) and the\n      # ResponseBodyProcessor signature carries\
+        \ NO error or termination\n      # state (requestcontrol/plugins.go:53-65,\
+        \ and its own TODO says so),\n      # so a disconnect is indistinguishable\
+        \ from a completion. Without the\n      # sweep those entries are charged\
+        \ as residents FOREVER and permanently\n      # inflate every externality\
+        \ on that endpoint.\n      #\n      # 900 s is chosen against the workload,\
+        \ not inherited: the longest\n      # deadline in play is deep_research's\
+        \ tau_e2e = 40 s (config.md \xA76)\n      # and reasoning's output distribution\
+        \ reaches 32 000 tokens, so a\n      # legitimately live request is far inside\
+        \ this bound while a\n      # stranded entry is reaped within one sweep interval.\
+        \ UNMEASURED\n      # against real client behaviour -- widen it if the reaped-entries\n\
+        \      # counter fires on requests that were still healthy.\n      entryTtlSeconds:\
+        \ 900\n      sweepIntervalSeconds: 30\n      # Signal 14 / D4: S_pf is what\
+        \ is being prefilled THIS STEP, not the\n      # outstanding backlog, and\
+        \ the EPP cannot know what the engine\n      # scheduled. The shadow sum is\
+        \ capped per occupant and capped in\n      # total at engine.chunkTokens.\
+        \ Still an over-estimate => over-states\n      # local prefill inflation =>\
+        \ biased toward REMOTE.\n      residentPrefillTokensCap: 32768\n\n    # -------------------------------------------------------------\n\
+        \    # Dead-but-declared: the capacity account\n    # -------------------------------------------------------------\n\
+        \    # `ablation.noCapacity: true` makes all three of these dead state. They\n\
+        \    # are declared rather than omitted because a HALF-specified subsystem\n\
+        \    # is worse than an absent one -- the read side would look complete --\n\
+        \    # and because config.md \xA79.2 keeps the switch reachable.\n    #\n\
+        \    # TWO OF THEM ARE NOT STATED ANYWHERE IN THE BUNDLE, and are recorded\n\
+        \    # here as decisions rather than defaults. A port RE-ENABLING the\n  \
+        \  # capacity term must source them properly, and must additionally supply\n\
+        \    # a monotonic clock and per-endpoint drain timestamps.\n    capacity:\n\
+        \      # NOT IN config.md. The fixed reference tau for the capacity\n    \
+        \  # account's scale (state.scale = state.mu * tauRefUs,\n      # sim/edpp.go:1177),\
+        \ independent of the operating tau_ttft. Set equal\n      # to interactive's\
+        \ tau_ttft for want of a stated value.\n      tauRefUs: 1000000\n      # S_nom,\
+        \ the nominal prefill chunk for the fixed prefill normalizer.\n      # Simulator\
+        \ default 512 (cmd/root.go:1506).\n      nomPrefillTokens: 512\n      # NOT\
+        \ IN config.md. The fixed decode width B used by the\n      # occupancy-time\
+        \ capacity account (sim/edpp.go:2381), itself reached\n      # only when `ablation.occupancyCapacity`\
+        \ is true -- so this is doubly\n      # dead. Set to engine.maxBatchSize.\n\
+        \      referenceBatch: 256\n\n    # -------------------------------------------------------------\n\
+        \    # OUTSIDE THE CALIBRATED THETA -- config.md \xA75 signal 25\n    # -------------------------------------------------------------\n\
+        \    # The client-visible per-token post-processing latency (streaming\n \
+        \   # detokenization), added explicitly to EVERY TTFT projection\n    # (sim/edpp.go:1235-1242)\
+        \ because it sits outside theta.\n    #\n    # NOT STATED IN config.md, WHICH\
+        \ GIVES NO VALUE, and 0 is the neutral\n    # choice rather than a measured\
+        \ one. It is NOT decision-neutral even\n    # though it is added to both the\
+        \ local and the disaggregated\n    # projection: both projections feed tHat,\
+        \ which enters ownGood through\n    # a SIGMOID, so a common additive constant\
+        \ still moves the two\n    # candidates' values by different amounts. Measure\
+        \ it on the target\n    # before trusting any magnitude.\n    outputTokenProcessingUs:\
+        \ 0.0\n\n# -------------------------------------------------------------------\n\
+        # The picker registration -- Filter + Picker, reads the handler's state.\n\
+        # -------------------------------------------------------------------\n# Filter\
+        \  splits the two pools by role label, REJECTS endpoints whose\n#        \
+        \ GPU-type label is absent or unmapped (counting each rejection by\n#    \
+        \     reason), and -- because `Picker.Pick` receives no request -- is the\n\
+        #         only place the arriving request's operands (a_r, SLO class, the\n\
+        #         per-endpoint a_p, the request ID) can be attached to the\n#    \
+        \     per-request endpoint clones for the Picker to read back.\n# Picker \
+        \ runs the joint argmin over D local plus D*P disaggregated\n#         candidates\
+        \ and returns BOTH picks in one ProfileRunResult --\n#         legitimate\
+        \ because `ProfileRunResult.TargetEndpoints` is a slice\n#         (scheduling/types.go:164-167).\n\
+        #\n# The handler's ProcessResults then SPLITS those two picks into two entries\n\
+        # of SchedulingResult.ProfileResults -- primary carrying the decode pick\n\
+        # ALONE. That split is mandatory, not cosmetic: the director turns EVERY\n\
+        # endpoint in the primary profile's TargetEndpoints into a routing\n# destination\
+        \ and comma-joins them (director.go:486-496), so leaving both in\n# the primary\
+        \ profile would dispatch the request to both pods. The joint\n# argmin is\
+        \ untouched; only the reporting shape splits.\n- type: causal-slo-externality-picker\n\
+        \  parameters:\n    handlerPluginName: causal-slo-externality-handler\n\n\
+        schedulingProfiles:\n# ONE ROLE-BLIND PROFILE, and this is the required shape\
+        \ rather than a\n# simplification. All profiles receive the same candidateEndpoints\
+        \ slice\n# (pkg/epp/scheduling/scheduler.go:81), so an unfiltered profile\
+        \ sees BOTH\n# pools -- which is exactly what the joint argmin needs: D local\
+        \ candidates\n# plus D*P disaggregated candidates, scored on one scale in\
+        \ one argmin.\n#\n# NO SCORERS ARE ATTACHED, and that is deliberate. The arm\
+        \ must IGNORE\n# inherited scorer contributions for the same clamping reason\
+        \ that forces it\n# to be a picker: a contribution passing through the profile's\
+        \ [0,1]\n# score-range enforcement cannot be combined with a signed, unbounded\
+        \ J on\n# one scale. Every ScoredEndpoint therefore reaches the picker with\
+        \ Score 0,\n# and the picker ignores Score entirely and computes J itself.\n\
+        #\n# The handler is NOT referenced here and does not need to be: every\n#\
+        \ instantiated plugin is offered to the requestcontrol config\n# (cmd/epp/runner/runner.go:614-640)\
+        \ and sorted into hook lists by interface\n# assertion (requestcontrol/request_control_config.go:88-109),\
+        \ so its\n# ProfileHandler, PreRequest and ResponseBody hooks are wired by\
+        \ its mere\n# presence in `plugins:`.\n- name: default\n  plugins:\n  - pluginRef:\
+        \ causal-slo-externality-picker\n"
+    replicas: 1
+    volumeMounts: []
+    volumes: []
+  extraServicePorts:
+  - name: zmq
+    port: 5557
+    protocol: TCP
+    targetPort: 5557
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8081
+  inferenceObjectives:
+  - name: standard
+    priority: 3
+  inferencePool:
+    failureMode: FailOpen
+  modelServers:
+    matchLabels:
+      llm-d.ai/inferenceServing: 'true'
+      llm-d.ai/model: meta-lla-888e33f1-instruct
+    targetPorts:
+    - number: 8000
+  monitoring:
+    interval: 10s
+    prometheus:
+      auth:
+        enabled: true
+        secretName: inference-gateway-sa-metrics-reader-secret
+      enabled: true
+    secretName: inference-gateway-sa-metrics-reader-secret
+  proxy:
+    args:
+    - --service-node
+    - envoy-sidecar
+    - --log-level
+    - warn
+    - --concurrency
+    - '8'
+    - --drain-strategy
+    - immediate
+    - --drain-time-s
+    - '60'
+    - -c
+    - /etc/envoy/envoy.yaml
+    resources:
+      limits:
+        cpu: '8'
+        memory: 16Gi
+      requests:
+        cpu: '4'
+        memory: 8Gi
+  tokenizer:
+    enabled: true
+    env:
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    - name: HF_HOME
+      value: /tmp/hf
+    modelName: meta-llama/Llama-3.3-70B-Instruct
+    volumeMounts:
+    - mountPath: /tmp/hf-cache
+      name: model-cache
+routing:
+  connector: nixlv2
+  debugLevel: 3
+  proxy:
+    enabled: true
+    imagePullPolicy: Always
+    resources:
+      limits:
+        cpu: '8'
+        memory: 16Gi
+      requests:
+        cpu: '4'
+        memory: 8Gi
+    targetPort: 8200
+    zapEncoder: json
+    zapLogLevel: debug
+  secure: false
+  servicePort: 8000
+scenarioName: scenario
+schedulerName: default-scheduler
+serviceAccount:
+  name: inference-perf-runner
+serviceAccountOverride: ''
+sharedInfraStackIndex: 1
+siblingStacks:
+- modelName: meta-llama/Llama-3.3-70B-Instruct
+  name: pdinfocomm3
+  standalone: false
+stackIndex: 1
+standalone:
+  acceleratorType:
+    labelKey: nvidia.com/gpu.product
+    labelValue: NVIDIA-H100-80GB-HBM3
+  additionalVolumeMounts: []
+  additionalVolumes: []
+  deployment:
+    name: null
+  enabled: false
+  extraContainerConfig: {}
+  extraEnvVars: []
+  extraPodConfig: {}
+  extraPodLabels: {}
+  image:
+    pullPolicy: Always
+    repository: docker.io/vllm/vllm-openai
+    tag: v0.26.0
+  initContainers: []
+  labels:
+    stood-up-by: auto
+    stood-up-from: llm-d-benchmark
+    stood-up-via: standalone
+  launcher:
+    args: null
+    customPreprocessCommand: null
+    enabled: false
+    image:
+      repository: null
+      tag: null
+    imagePullPolicy: Always
+    port: 8001
+    vllmPort: 8002
+  modelMountPath: /model-cache
+  modelPvcName: model-pvc
+  mountModelVolume: true
+  networkNr: '1'
+  networkResource: rdma/roce_gdr
+  nodeSelector: {}
+  parallelism:
+    tensor: 1
+  podAnnotations: {}
+  probes:
+    liveness:
+      failureThreshold: 3
+      periodSeconds: 5
+    readiness:
+      failureThreshold: 3
+      periodSeconds: 5
+    startup:
+      failureThreshold: 60
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
+  replicas: 1
+  resources:
+    limits:
+      cpu: '4'
+      memory: 40Gi
+    requests:
+      cpu: '4'
+      memory: 40Gi
+  role: both
+  schedulerName: default-scheduler
+  service:
+    additionalPorts: []
+    annotations: {}
+    name: null
+    port: 80
+    type: ClusterIP
+  vllm:
+    additionalFlags: []
+    args: []
+    customCommand: null
+    customPreprocessCommand: null
+    enablePrefixCaching: false
+    loadFormat: auto
+    loggingLevel: INFO
+    modelCommand: custom
+    modelLoaderExtraConfig: '{}'
+    port: 8000
+    preprocessCommand: /bin/true
+    workerMultiprocMethod: spawn
+storage:
+  downloadMaxRetries: 2
+  downloadTimeout: 2400
+  extraPvc:
+    accessModes:
+    - ReadWriteMany
+    name: ''
+    size: 10Gi
+    storageClassName: auto
+    volumeMode: Filesystem
+  hostPath:
+    capacity: 300Gi
+    daemonSetName: download-model-ds
+    daemonSetTimeout: 3600
+    enabled: false
+    nodeSelector: {}
+    path: /mnt/models
+    storageClassName: hostpath
+    tolerations: []
+  modelPvc:
+    accessModes:
+    - ReadWriteMany
+    name: model-pvc
+    size: 1Ti
+    storageClassName: auto
+  workloadPvc:
+    accessModes:
+    - ReadWriteMany
+    name: workload-pvc
+    size: 20Gi
+    storageClassName: auto
+vllmCommon:
+  containerHome: /tmp
+  ephemeralStorage: ''
+  ephemeralStorageResource: ephemeral-storage
+  flags:
+    allowLongMaxModelLen: '1'
+    disableLogRequests: true
+    disableUvicornAccessLog: false
+    enforceEager: false
+    serverDevMode: '1'
+  hfHome: /tmp/huggingface
+  host: 0.0.0.0
+  inferencePort: 8000
+  kvEvents:
+    enabled: false
+    port: 5557
+    publisher: zmq
+    topicPrefix: kv
+  kvTransfer:
+    connector: NixlConnector
+    enabled: true
+    role: kv_both
+  networkNr: '1'
+  networkResource: rdma/roce_gdr
+  nixlSideChannelPort: '5557'
+  preprocessScript: export LD_LIBRARY_PATH=$(find / -name libcuda.so.1 -printf '%h\n'
+    2>/dev/null | sed ':a; N; $!ba; s/\n/:/g'):${LD_LIBRARY_PATH}; export LIBRARY_PATH=$(find
+    / -name libcuda.so.1 -printf '%h\n' 2>/dev/null | head -1):${LIBRARY_PATH}; .
+    /shared-config/llmdbench_env.sh
+  priorityClassName: ''
+  pullSecret: ''
+  shell: /bin/bash
+  ucxSockaddrTlsPriority: tcp
+  ucxTls: rc,sm,cuda_ipc,cuda_copy
+  volumeMounts:
+  - mountPath: /shared-config
+    name: shared-config
+  - mountPath: /dev/shm
+    name: dshm
+  volumes:
+  - emptyDir: {}
+    name: shared-config
+    type: emptyDir
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 16Gi
+    name: dshm
+    type: emptyDir
+workDir: /workspace/data/try8/plans/causalsloexternality/deep-research-single-turn
+wva:
+  controller:
+    enabled: true
+  enabled: false
+  hpa:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        stabilizationWindowSeconds: 120
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 100
+        stabilizationWindowSeconds: 120
+    enabled: true
+    maxReplicas: 16
+    minReplicas: 1
+    targetAvgValue: 1
+  image:
+    repository: ghcr.io/llm-d/llm-d-workload-variant-autoscaler
+    tag: verify-a3c779
+  metrics:
+    enabled: true
+    port: 8443
+    secure: true
+  namespace: kalantar-0
+  namespaceScoped: true
+  prometheus:
+    baseUrl: https://thanos-querier.openshift-monitoring.svc.cluster.local
+    port: 9091
+  replicaCount: 1
+  variantAutoscaling:
+    variantCost: '10.0'
+  vllmService:
+    enabled: true
+    interval: 15s
+    nodePortMax: 32767
+    nodePortMin: 30000
+    scheme: http
+  wellLitPath: inference-scheduling

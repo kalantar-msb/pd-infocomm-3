@@ -1,0 +1,46 @@
+{
+  "collected_at": "2026-09-09T04:29:47Z",
+  "pods": [
+    {
+      "name": "meta-lla-888e33f1-instruct-decode-558d9f5fd4-bwsxm",
+      "node": "pokprod-b93r43s0",
+      "model": "meta-lla-888e33f1-instruct",
+      "role": "decode",
+      "creation_timestamp": "2026-09-09T04:02:27Z",
+      "ready_timestamp": "2026-09-09T04:05:29Z",
+      "startup_seconds": 182.0
+    },
+    {
+      "name": "meta-lla-888e33f1-instruct-decode-558d9f5fd4-zrt7l",
+      "node": "pokprod-b93r44s0",
+      "model": "meta-lla-888e33f1-instruct",
+      "role": "decode",
+      "creation_timestamp": "2026-09-09T04:02:27Z",
+      "ready_timestamp": "2026-09-09T04:05:33Z",
+      "startup_seconds": 186.0
+    },
+    {
+      "name": "meta-lla-888e33f1-instruct-prefill-6cb8877bd8-gk25t",
+      "node": "pokprod-b93r44s2",
+      "model": "meta-lla-888e33f1-instruct",
+      "role": "prefill",
+      "creation_timestamp": "2026-09-09T04:02:27Z",
+      "ready_timestamp": "2026-09-09T04:06:33Z",
+      "startup_seconds": 246.0
+    }
+  ],
+  "aggregate": {
+    "mean": 204.66666666666666,
+    "stddev": 35.85154575933001,
+    "min": 182.0,
+    "p25": 184.0,
+    "p50": 186.0,
+    "p75": 216.0,
+    "p90": 234.0,
+    "p95": 240.0,
+    "p99": 244.8,
+    "max": 246.0,
+    "count": 3,
+    "unit": "s"
+  }
+}

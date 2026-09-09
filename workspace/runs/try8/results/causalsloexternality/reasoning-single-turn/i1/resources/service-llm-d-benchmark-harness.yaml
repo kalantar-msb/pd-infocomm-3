@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2026-05-05T15:18:28Z"
+  name: llm-d-benchmark-harness
+  namespace: kalantar-0
+  resourceVersion: "718996950"
+  uid: d9ddc914-ee37-43f7-b73b-8677c75416e4
+spec:
+  clusterIP: 172.30.244.202
+  clusterIPs:
+  - 172.30.244.202
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: rsync
+    port: 20873
+    protocol: TCP
+    targetPort: 20873
+  selector:
+    app: llm-d-benchmark-harness
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

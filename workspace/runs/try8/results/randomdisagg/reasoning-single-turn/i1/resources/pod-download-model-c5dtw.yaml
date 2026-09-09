@@ -1,0 +1,186 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.ovn.org/pod-networks: '{"default":{"ip_addresses":["10.131.3.53/23"],"mac_address":"0a:58:0a:83:03:35","gateway_ips":["10.131.2.1"],"routes":[{"dest":"10.128.0.0/14","nextHop":"10.131.2.1"},{"dest":"172.30.0.0/16","nextHop":"10.131.2.1"},{"dest":"169.254.0.5/32","nextHop":"10.131.2.1"},{"dest":"100.64.0.0/16","nextHop":"10.131.2.1"}],"ip_address":"10.131.3.53/23","gateway_ip":"10.131.2.1","role":"primary"}}'
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "ovn-kubernetes",
+          "interface": "eth0",
+          "ips": [
+              "10.131.3.53"
+          ],
+          "mac": "0a:58:0a:83:03:35",
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: anyuid
+  creationTimestamp: "2026-09-09T03:28:37Z"
+  generateName: download-model-
+  labels:
+    app: llm-d-benchmark-harness
+    batch.kubernetes.io/controller-uid: 6718e8f1-8953-4b78-a102-3ca3804aa83f
+    batch.kubernetes.io/job-name: download-model
+    controller-uid: 6718e8f1-8953-4b78-a102-3ca3804aa83f
+    job-name: download-model
+  name: download-model-c5dtw
+  namespace: kalantar-0
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Job
+    name: download-model
+    uid: 6718e8f1-8953-4b78-a102-3ca3804aa83f
+  resourceVersion: "2210109272"
+  uid: 6de5f539-ab0c-4b5b-ab48-98c785c74a4d
+spec:
+  containers:
+  - args:
+    - |
+      mkdir -p "${MOUNT_PATH}/${MODEL_PATH}" && \
+      pip install -U --user huggingface_hub && \
+      export PATH="${PATH}:${HOME}/.local/bin" && \
+      hf auth login --token "${HF_TOKEN}" && \
+      hf download "${HF_MODEL_ID}" --local-dir "/cache/${MODEL_PATH}"
+    command:
+    - /bin/sh
+    - -c
+    env:
+    - name: MODEL_PATH
+      value: models/meta-llama/Llama-3.3-70B-Instruct
+    - name: HF_MODEL_ID
+      value: meta-llama/Llama-3.3-70B-Instruct
+    - name: HF_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: HF_TOKEN
+          name: hf-secret
+    - name: HF_HOME
+      value: /tmp/huggingface
+    - name: HOME
+      value: /tmp
+    - name: MOUNT_PATH
+      value: /cache
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imagePullPolicy: IfNotPresent
+    name: downloader
+    resources: {}
+    securityContext:
+      capabilities:
+        drop:
+        - MKNOD
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /cache
+      name: model-cache
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xjrc6
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: pokprod-b93r44s1
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: OnFailure
+  schedulerName: default-scheduler
+  securityContext:
+    seLinuxOptions:
+      level: s0:c52,c29
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: model-cache
+    persistentVolumeClaim:
+      claimName: model-pvc
+  - name: kube-api-access-xjrc6
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+      - configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: openshift-service-ca.crt
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:29:02Z"
+    status: "False"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:28:37Z"
+    reason: PodCompleted
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:29:00Z"
+    reason: PodCompleted
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:29:00Z"
+    reason: PodCompleted
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T03:28:37Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://86c0f4df3afc0d05e3cb60cc31231a77102068d3d106cf3404f65e7e7fe331ff
+    image: ghcr.io/llm-d/llm-d-benchmark:v0.7.9
+    imageID: ghcr.io/llm-d/llm-d-benchmark@sha256:90168bcfa7f1080efdbe9e00e9bee45486ca9420b6c0742f27e025ff2618508a
+    lastState: {}
+    name: downloader
+    ready: false
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: cri-o://86c0f4df3afc0d05e3cb60cc31231a77102068d3d106cf3404f65e7e7fe331ff
+        exitCode: 0
+        finishedAt: "2026-09-09T03:28:59Z"
+        reason: Completed
+        startedAt: "2026-09-09T03:28:46Z"
+    volumeMounts:
+    - mountPath: /cache
+      name: model-cache
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-xjrc6
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.98.44
+  hostIPs:
+  - ip: 192.168.98.44
+  phase: Succeeded
+  podIP: 10.131.3.53
+  podIPs:
+  - ip: 10.131.3.53
+  qosClass: BestEffort
+  startTime: "2026-09-09T03:28:37Z"

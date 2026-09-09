@@ -1,0 +1,12 @@
+{
+  "level": "OVERLOADED",
+  "score": 1,
+  "confidence": 1,
+  "signals": {
+    "latency_trend": 1,
+    "latency_trend_raw": 1,
+    "noise_floor": 0.0659380473395787,
+    "quartile_monotone": 1,
+    "rate_deficit": 0
+  }
+}

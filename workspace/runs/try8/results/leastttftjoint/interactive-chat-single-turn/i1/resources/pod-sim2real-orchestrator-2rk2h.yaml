@@ -1,0 +1,284 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.ovn.org/pod-networks: '{"default":{"ip_addresses":["10.131.9.138/23"],"mac_address":"0a:58:0a:83:09:8a","gateway_ips":["10.131.8.1"],"routes":[{"dest":"10.128.0.0/14","nextHop":"10.131.8.1"},{"dest":"172.30.0.0/16","nextHop":"10.131.8.1"},{"dest":"169.254.0.5/32","nextHop":"10.131.8.1"},{"dest":"100.64.0.0/16","nextHop":"10.131.8.1"}],"ip_address":"10.131.9.138/23","gateway_ip":"10.131.8.1","role":"primary"}}'
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "ovn-kubernetes",
+          "interface": "eth0",
+          "ips": [
+              "10.131.9.138"
+          ],
+          "mac": "0a:58:0a:83:09:8a",
+          "default": true,
+          "dns": {}
+      }]
+    openshift.io/scc: restricted-v2
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  creationTimestamp: "2026-09-09T02:14:40Z"
+  finalizers:
+  - batch.kubernetes.io/job-tracking
+  generateName: sim2real-orchestrator-
+  labels:
+    batch.kubernetes.io/controller-uid: d6f95d87-c3ef-44d4-80c8-ff61272da24a
+    batch.kubernetes.io/job-name: sim2real-orchestrator
+    controller-uid: d6f95d87-c3ef-44d4-80c8-ff61272da24a
+    job-name: sim2real-orchestrator
+  name: sim2real-orchestrator-2rk2h
+  namespace: kalantar-0
+  ownerReferences:
+  - apiVersion: batch/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Job
+    name: sim2real-orchestrator
+    uid: d6f95d87-c3ef-44d4-80c8-ff61272da24a
+  resourceVersion: "2209573465"
+  uid: 6d8ec8e3-a46b-4814-b4f9-e82fcb385a82
+spec:
+  containers:
+  - args:
+    - --experiment-root
+    - /data
+    - --run
+    - try8
+    - run
+    - --defaults-path
+    - /data/workspace/defaults.yaml
+    env:
+    - name: PYTHONUNBUFFERED
+      value: "1"
+    - name: SIM2REAL_ORCHESTRATOR_POD
+      value: "1"
+    image: ghcr.io/inference-sim/sim2real/orchestrator:latest
+    imagePullPolicy: Always
+    name: orchestrator
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1002710000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data/workspace
+      name: workspace
+    - mountPath: /data/live/clusters/pokprod001
+      name: live-cluster-config
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-z2rgs
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  initContainers:
+  - command:
+    - sh
+    - -c
+    - set -e; cp -r /data/config/. /data/workspace && ln -sf /data/live/clusters/pokprod001/cluster_config.json
+      /data/workspace/clusters/pokprod001/cluster_config.json
+    image: ghcr.io/inference-sim/sim2real/orchestrator:latest
+    imagePullPolicy: Always
+    name: copy-inputs
+    resources: {}
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      runAsNonRoot: true
+      runAsUser: 1002710000
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /data/config
+      name: config
+      readOnly: true
+    - mountPath: /data/workspace
+      name: workspace
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-z2rgs
+      readOnly: true
+  nodeName: pokprod-b93r38s3
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Never
+  schedulerName: default-scheduler
+  securityContext:
+    fsGroup: 1002710000
+    seLinuxOptions:
+      level: s0:c52,c29
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccount: sim2real-runner
+  serviceAccountName: sim2real-runner
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - configMap:
+      defaultMode: 420
+      items:
+      - key: cluster--baseline.yaml
+        path: runs/try8/cluster/baseline.yaml
+      - key: cluster--causalsloexternality.yaml
+        path: runs/try8/cluster/causalsloexternality.yaml
+      - key: cluster--leastttftjoint.yaml
+        path: runs/try8/cluster/leastttftjoint.yaml
+      - key: cluster--pipelinerun-deep-research-single-turn.7Cbaseline.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-deep-research-single-turn|baseline|i1.yaml
+      - key: cluster--pipelinerun-deep-research-single-turn.7Ccausalsloexternality.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-deep-research-single-turn|causalsloexternality|i1.yaml
+      - key: cluster--pipelinerun-deep-research-single-turn.7Cleastttftjoint.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-deep-research-single-turn|leastttftjoint|i1.yaml
+      - key: cluster--pipelinerun-deep-research-single-turn.7Crandomdisagg.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-deep-research-single-turn|randomdisagg|i1.yaml
+      - key: cluster--pipelinerun-interactive-chat-single-turn.7Cbaseline.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-interactive-chat-single-turn|baseline|i1.yaml
+      - key: cluster--pipelinerun-interactive-chat-single-turn.7Ccausalsloexternality.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-interactive-chat-single-turn|causalsloexternality|i1.yaml
+      - key: cluster--pipelinerun-interactive-chat-single-turn.7Cleastttftjoint.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-interactive-chat-single-turn|leastttftjoint|i1.yaml
+      - key: cluster--pipelinerun-interactive-chat-single-turn.7Crandomdisagg.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-interactive-chat-single-turn|randomdisagg|i1.yaml
+      - key: cluster--pipelinerun-reasoning-single-turn.7Cbaseline.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-reasoning-single-turn|baseline|i1.yaml
+      - key: cluster--pipelinerun-reasoning-single-turn.7Ccausalsloexternality.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-reasoning-single-turn|causalsloexternality|i1.yaml
+      - key: cluster--pipelinerun-reasoning-single-turn.7Cleastttftjoint.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-reasoning-single-turn|leastttftjoint|i1.yaml
+      - key: cluster--pipelinerun-reasoning-single-turn.7Crandomdisagg.7Ci1.yaml
+        path: runs/try8/cluster/pipelinerun-reasoning-single-turn|randomdisagg|i1.yaml
+      - key: cluster--randomdisagg.yaml
+        path: runs/try8/cluster/randomdisagg.yaml
+      - key: cluster_config--pokprod001
+        path: clusters/pokprod001/cluster_config.json
+      - key: defaults.yaml
+        path: defaults.yaml
+      - key: run_metadata.json
+        path: runs/try8/run_metadata.json
+      - key: setup_config.json
+        path: setup_config.json
+      name: sim2real-run-inputs
+    name: config
+  - configMap:
+      defaultMode: 420
+      items:
+      - key: cluster_config--pokprod001
+        path: cluster_config.json
+      name: sim2real-run-inputs
+    name: live-cluster-config
+  - emptyDir: {}
+    name: workspace
+  - name: kube-api-access-z2rgs
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+      - configMap:
+          items:
+          - key: service-ca.crt
+            path: service-ca.crt
+          name: openshift-service-ca.crt
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:14:42Z"
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:14:42Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:14:43Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:14:43Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-09-09T02:14:40Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: cri-o://0dd96d646e2654004b635dab800f2863a2ab640d902efc9b428704465ee717aa
+    image: ghcr.io/inference-sim/sim2real/orchestrator:latest
+    imageID: ghcr.io/inference-sim/sim2real/orchestrator@sha256:616ddb80da9648d2fdff503d64429c48c410ea7c847743038e710cbec4a2a454
+    lastState: {}
+    name: orchestrator
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-09-09T02:14:42Z"
+    volumeMounts:
+    - mountPath: /data/workspace
+      name: workspace
+    - mountPath: /data/live/clusters/pokprod001
+      name: live-cluster-config
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-z2rgs
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.98.34
+  hostIPs:
+  - ip: 192.168.98.34
+  initContainerStatuses:
+  - containerID: cri-o://d0adfd39bb4a0aeb78441809e38a5fef657fec8ba31364d8eec50235b9a74109
+    image: ghcr.io/inference-sim/sim2real/orchestrator:latest
+    imageID: ghcr.io/inference-sim/sim2real/orchestrator@sha256:616ddb80da9648d2fdff503d64429c48c410ea7c847743038e710cbec4a2a454
+    lastState: {}
+    name: copy-inputs
+    ready: true
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: cri-o://d0adfd39bb4a0aeb78441809e38a5fef657fec8ba31364d8eec50235b9a74109
+        exitCode: 0
+        finishedAt: "2026-09-09T02:14:42Z"
+        reason: Completed
+        startedAt: "2026-09-09T02:14:42Z"
+    volumeMounts:
+    - mountPath: /data/config
+      name: config
+      readOnly: true
+      recursiveReadOnly: Disabled
+    - mountPath: /data/workspace
+      name: workspace
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-z2rgs
+      readOnly: true
+      recursiveReadOnly: Disabled
+  phase: Running
+  podIP: 10.131.9.138
+  podIPs:
+  - ip: 10.131.9.138
+  qosClass: BestEffort
+  startTime: "2026-09-09T02:14:40Z"
