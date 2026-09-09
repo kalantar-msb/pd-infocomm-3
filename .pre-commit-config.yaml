@@ -72,6 +72,7 @@ repos:
         # every deployment, so neither the limit nor the baseline can hold them.
         # Keyed on line shape, so unlabelled samples, HELP text and every
         # YAML/env line stay in scope.
+        #
         # --word-list: pod names are object names, not secrets, but reach 4.48
         # entropy -- above the 4.391 HF token -- and their suffixes change every
         # deployment, so neither the limit nor the baseline can hold them. Keyed
